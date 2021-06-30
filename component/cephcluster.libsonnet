@@ -16,6 +16,9 @@ local serviceaccounts = {
 local roles =
   if params.ceph_cluster.namespace != params.namespace then {
     osd: kube.Role('rook-ceph-osd') {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
       rules: [
         {
           apiGroups: [ '' ],
@@ -30,6 +33,9 @@ local roles =
       ],
     },
     mgr: kube.Role('rook-ceph-mgr') {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
       rules: [
         {
           apiGroups: [ '' ],
@@ -49,6 +55,9 @@ local roles =
       ],
     },
     cmd_reporter: kube.Role('rook-ceph-cmd-reporter') {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
       rules: [
         {
           apiGroups: [ '' ],
@@ -58,6 +67,9 @@ local roles =
       ],
     },
     monitoring: kube.Role('rook-ceph-monitoring') {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
       rules: [
         {
           apiGroups: [ 'monitoring.coreos.com' ],

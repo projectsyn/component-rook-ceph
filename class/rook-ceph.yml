@@ -24,3 +24,9 @@ parameters:
           - rook-ceph/component/main.jsonnet
         input_type: jsonnet
         output_path: rook-ceph/
+  commodore:
+    postprocess:
+      filters:
+        - type: jsonnet
+          path: rook-ceph/01_rook_ceph_helmchart/rook-ceph/templates/
+          filter: postprocess/patch_operator_deployment.jsonnet

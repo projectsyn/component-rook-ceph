@@ -1,12 +1,26 @@
 parameters:
   kapitan:
+    dependencies:
+      - type: helm
+        source: https://charts.rook.io/release
+        chart_name: rook-ceph
+        version: ${rook_ceph:charts:rook-ceph}
+        output_path: dependencies/rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
     compile:
       - input_paths:
           - rook-ceph/component/app.jsonnet
         input_type: jsonnet
         output_path: apps/
       - input_paths:
+          - rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
+        input_type: helm
+        output_type: yaml
+        output_path: rook-ceph/01_rook_ceph_helmchart
+        helm_values: ${rook_ceph:operator_helm_values}
+        helm_params:
+          release_name: syn-rook-ceph
+          namespace: ${rook_ceph:namespace}
+      - input_paths:
           - rook-ceph/component/main.jsonnet
         input_type: jsonnet
         output_path: rook-ceph/
-

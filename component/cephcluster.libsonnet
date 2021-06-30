@@ -5,7 +5,7 @@ local inv = kap.inventory();
 local params = inv.parameters.rook_ceph;
 
 local serviceaccounts = {
-  [std.strReplace(suffix, '-', '_')]: kube.ServiceAccount('%s-%s' % [ params.ceph_cluster.name, suffix ]) {
+  [std.strReplace(suffix, '-', '_')]: kube.ServiceAccount('rook-ceph-%s' % suffix) {
     metadata+: {
       namespace: params.ceph_cluster.namespace,
     },
@@ -15,7 +15,7 @@ local serviceaccounts = {
 
 local roles =
   if params.ceph_cluster.namespace != params.namespace then {
-    osd: kube.Role('%s-osd' % params.ceph_cluster.name) {
+    osd: kube.Role('rook-ceph-osd') {
       rules: [
         {
           apiGroups: [ '' ],
@@ -29,7 +29,7 @@ local roles =
         },
       ],
     },
-    mgr: kube.Role('%s-mgr' % params.ceph_cluster.name) {
+    mgr: kube.Role('rook-ceph-mgr') {
       rules: [
         {
           apiGroups: [ '' ],
@@ -48,7 +48,7 @@ local roles =
         },
       ],
     },
-    cmd_reporter: kube.Role('%s-cmd-reporter' % params.ceph_cluster.name) {
+    cmd_reporter: kube.Role('rook-ceph-cmd-reporter') {
       rules: [
         {
           apiGroups: [ '' ],
@@ -57,7 +57,7 @@ local roles =
         },
       ],
     },
-    monitoring: kube.Role('%s-monitoring' % params.ceph_cluster.name) {
+    monitoring: kube.Role('rook-ceph-monitoring') {
       rules: [
         {
           apiGroups: [ 'monitoring.coreos.com' ],
@@ -72,7 +72,7 @@ local roles =
 
 local rolebindings = [
   // allow the operator to create resource in the cluster's namespace
-  kube.RoleBinding('%s-cluster-mgmt' % params.ceph_cluster.name) {
+  kube.RoleBinding('rook-ceph-cluster-mgmt') {
     metadata+: {
       namespace: params.ceph_cluster.namespace,
     },
@@ -88,7 +88,7 @@ local rolebindings = [
     } ],
   },
   // allow the osd pods in the namespace to work with configmaps
-  kube.RoleBinding('%s-osd' % params.ceph_cluster.name) {
+  kube.RoleBinding('rook-ceph-osd') {
     metadata+: {
       namespace: params.ceph_cluster.namespace,
     },
@@ -96,7 +96,7 @@ local rolebindings = [
     subjects_:: [ serviceaccounts.osd ],
   },
   // Allow the ceph mgr to access the cluster-specific resources necessary for the mgr modules
-  kube.RoleBinding('%s-mgr' % params.ceph_cluster.name) {
+  kube.RoleBinding('rook-ceph-mgr') {
     metadata+: {
       namespace: params.ceph_cluster.namespace,
     },
@@ -115,7 +115,7 @@ local rolebindings = [
     },
     subjects_:: [ serviceaccounts.mgr ],
   },
-  kube.RoleBinding('%s-cmd-reporter' % params.ceph_cluster.name) {
+  kube.RoleBinding('rook-ceph-cmd-reporter') {
     metadata+: {
       namespace: params.ceph_cluster.namespace,
     },
@@ -123,7 +123,7 @@ local rolebindings = [
     subjects_:: [ serviceaccounts.cmd_reporter ],
   },
   // monitoring
-  kube.RoleBinding('%s-monitoring' % params.ceph_cluster.name) {
+  kube.RoleBinding('rook-ceph-monitoring') {
     metadata+: {
       namespace: params.ceph_cluster.namespace,
     },

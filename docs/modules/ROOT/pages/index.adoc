@@ -1,5 +1,5 @@
 = Rook Ceph
 
-rook-ceph is a Commodore component to manage Rook Ceph.
+Rook Cep; is a Commodore component to manage the https://rook.io[Rook.io] Ceph operator.
 
 See the xref:references/parameters.adoc[parameters] reference for further details.

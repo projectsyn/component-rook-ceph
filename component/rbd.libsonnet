@@ -27,8 +27,12 @@ local rbd_storageclass =
 local rbd_snapclass =
   sp.configure_snapshotclass('rbd');
 
-{
+if params.ceph_cluster.storage_classes.rbd.enabled then {
   storagepool: rbd_blockpool,
   storageclass: rbd_storageclass,
   snapshotclass: rbd_snapclass,
+} else {
+  storagepool: null,
+  storageclass: null,
+  snapshotclass: null,
 }

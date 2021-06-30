@@ -23,10 +23,21 @@ local load_storageclass(type) =
   // return storageclass
   sc[0];
 
+local get_sc_config(type) =
+  local cfg = com.getValueOrDefault(
+    params.ceph_cluster.storage_classes,
+    type,
+    {}
+  );
+  com.makeMergeable(com.getValueOrDefault(cfg, 'config', {}));
+
 local configure_sc(type, pool) =
   local obj = load_storageclass(type);
+  local sc_config = get_sc_config(type);
   com.makeMergeable(obj) +
-  sc.storageClass('%s-%s' % [ params.ceph_cluster.name, type ]) {
+  sc.storageClass('%s-%s' % [ params.ceph_cluster.name, type ]) +
+  sc_config +
+  {
     parameters+: {
       clusterID: params.ceph_cluster.namespace,
       pool: pool,

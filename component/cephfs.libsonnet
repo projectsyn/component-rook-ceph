@@ -80,8 +80,12 @@ local cephfs_storageclass =
 local cephfs_snapclass =
   sp.configure_snapshotclass('cephfs');
 
-{
+if params.ceph_cluster.storage_classes.cephfs.enabled then {
   storagepool: cephfs_pool,
   storageclass: cephfs_storageclass,
   snapshotclass: cephfs_snapclass,
+} else {
+  storagepool: null,
+  storageclass: null,
+  snapshotclass: null,
 }

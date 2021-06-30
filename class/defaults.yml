@@ -8,6 +8,17 @@ parameters:
       namespace: syn-rook-ceph-${rook_ceph:ceph_cluster:name}
       node_count: 3
       block_storage_class: localblock
+      storage_classes:
+        rbd:
+          enabled: true
+          config:
+            parameters:
+              csi.storage.k8s.io/fstype: ext4
+            allowVolumeExpansion: true
+        cephfs:
+          enabled: false
+          config:
+            allowVolumeExpansion: true
 
     node_selector:
       node-role.kubernetes.io/storage: ''

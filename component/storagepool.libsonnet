@@ -38,6 +38,7 @@ local configure_sc(type, pool) =
   sc.storageClass('%s-%s' % [ params.ceph_cluster.name, type ]) +
   sc_config +
   {
+    provisioner: '%s.rbd.csi.ceph.com' % params.namespace,
     parameters+: {
       clusterID: params.ceph_cluster.namespace,
       pool: pool,

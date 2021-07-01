@@ -1,6 +1,6 @@
 # Commodore Component: Rook Ceph
 
-This is a [Commodore][commodore] Component for Rook Ceph.
+This is a [Commodore][commodore] Component to manage the [Rook.io](https://rook.io) rook-ceph operator, Ceph cluster and CSI drivers.
 
 This repository is part of Project Syn.
 For documentation on Project Syn and this component, see https://syn.tools.

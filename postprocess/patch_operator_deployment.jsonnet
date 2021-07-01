@@ -1,4 +1,6 @@
 local com = import 'lib/commodore.libjsonnet';
+local inv = com.inventory();
+local params = inv.parameters.rook_ceph;
 
 local deployment_file = std.extVar('output_path') + '/deployment.yaml';
 
@@ -9,6 +11,19 @@ local deployment = com.yaml_load(deployment_file) + {
         containers: [
           if c.name == 'rook-ceph-operator' then
             c {
+              env: [
+                if e.name == 'ROOK_CSI_ENABLE_RBD' then
+                  e {
+                    value: '%s' % params.ceph_cluster.storage_classes.rbd.enabled,
+                  }
+                else if e.name == 'ROOK_CSI_ENABLE_CEPHFS' then
+                  e {
+                    value: '%s' % params.ceph_cluster.storage_classes.cephfs.enabled,
+                  }
+                else
+                  e
+                for e in super.env
+              ],
               volumeMounts+: [
                 {
                   mountPath: '/var/lib/rook',

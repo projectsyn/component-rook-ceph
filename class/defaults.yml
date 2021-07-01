@@ -8,6 +8,8 @@ parameters:
       namespace: syn-rook-ceph-${rook_ceph:ceph_cluster:name}
       node_count: 3
       block_storage_class: localblock
+      # set to true if backing storage is SSD
+      tune_fast_device_class: false
       storage_classes:
         rbd:
           enabled: true
@@ -119,6 +121,7 @@ parameters:
                     requests:
                       storage: 1
             encrypted: true
+            tuneFastDeviceClass: ${rook_ceph:ceph_cluster:tune_fast_device_class}
 
       disruptionManagement:
         managePodBudgets: true

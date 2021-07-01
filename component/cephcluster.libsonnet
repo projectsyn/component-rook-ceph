@@ -4,14 +4,16 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.rook_ceph;
 
-local serviceaccounts = {
-  [std.strReplace(suffix, '-', '_')]: kube.ServiceAccount('rook-ceph-%s' % suffix) {
-    metadata+: {
-      namespace: params.ceph_cluster.namespace,
-    },
+local serviceaccounts =
+  if params.ceph_cluster.namespace != params.namespace then {
+    [std.strReplace(suffix, '-', '_')]: kube.ServiceAccount('rook-ceph-%s' % suffix) {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
+    }
+    for suffix in [ 'osd', 'mgr', 'cmd-reporter' ]
   }
-  for suffix in [ 'osd', 'mgr', 'cmd-reporter' ]
-};
+  else {};
 
 local roles =
   if params.ceph_cluster.namespace != params.namespace then {
@@ -79,93 +81,97 @@ local roles =
       ],
     },
   }
-  else
-    {};
+  else {};
 
-local rolebindings = [
-  // allow the operator to create resource in the cluster's namespace
-  kube.RoleBinding('rook-ceph-cluster-mgmt') {
-    metadata+: {
-      namespace: params.ceph_cluster.namespace,
+local rolebindings =
+  if params.ceph_cluster.namespace != params.namespace then [
+    // allow the operator to create resource in the cluster's namespace
+    kube.RoleBinding('rook-ceph-cluster-mgmt') {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
+      roleRef: {
+        apiGroup: 'rbac.authorization.k8s.io',
+        kind: 'ClusterRole',
+        name: 'rook-ceph-cluster-mgmt',
+      },
+      subjects: [ {
+        kind: 'ServiceAccount',
+        name: 'rook-ceph-system',
+        namespace: params.namespace,
+      } ],
     },
-    roleRef: {
-      apiGroup: 'rbac.authorization.k8s.io',
-      kind: 'ClusterRole',
-      name: 'rook-ceph-cluster-mgmt',
+    // allow the osd pods in the namespace to work with configmaps
+    kube.RoleBinding('rook-ceph-osd') {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
+      roleRef_:: roles.osd,
+      subjects_:: [ serviceaccounts.osd ],
     },
-    subjects: [ {
-      kind: 'ServiceAccount',
-      name: 'rook-ceph-system',
-      namespace: params.namespace,
-    } ],
-  },
-  // allow the osd pods in the namespace to work with configmaps
-  kube.RoleBinding('rook-ceph-osd') {
-    metadata+: {
-      namespace: params.ceph_cluster.namespace,
+    // Allow the ceph mgr to access the cluster-specific resources necessary for the mgr modules
+    kube.RoleBinding('rook-ceph-mgr') {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
+      roleRef_:: roles.mgr,
+      subjects_:: [ serviceaccounts.mgr ],
     },
-    roleRef_:: roles.osd,
-    subjects_:: [ serviceaccounts.osd ],
-  },
-  // Allow the ceph mgr to access the cluster-specific resources necessary for the mgr modules
-  kube.RoleBinding('rook-ceph-mgr') {
-    metadata+: {
-      namespace: params.ceph_cluster.namespace,
+    // Allow the ceph mgr to access the rook system resources necessary for the mgr modules
+    kube.RoleBinding('rook-ceph-mgr-system-%s' % params.ceph_cluster.name) {
+      metadata+: {
+        namespace: params.namespace,
+      },
+      roleRef: {
+        apiGroup: 'rbac.authorization.k8s.io',
+        kind: 'ClusterRole',
+        name: 'rook-ceph-mgr-system',
+      },
+      subjects_:: [ serviceaccounts.mgr ],
     },
-    roleRef_:: roles.mgr,
-    subjects_:: [ serviceaccounts.mgr ],
-  },
-  // Allow the ceph mgr to access the rook system resources necessary for the mgr modules
-  kube.RoleBinding('rook-ceph-mgr-system-%s' % params.ceph_cluster.name) {
-    metadata+: {
-      namespace: params.namespace,
+    kube.RoleBinding('rook-ceph-cmd-reporter') {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
+      roleRef_:: roles.cmd_reporter,
+      subjects_:: [ serviceaccounts.cmd_reporter ],
     },
-    roleRef: {
-      apiGroup: 'rbac.authorization.k8s.io',
-      kind: 'ClusterRole',
-      name: 'rook-ceph-mgr-system',
+    // monitoring
+    kube.RoleBinding('rook-ceph-monitoring') {
+      metadata+: {
+        namespace: params.ceph_cluster.namespace,
+      },
+      roleRef_:: roles.monitoring,
+      subjects: [ {
+        kind: 'ServiceAccount',
+        name: 'rook-ceph-system',
+        namespace: params.namespace,
+      } ],
     },
-    subjects_:: [ serviceaccounts.mgr ],
-  },
-  kube.RoleBinding('rook-ceph-cmd-reporter') {
-    metadata+: {
-      namespace: params.ceph_cluster.namespace,
-    },
-    roleRef_:: roles.cmd_reporter,
-    subjects_:: [ serviceaccounts.cmd_reporter ],
-  },
-  // monitoring
-  kube.RoleBinding('rook-ceph-monitoring') {
-    metadata+: {
-      namespace: params.ceph_cluster.namespace,
-    },
-    roleRef_:: roles.monitoring,
-    subjects: [ {
-      kind: 'ServiceAccount',
-      name: 'rook-ceph-system',
-      namespace: params.namespace,
-    } ],
-  },
-];
+  ]
+  else [];
 
-local clusterrolebindings = [
-  kube.ClusterRoleBinding('rook-ceph-mgr-cluster-%s' % params.ceph_cluster.name) {
-    roleRef: {
-      apiGroup: 'rbac.authorization.k8s.io',
-      kind: 'ClusterRole',
-      name: 'rook-ceph-mgr-cluster',
+local clusterrolebindings =
+  if params.ceph_cluster.namespace != params.namespace then [
+    kube.ClusterRoleBinding('rook-ceph-mgr-cluster-%s' % params.ceph_cluster.name) {
+      roleRef: {
+        apiGroup: 'rbac.authorization.k8s.io',
+        kind: 'ClusterRole',
+        name: 'rook-ceph-mgr-cluster',
+      },
+      subjects_:: [ serviceaccounts.mgr ],
     },
-    subjects_:: [ serviceaccounts.mgr ],
-  },
-  kube.ClusterRoleBinding('rook-ceph-osd-%s' % params.ceph_cluster.name) {
-    roleRef: {
-      apiGroup: 'rbac.authorization.k8s.io',
-      kind: 'ClusterRole',
-      name: 'rook-ceph-osd',
+    kube.ClusterRoleBinding('rook-ceph-osd-%s' % params.ceph_cluster.name) {
+      roleRef: {
+        apiGroup: 'rbac.authorization.k8s.io',
+        kind: 'ClusterRole',
+        name: 'rook-ceph-osd',
+      },
+      subjects_:: [ serviceaccounts.osd ],
     },
-    subjects_:: [ serviceaccounts.osd ],
-  },
-];
+  ]
+  else [];
+
 
 local objValues(o) = [ o[it] for it in std.objectFields(o) ];
 

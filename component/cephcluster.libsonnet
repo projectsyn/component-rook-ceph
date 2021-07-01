@@ -4,6 +4,8 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.rook_ceph;
 
+local on_openshift = inv.parameters.facts.distribution == 'openshift4';
+
 local serviceaccounts =
   if params.ceph_cluster.namespace != params.namespace then {
     [std.strReplace(suffix, '-', '_')]: kube.ServiceAccount('rook-ceph-%s' % suffix) {
@@ -16,6 +18,28 @@ local serviceaccounts =
   else {};
 
 local roles =
+  (
+    // For OCP4 we need the metrics discovery role
+    if on_openshift then
+      {
+        metrics: kube.Role('rook-ceph-metrics') {
+          metadata+: {
+            namespace: params.ceph_cluster.namespace,
+          },
+          rules: [
+            {
+              apiGroups: [ '' ],
+              resources: [ 'services', 'endpoints', 'pods' ],
+              verbs: [ 'get', 'list', 'watch' ],
+            },
+          ],
+        },
+      }
+    else {}
+  ) +
+  // the following roles are created by the operator helm chart in the
+  // operator namespace. However, if we create the Ceph cluster in a different
+  // namespace, we need to create them in that namespace instead.
   if params.ceph_cluster.namespace != params.namespace then {
     osd: kube.Role('rook-ceph-osd') {
       metadata+: {
@@ -84,6 +108,24 @@ local roles =
   else {};
 
 local rolebindings =
+  (
+    // For OCP4, we need the metrics discovery rolebinding
+    if on_openshift then
+      [
+        kube.RoleBinding('rook-ceph-metrics') {
+          metadata+: {
+            namespace: params.ceph_cluster.namespace,
+          },
+          roleRef_:: roles.metrics,
+          subjects: [ {
+            kind: 'ServiceAccount',
+            name: 'prometheus-k8s',
+            namespace: 'openshift-monitoring',
+          } ],
+        },
+      ]
+    else []
+  ) +
   if params.ceph_cluster.namespace != params.namespace then [
     // allow the operator to create resource in the cluster's namespace
     kube.RoleBinding('rook-ceph-cluster-mgmt') {

@@ -16,6 +16,11 @@ local ns_config =
         // plugins need to run everywhere
         'openshift.io/node-selector': '',
       },
+      labels+: {
+        // Configure the namespaces so that the OCP4 cluster-monitoring
+        // Prometheus can find the servicemonitors and rules.
+        'openshift.io/cluster-monitoring': 'true',
+      },
     },
   }
   else

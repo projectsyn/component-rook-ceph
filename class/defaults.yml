@@ -4,7 +4,7 @@ parameters:
     namespace: syn-rook-ceph-operator
 
     ceph_cluster:
-      name: ceph
+      name: cluster
       namespace: syn-rook-ceph-${rook_ceph:ceph_cluster:name}
       node_count: 3
       block_storage_class: localblock

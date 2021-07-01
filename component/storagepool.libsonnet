@@ -35,10 +35,10 @@ local configure_sc(type, pool) =
   local obj = load_storageclass(type);
   local sc_config = get_sc_config(type);
   com.makeMergeable(obj) +
-  sc.storageClass('%s-%s' % [ params.ceph_cluster.name, type ]) +
+  sc.storageClass('ceph-%s-%s' % [ params.ceph_cluster.name, type ]) +
   sc_config +
   {
-    provisioner: '%s.rbd.csi.ceph.com' % params.namespace,
+    provisioner: '%s.%s.csi.ceph.com' % [ params.namespace, type ],
     parameters+: {
       clusterID: params.ceph_cluster.namespace,
       pool: pool,
@@ -60,6 +60,10 @@ local load_snapclass(type) =
 local configure_snapclass(type) =
   local obj = load_snapclass(type);
   obj {
+    metadata+: {
+      name: 'ceph-%s-%s-snapclass' % [ params.ceph_cluster.name, type ],
+    },
+    driver: '%s.%s.csi.ceph.com' % [ params.namespace, type ],
     parameters+: {
       clusterID: params.ceph_cluster.namespace,
       'csi.storage.k8s.io/snapshotter-secret-namespace': params.ceph_cluster.namespace,

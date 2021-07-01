@@ -51,7 +51,7 @@ parameters:
       nodeSelector: ${rook_ceph:node_selector}
       tolerations: ${rook_ceph:tolerations}
       csi:
-        enableCSIHostNetwork: true
+        enableCSIHostNetwork: false
         cephcsi:
           image: ${rook_ceph:images:cephcsi:registry}/${rook_ceph:images:cephcsi:image}:${rook_ceph:images:cephcsi:tag}
 

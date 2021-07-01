@@ -10,6 +10,8 @@ parameters:
       block_storage_class: localblock
       # set to true if backing storage is SSD
       tune_fast_device_class: false
+      # Rendered into rook-config-override CM
+      config_override: {}
       storage_classes:
         rbd:
           enabled: true
@@ -70,10 +72,6 @@ parameters:
     toolbox:
       enabled: true
       image: ${rook_ceph:images:rook}
-
-    # rendered as ceph config
-    # Defaults todo
-    configOverride: {}
 
     cephClusterSpec:
       cephVersion:

@@ -212,8 +212,9 @@ local configmap =
       namespace: params.ceph_cluster.namespace,
     },
     data: {
-      // TODO
-      config: '',
+      config: std.manifestIni({
+        sections: params.ceph_cluster.config_override,
+      }),
     },
   };
 

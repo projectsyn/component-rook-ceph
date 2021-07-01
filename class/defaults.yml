@@ -11,7 +11,12 @@ parameters:
       # set to true if backing storage is SSD
       tune_fast_device_class: false
       # Rendered into rook-config-override CM
-      config_override: {}
+      config_override:
+        osd:
+          # We explicitly set bluefs_buffered_io to false to get good write
+          # bandwidth on Exoscale -> TODO: needs to be checked per
+          # infrastructure, maybe move the config to cloud/exoscale/params.yml
+          bluefs_buffered_io: false
       storage_classes:
         rbd:
           enabled: true

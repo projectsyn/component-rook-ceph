@@ -19,7 +19,7 @@ local rbd_blockpool =
         size: 3,
         requireSafeReplicaSize: true,
       },
-    },
+    } + com.makeMergeable(params.ceph_cluster.storage_pools.rbd),
   };
 
 local rbd_storageclass =

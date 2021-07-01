@@ -21,6 +21,9 @@ parameters:
           enabled: false
           config:
             allowVolumeExpansion: true
+      storage_pools:
+        rbd: {}
+        cephfs: {}
 
     node_selector:
       node-role.kubernetes.io/storage: ''

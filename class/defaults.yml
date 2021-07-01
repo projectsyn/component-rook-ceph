@@ -51,6 +51,13 @@ parameters:
         repository: ${rook_ceph:images:rook:registry}/${rook_ceph:images:rook:image}
         tag: ${rook_ceph:images:rook:tag}
       nodeSelector: ${rook_ceph:node_selector}
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+        requests:
+          cpu: 750m
+          memory: 512Mi
       tolerations: ${rook_ceph:tolerations}
       csi:
         enableCSIHostNetwork: false

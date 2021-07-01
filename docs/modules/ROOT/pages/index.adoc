@@ -1,0 +1,5 @@
+= Rook Ceph
+
+rook-ceph is a Commodore component to manage Rook Ceph.
+
+See the xref:references/parameters.adoc[parameters] reference for further details.

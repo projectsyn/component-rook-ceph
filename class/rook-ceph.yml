@@ -1,0 +1,12 @@
+parameters:
+  kapitan:
+    compile:
+      - input_paths:
+          - rook-ceph/component/app.jsonnet
+        input_type: jsonnet
+        output_path: apps/
+      - input_paths:
+          - rook-ceph/component/main.jsonnet
+        input_type: jsonnet
+        output_path: rook-ceph/
+

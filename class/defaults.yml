@@ -1,0 +1,4 @@
+parameters:
+  rook_ceph:
+    =_metadata: {}
+    namespace: syn-rook-ceph

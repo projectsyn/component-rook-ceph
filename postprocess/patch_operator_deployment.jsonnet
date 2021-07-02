@@ -14,11 +14,11 @@ local deployment = com.yaml_load(deployment_file) + {
               env: [
                 if e.name == 'ROOK_CSI_ENABLE_RBD' then
                   e {
-                    value: '%s' % params.ceph_cluster.storage_classes.rbd.enabled,
+                    value: '%s' % params.ceph_cluster.rbd_enabled,
                   }
                 else if e.name == 'ROOK_CSI_ENABLE_CEPHFS' then
                   e {
-                    value: '%s' % params.ceph_cluster.storage_classes.cephfs.enabled,
+                    value: '%s' % params.ceph_cluster.cephfs_enabled,
                   }
                 else
                   e

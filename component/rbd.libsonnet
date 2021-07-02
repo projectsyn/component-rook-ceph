@@ -8,31 +8,40 @@ local params = inv.parameters.rook_ceph;
 
 local sp = import 'storagepool.libsonnet';
 
-local rbd_blockpool =
-  kube._Object('ceph.rook.io/v1', 'CephBlockPool', 'storagepool') {
+local rbd_params = params.ceph_cluster.storage_pools.rbd;
+
+local rbd_blockpools = [
+  kube._Object('ceph.rook.io/v1', 'CephBlockPool', name) {
     metadata+: {
       namespace: params.ceph_cluster.namespace,
     },
-    spec: {
-      failureDomain: 'host',
-      replicated: {
-        size: 3,
-        requireSafeReplicaSize: true,
-      },
-    } + com.makeMergeable(params.ceph_cluster.storage_pools.rbd),
-  };
+    spec: com.makeMergeable(
+      com.getValueOrDefault(
+        params.ceph_cluster.storage_pools.rbd[name],
+        'config',
+        {}
+      )
+    ),
+  }
+  for name in std.objectFields(rbd_params)
+];
 
-local rbd_storageclass =
-  sp.configure_storageclass('rbd', rbd_blockpool.metadata.name);
-local rbd_snapclass =
-  sp.configure_snapshotclass('rbd');
+local rbd_storageclasses = [
+  sp.configure_storageclass('rbd', name)
+  for name in std.objectFields(rbd_params)
+];
 
-if params.ceph_cluster.storage_classes.rbd.enabled then {
-  storagepool: rbd_blockpool,
-  storageclass: rbd_storageclass,
-  snapshotclass: rbd_snapclass,
+local rbd_snapclasses = [
+  sp.configure_snapshotclass('rbd', name)
+  for name in std.objectFields(rbd_params)
+];
+
+if params.ceph_cluster.rbd_enabled then {
+  storagepools: rbd_blockpools,
+  storageclasses: rbd_storageclasses,
+  snapshotclasses: rbd_snapclasses,
 } else {
-  storagepool: null,
-  storageclass: null,
-  snapshotclass: null,
+  storagepools: [],
+  storageclasses: [],
+  snapshotclasses: [],
 }

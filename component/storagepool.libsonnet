@@ -23,19 +23,24 @@ local load_storageclass(type) =
   // return storageclass
   sc[0];
 
-local get_sc_config(type) =
-  local cfg = com.getValueOrDefault(
-    params.ceph_cluster.storage_classes,
-    type,
-    {}
+local get_sc_config(type, pool) =
+  assert std.objectHas(params.ceph_cluster.storage_pools, type);
+  assert std.objectHas(
+    params.ceph_cluster.storage_pools[type], pool
   );
-  com.makeMergeable(com.getValueOrDefault(cfg, 'config', {}));
+  com.makeMergeable(com.getValueOrDefault(
+    params.ceph_cluster.storage_pools[type][pool],
+    'storage_class_config',
+    {}
+  ));
 
 local configure_sc(type, pool) =
   local obj = load_storageclass(type);
-  local sc_config = get_sc_config(type);
+  local sc_config = get_sc_config(type, pool);
   com.makeMergeable(obj) +
-  sc.storageClass('ceph-%s-%s' % [ params.ceph_cluster.name, type ]) +
+  sc.storageClass(
+    '%s-%s-%s' % [ type, pool, params.ceph_cluster.name ]
+  ) +
   sc_config +
   {
     provisioner: '%s.%s.csi.ceph.com' % [ params.namespace, type ],
@@ -57,11 +62,11 @@ local load_snapclass(type) =
   assert std.length(manifest) == 1;
   manifest[0];
 
-local configure_snapclass(type) =
+local configure_snapclass(type, pool) =
   local obj = load_snapclass(type);
   obj {
     metadata+: {
-      name: 'ceph-%s-%s-snapclass' % [ params.ceph_cluster.name, type ],
+      name: '%s-%s-%s' % [ type, pool, params.ceph_cluster.name ],
     },
     driver: '%s.%s.csi.ceph.com' % [ params.namespace, type ],
     parameters+: {

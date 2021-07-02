@@ -8,7 +8,45 @@ local params = inv.parameters.rook_ceph;
 
 local sp = import 'storagepool.libsonnet';
 
-local cephfs_pool =
+local cephfs_params = params.ceph_cluster.storage_pools.cephfs;
+
+local metadataServerPlacement = {
+  spec+: {
+    metadataServer+: {
+      placement+: {
+        podAntiAffinity+: {
+          requiredDuringSchedulingIgnoredDuringExecution+: [ {
+            labelSelector: [ {
+              matchExpressions: [ {
+                key: 'app',
+                operator: 'In',
+                values: [ 'rook-ceph-mds' ],
+              } ],
+            } ],
+            topologyKey: 'kubernetes.io/hostname',
+          } ],
+          preferredDuringSchedulingIgnoredDuringExecution+: [ {
+            weight: 100,
+            podAffinityTerm: {
+              labelSelector: {
+                matchExpressions: [ {
+                  key: 'app',
+                  operator: 'In',
+                  values: [ 'rook-ceph-mds' ],
+                } ],
+                topologyKey: 'topology.kubernetes.io/zone',
+              },
+            },
+          } ],
+        },
+      },
+    },
+  },
+};
+
+// Users are responsible for providing working cephfs configs, we don't
+// verify them here
+local cephfs_pools = [
   kube._Object(
     'ceph.rook.io/v1',
     'CephFilesystem',
@@ -17,75 +55,46 @@ local cephfs_pool =
     metadata+: {
       namespace: params.ceph_cluster.namespace,
     },
-    spec: {
-      metadataPool: {
-        replicated: {
-          size: 3,
-          requireSafeReplicaSize: true,
-        },
-      },
-      parameters: {
-        compression_mode: 'none',
-      },
-      dataPools: [ {
-        failureDomain: 'host',
-        replicated: {
-          size: 3,
-          requireSafeReplicaSize: true,
-        },
-        parameters: {
-          compression_mode: 'none',
-        },
-      } ],
-      preserveFilesystemOnDelete: true,
-      metadataServer: {
-        activeCount: 1,
-        activeStandby: true,
-        placement: {
-          podAntiAffinity: {
-            requiredDuringSchedulingIgnoredDuringExecution: [ {
-              labelSelector: [ {
-                matchExpressions: [ {
-                  key: 'app',
-                  operator: 'In',
-                  values: [ 'rook-ceph-mds' ],
-                } ],
-              } ],
-              topologyKey: 'kubernetes.io/hostname',
-            } ],
-            preferredDuringSchedulingIgnoredDuringExecution: [ {
-              weight: 100,
-              podAffinityTerm: {
-                labelSelector: {
-                  matchExpressions: [ {
-                    key: 'app',
-                    operator: 'In',
-                    values: [ 'rook-ceph-mds' ],
-                  } ],
-                  topologyKey: 'topology.kubernetes.io/zone',
-                },
-              },
-            } ],
-          },
-        },
-      },
-      mirroring: {
-        enabled: false,
-      },
+  } +
+  metadataServerPlacement +
+  {
+    spec+:
+      com.makeMergeable(
+        com.getValueOrDefault(
+          cephfs_params[pool],
+          'config',
+          {}
+        )
+      ),
+  } +
+  {
+    spec+: {
+      // overwrite datapools setup by user -> documentation clearly states
+      // to configure dataPools in params.data_pools.
+      dataPools: [
+        cephfs_params[pool].data_pools[pn]
+        for pn in std.objectFields(cephfs_params[pool].data_pools)
+      ],
     },
-  };
+  }
+  for pool in std.objectFields(cephfs_params)
+];
 
-local cephfs_storageclass =
-  sp.configure_storageclass('cephfs', cephfs_pool.metadata.name);
-local cephfs_snapclass =
-  sp.configure_snapshotclass('cephfs');
+local cephfs_storageclasses = [
+  sp.configure_storageclass('cephfs', pool)
+  for pool in std.objectFields(cephfs_params)
+];
+local cephfs_snapclasses = [
+  sp.configure_snapshotclass('cephfs', pool)
+  for pool in std.objectFields(cephfs_params)
+];
 
-if params.ceph_cluster.storage_classes.cephfs.enabled then {
-  storagepool: cephfs_pool,
-  storageclass: cephfs_storageclass,
-  snapshotclass: cephfs_snapclass,
+if params.ceph_cluster.cephfs_enabled then {
+  storagepools: cephfs_pools,
+  storageclasses: cephfs_storageclasses,
+  snapshotclasses: cephfs_snapclasses,
 } else {
-  storagepool: null,
-  storageclass: null,
-  snapshotclass: null,
+  storagepools: [],
+  storageclasses: [],
+  snapshotclasses: [],
 }

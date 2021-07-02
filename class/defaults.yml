@@ -17,20 +17,53 @@ parameters:
           # bandwidth on Exoscale -> TODO: needs to be checked per
           # infrastructure, maybe move the config to cloud/exoscale/params.yml
           bluefs_buffered_io: false
-      storage_classes:
-        rbd:
-          enabled: true
-          config:
-            parameters:
-              csi.storage.k8s.io/fstype: ext4
-            allowVolumeExpansion: true
-        cephfs:
-          enabled: false
-          config:
-            allowVolumeExpansion: true
+
+      # Whether to setup RBD CSI driver and pools
+      rbd_enabled: true
+      # Whether to setup CephFS CSI driver and pools
+      cephfs_enabled: false
+
       storage_pools:
-        rbd: {}
-        cephfs: {}
+        rbd:
+          storagepool:
+            config:
+              failureDomain: host
+              replicated:
+                size: 3
+                requireSafeReplicaSize: true
+            storage_class_config:
+              parameters:
+                csi.storage.k8s.io/fstype: ext4
+              allowVolumeExpansion: true
+        cephfs:
+          fspool:
+            data_pools:
+              pool0:
+                failureDomain: host
+                replicated:
+                  size: 3
+                  requireSafeReplicaSize: true
+                parameters:
+                  compression_mode: none
+            config:
+              metadataPool:
+                replicated:
+                  size: 3
+                  requireSafeReplicaSize: true
+              parameters:
+                compression_mode: none
+              # dataPools rendered from data_pools in Jsonnet
+              preserveFilesystemOnDelete: true
+              metadataServer:
+                activeCount: 1
+                activeStandby: true
+                # metadata server placement done in Jsonnet but can be
+                # extended here
+              mirroring:
+                enabled: false
+            storage_class_config:
+              allowVolumeExpansion: true
+
 
     node_selector:
       node-role.kubernetes.io/storage: ''

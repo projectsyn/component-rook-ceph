@@ -41,16 +41,13 @@ local cephfs_config = import 'cephfs.libsonnet';
   '10_cephcluster_configoverride': cephcluster.configmap,
   '10_cephcluster_cluster': cephcluster.cluster,
   '10_cephcluster_toolbox': cephcluster.toolbox,
-  '20_storagepools': std.prune([
-    rbd_config.storagepool,
-    cephfs_config.storagepool,
-  ]),
-  '30_storageclasses': std.prune([
-    rbd_config.storageclass,
-    cephfs_config.storageclass,
-  ]),
-  '30_snapshotclasses': std.prune([
-    rbd_config.snapshotclass,
-    cephfs_config.snapshotclass,
-  ]),
+  '20_storagepools':
+    rbd_config.storagepools +
+    cephfs_config.storagepools,
+  '30_storageclasses':
+    rbd_config.storageclasses +
+    cephfs_config.storageclasses,
+  '30_snapshotclasses':
+    rbd_config.snapshotclasses +
+    cephfs_config.snapshotclasses,
 }

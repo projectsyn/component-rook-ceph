@@ -1,5 +1,11 @@
 = Rook Ceph
 
-Rook Cep; is a Commodore component to manage the https://rook.io[Rook.io] Ceph operator.
+Rook Ceph is a Commodore component to manage the https://rook.io[Rook.io] Ceph operator and associated resources.
+The component configures a single Ceph cluster and allows users to configure one or more `CephBlockPool` and `CephFilesystem` resources on the Ceph cluster.
+For each storage pool (RBD blockpool or CephFS), the component creates a `StorageClass` and `VolumeSnapshotClass`.
 
-See the xref:references/parameters.adoc[parameters] reference for further details.
+The component depends on the https://hub.syn.tools/storageclass/index.html[storageclass component] for managing StorageClasses.
+
+To get started with the component, see the xref:how-tos/quick-start.adoc[quick-start guide].
+
+See the xref:references/parameters.adoc[parameters] reference for a documentation of all the parameters the component understands.

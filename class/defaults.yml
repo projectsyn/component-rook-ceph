@@ -172,6 +172,5 @@ parameters:
       disruptionManagement:
         managePodBudgets: true
         osdMaintenanceTimeout: 30
-        # Enable on OCP -> TODO do in Jsonnet?
         manageMachineDisruptionBudgets: false
         machineDisruptionBudgetNamespace: openshift-machine-api

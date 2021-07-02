@@ -6,14 +6,370 @@ The parent key for all of the following parameters is `rook_ceph`.
 
 [horizontal]
 type:: string
-default:: `syn-rook-ceph`
+default:: `syn-rook-ceph-operator`
 
-The namespace in which to deploy this component.
+The namespace in which the Rook Ceph operator and the CSI drivers are deployed
+
+== `ceph_cluster`
+
+[horizontal]
+type:: dict
+
+The configuration of the Ceph cluster to deploy.
+See the following sections for individual parameters nested under this key.
+
+=== `name`
+
+[horizontal]
+type:: string
+default:: `cluster`
+
+The name of the Ceph cluster object.
+Also used as part of the storageclass and volumesnapshotclass names.
+
+=== `namespace`
+
+[horizontal]
+type:: string
+default:: `syn-rook-ceph-${rook_ceph:ceph_cluster:name}`
+
+The namespace in which the Ceph cluster is deployed.
+
+By default, the component deploys the Ceph cluster in a different namespace than the operator and the CSI drivers.
+However, the component also supports deploying the operator, CSI drivers and Ceph cluster in the same namespace.
+
+=== `node_count`
+
+[horizontal]
+type:: integer
+default:: `3`
+
+The number of storage nodes (disks really) that the Ceph cluster should expect.
+
+The operator will deploy this many Ceph OSDs.
+
+=== `block_storage_class`
+
+[horizontal]
+type:: string
+default:: `localblock`
+
+The storage class to use for the block storage volumes backing the Ceph cluster.
+The storage class **must** support `volumeMode=Block`.
 
 
-== Example
+=== `tune_fast_device_class`
+
+[horizontal]
+type:: boolean
+default:: `false`
+
+This parameter can be set to `true` to tune the Ceph cluster OSD parameters for SSDs (or better).
+
+See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-sets[the Rook.io Ceph cluster CRD documentation] for a more detailed explanation.
+
+=== `config_override`
+
+[horizontal]
+type:: dict
+default::
++
+[source,yaml]
+----
+osd:
+  bluefs_buffered_io: false
+----
+
+Additional Ceph configurations which are rendered in Ini format by the component.
+Each key in the dict is translated into a section in the resulting Ini file containing the key's value -- which is expected to be a dict -- as settings.
+
+The default value is translated into the following Ini file:
+
+[source,ini]
+----
+[osd]
+bluefs_buffered_io = false
+----
+
+The resulting Ini file is written to the ConfigMap `rook-config-override` in the Ceph cluster namespace.
+
+=== `rbd_enabled`
+
+[horizontal]
+type:: boolean
+default:: `true`
+
+This parameter controls whether the RBD CSI driver and any configured `CephBlockPool` resources and associated storage- and volumesnapshotclasses are provisioned.
+
+The `CephBlockPool` resources are defined and configured in parameter <<_xrf_TODO,`storage_pools.rbd`>>.
+
+
+=== `cephfs_enabled`
+
+[horizontal]
+type:: boolean
+default:: `false`
+
+This parameter controls whether the CephFS CSI driver and any configured `CephFilesystem` resources and associated storage- and volumesnapshotclasses are provisioned.
+
+The `CephFilesystem` resources are defined and configured in parameter <<_xrf_TODO,`storage_pools.cephfs`>>.
+
+=== `storage_pools.rbd`
+
+[horizontal]
+type:: dict
+keys:: Names of `CephBlockPool` resources
+values:: dicts with keys `config` and `storage_class_config`
+
+In this parameter `CephBlockPool` resources are configured.
+The component creates exactly one storageclass and volumesnapshotclass per block pool.
+
+By default the parameter holds the following configuration:
 
 [source,yaml]
 ----
-namespace: example-namespace
+storagepool:
+  config:
+    failureDomain: host
+    replicated:
+      size: 3
+      requireSafeReplicaSize: true
+  storage_class_config:
+    parameters:
+      csi.storage.k8s.io/fstype: ext4
+    allowVolumeExpansion: true
 ----
+
+This configuration results in
+
+* A `CephBlockPool` named `storagepool` which is configured with 3 replicas distributed on different hosts
+* A storageclass which creates PVs on this block pool, uses the `ext4` filesystem and supports volume expansion
+* A volumesnapshotclass associated with the storageclass
+
+See https://rook.io/docs/rook/v1.6/ceph-pool-crd.html[the Rook.io `CephBlockPool` CRD documentation] for all possible configurations in key `config`.
+
+The values in key `storage_class_config` are merged into the `StorageClass` resource.
+
+=== `storage_pools.cephfs`
+
+[horizontal]
+type:: dict
+keys:: Names of `CephFilesystem` resources
+values:: dicts with keys `data_pools`, `config` and `storage_class_config`
+
+In this parameter `CephFilesystem` resources are configured.
+The component creates exactly one storageclass and volumesnapshotclass per CephFS.
+
+By default the parameter holds the following configuration:
+
+[source,yaml]
+----
+fspool:
+  data_pools:
+    pool0:
+      failureDomain: host
+      replicated:
+        size: 3
+        requireSafeReplicaSize: true
+      parameters:
+        compression_mode: none
+  config:
+    metadataPool:
+      replicated:
+        size: 3
+        requireSafeReplicaSize: true
+    parameters:
+      compression_mode: none
+    # dataPools rendered from data_pools in Jsonnet
+    preserveFilesystemOnDelete: true
+    metadataServer:
+      activeCount: 1
+      activeStandby: true
+      # metadata server placement done in Jsonnet but can be
+      # extended here
+    mirroring:
+      enabled: false
+  storage_class_config:
+    allowVolumeExpansion: true
+----
+
+This configuration creates one `CephFilesystem` resource named `fspool`.
+This CephFS instance is configured to have 3 replicas both for the metadata pool and its single data pool.
+
+The key `data_pools` is provided to avoid having to manage a list of data pools directly in the hierarchy.
+The values of each key in `data_pools` are placed in the resulting CephFS resource's field `.spec.dataPools`
+
+The contents of key `config` are used as the base value of the resulting resource's `.spec` field.
+Note that data pools given in `config` in the hierarchy will be overwritten by the pools configured in `data_pools`.
+
+The values in key `storage_class_config` are merged into the `StorageClass` resource which is for the CephFS instance.
+
+See https://rook.io/docs/rook/v1.6/ceph-filesystem-crd.html[the Rook.io `CephFilesystem` CRD documentation] for all possible configurations in key `config`.
+
+
+== `node_selector`
+
+[horizontal]
+type:: dict
+default::
++
+[source,yaml]
+----
+node-role.kubernetes.io/storage: ''
+----
+
+
+The node selector (if applicable) for all the resources managed by the component.
+
+== `tolerations`
+
+[horizontal]
+type:: dict
+default::
++
+[source,yaml]
+----
+- key: storagenode
+  operator: Exists
+----
+
+The tolerations (if applicable) for all the resources managed by the component.
+
+The component assumes that nodes on which the deployments should be scheduled may be tainted with `storagenode=True:NoSchedule`.
+
+== `images`
+[horizontal]
+type:: dict
+default:: See https://github.com/projectsyn/component-rook-ceph/blob/master/class/defaults.yml[`class/defaults.yml` on Github]
+
+This parameter allows selecting the Docker images to use for Rook.io, Ceph, and Ceph-CSI.
+Each image is specified using keys `registry`, `image` and `tag`.
+This structure allows easily injecting a registry mirror, if required.
+
+== `charts`
+
+[horizontal]
+type:: dict
+default:: See https://github.com/projectsyn/component-rook-ceph/blob/master/class/defaults.yml[`class/defaults.yml` on Github]
+
+This parameter allows selecting the Helm chart version for the `rook-ceph` operator.
+
+== `operator_helm_values`
+
+[horizontal]
+type:: dict
+default:: See https://github.com/projectsyn/component-rook-ceph/blob/master/class/defaults.yml[`class/defaults.yml` on Github]
+
+The Helm values to use when rendering the rook-ceph operator Helm chart.
+
+A few Helm values are configured based on other component parameters by default:
+
+* The data in parameter `images` is used to set the `image.repository`, `image.tag`, and `csi.cephcsi.image` Helm values
+* The value of `node_selector` is used to set Helm value `nodeSelector`
+* The value of `tolerations` is used to set Helm value `tolerations`
+
+See https://rook.io/docs/rook/v1.6/helm-operator.html#configuration[the Rook.io docs] for a full list of Helm values.
+
+== `toolbox`
+
+[horizontal]
+type:: dict
+default::
++
+[source,yaml]
+----
+enabled: true
+image: ${rook_ceph:images:rook}
+----
+
+The configuration for the Rook-Ceph toolbox deployment.
+This deployment provides an in-cluster shell to observe and administrate the Ceph cluster.
+
+== `cephClusterSpec`
+
+[horizontal]
+type:: dict
+default:: See https://github.com/projectsyn/component-rook-ceph/blob/master/class/defaults.yml[`class/defaults.yml` on Github]
+
+The default configuration for the `CephCluster` resource.
+The value of this parameter is used as field `.spec` of the resulting resource.
+
+Selected configurations of the Ceph cluster are inherited from other component parameters.
+If you overwrite those configurations in this parameter, the values provided in the "source" parameters won't have an effect.
+
+=== Inherited configurations
+
+* `cephVersion.image` is constructed from the data in parameter <<_images,`images`>>.
+* `placement.all.nodeAffinity` is built from parameter <<_node_selector,`node_selector`>>.
+The component constructs the following value for the configuration:
++
+[source,yaml]
+----
+requiredDuringSchedulingIgnoredDuringExecution:
+  nodeSelectorTerms:
+    - matchExpressions: <1>
+        - key: NODE_SELECTOR_KEY
+          operator: Exists
+        ...
+----
+<1> The component creates an entry in `matchExpressions` with `key` equal to the node selector key and `operator=Exists` for each key in parameter <<_node_selector,`node_selector`>>.
+
+* `placement.all.tolerations` is set to the value of parameter <<_tolerations,`tolerations`>>.
+* The component creates as single entry for `storage.storageClassDeviceSets` based on values given in parameter <<_ceph_cluster,`ceph_cluster`>>.
+Users are encouraged to use the parameter <<_ceph_cluster,`ceph_cluster`>> to configure the Ceph cluster's backing storage.
++
+The component expects that the provided storageclass for the backing storage supports `volumeMode=Block`.
+
+See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#settings[the Rook.io `CephCluster` documentation] for a full list of configuration parameters.
+
+== Example configurations
+
+=== Configure and tune Ceph's backing storage
+
+To configure the component for an infrastructure which provides backing storage as storageclass `localblock-storage` and uses SSDs to provide local volumes the following config can be provided.
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      block_storage_class: localblock-storage
+      tune_fast_device_class: true
+----
+
+=== Configure target size of RBD block pool
+
+To tell the Ceph cluster that the default RBD block pool, which is named `storagepool`, is expected to take up 80% of the Ceph cluster's capacity, the following config can be provided.
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      storage_pools:
+        rbd:
+          storagepool:
+            config:
+              parameters:
+                target_size_ratio: "0.8"
+----
+
+=== Configure the component for OCP4
+
+The component automatically configures some parameters for OpenShift 4.
+However, the following configurations must be provided through the hierarchy.
+The hierarchy may set these parameters in the OpenShift 4 distribution class.
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    operator_helm_values:
+      hostpathRequiresPrivileged: true <1>
+    cephClusterSpec:
+      disruptionManagement:
+        manageMachineDisruptionBudgets: true <2>
+----
+<1> The operator needs to be informed that deployments which use `hostPath` volume mounts need to run with `privileged` security context.
+This setting is required on any cluster which uses SELinux on the nodes.
+<2> Tell the operator to create and manage MachineDisruptionBudgets.

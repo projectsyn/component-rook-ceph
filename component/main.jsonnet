@@ -47,7 +47,7 @@ local namespaces =
   '10_cephcluster_rbac': cephcluster.rbac,
   '10_cephcluster_configoverride': cephcluster.configmap,
   '10_cephcluster_cluster': cephcluster.cluster,
-  '10_cephcluster_toolbox': cephcluster.toolbox,
+  [if params.toolbox.enabled then '10_cephcluster_toolbox']: cephcluster.toolbox,
   '20_storagepools':
     rbd_config.storagepools +
     cephfs_config.storagepools,

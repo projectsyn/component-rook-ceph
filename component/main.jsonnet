@@ -31,11 +31,18 @@ local ocp_config = import 'openshift.libsonnet';
 local rbd_config = import 'rbd.libsonnet';
 local cephfs_config = import 'cephfs.libsonnet';
 
-{
-  '00_namespaces': [
+local namespaces =
+  [
     kube.Namespace(params.namespace) + ns_config,
-    kube.Namespace(params.ceph_cluster.namespace) + ns_config,
-  ],
+  ] +
+  if params.ceph_cluster.namespace != params.namespace then
+    [
+      kube.Namespace(params.ceph_cluster.namespace) + ns_config,
+    ]
+  else [];
+
+{
+  '00_namespaces': namespaces,
   [if on_openshift then '02_openshift_sccs']: ocp_config.sccs,
   '10_cephcluster_rbac': cephcluster.rbac,
   '10_cephcluster_configoverride': cephcluster.configmap,

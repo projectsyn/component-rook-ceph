@@ -1,0 +1,66 @@
+= Quick start
+
+This how-to will guide you to a working Ceph setup using the default configuration.
+
+== Prerequisites
+
+* Cluster is already managed by Project Syn
+* At least three (3) adequately sized nodes (minimum 8vCPU, 16GB RAM) are provisioned for the storage cluster
+** The nodes are labeled with `node-role.kubernetes.io/storage=''` and tainted with `storagenode=True:NoSchedule`
+* Block storage volumes (`volumeMode=Block`) are available in the cluster
+* The block storage volumes are associated with a StorageClass
+* A working `commodore` command is available locally.
+See the https://syn.tools/commodore/running-commodore.html[Running Commodore] documentation for details.
+
+== Steps
+
+. Enable component `rook-ceph`
++
+.c-cluster-id.yml
+[source,yaml]
+----
+applications:
+  - rook-ceph
+----
+
+. Configure backing storageclass for the Ceph cluster
++
+.c-cluster-id.yml
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      block_storage_class: <block-storage-class> <1>
+----
+<1> Specify the name of a storage class which provides volumes with `volumeMode=Block`.
+
+. If your block storage volumes are provisioned dynamically, specify the volume size
++
+.c-cluster-id.yml
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      block_volume_size: 200Gi <1>
+----
+<1> If you are using pre-provisioned block storage volumes, you can leave this parameter at its default value of `1`.
+
+. If your block storage volumes are backed by SSDs (or better), tune Ceph for SSD backing storage.
++
+.c-cluster-id.yml
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      tune_fast_device_class: true
+----
+
+. Compile and push the cluster catalog
++
+[source,yaml]
+----
+commodore catalog compile <c-cluster-id> --push -i
+----

@@ -1,2 +1,9 @@
 * xref:index.adoc[Home]
+
+.How-to guides
+
+* xref:how-tos/quick-start.adoc[Quick start]
+
+.Technical reference
+
 * xref:references/parameters.adoc[Parameters]

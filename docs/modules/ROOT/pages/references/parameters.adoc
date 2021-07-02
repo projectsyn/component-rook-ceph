@@ -58,6 +58,15 @@ The storage class to use for the block storage volumes backing the Ceph cluster.
 The storage class **must** support `volumeMode=Block`.
 
 
+=== `block_volume_size`
+
+[horizontal]
+type:: https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/quantity/#Quantity[K8s Quantity]
+default:: `1`
+
+By default, the component expects that pre-provisioned block storage volumes are used.
+If you deploy the component on a cluster which dynamically provisions volumes for the storage class configured in `ceph_cluster.block_storage_class`, set this value to the desired size of the disk for a single node of your Ceph cluster.
+
 === `tune_fast_device_class`
 
 [horizontal]

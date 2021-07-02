@@ -8,6 +8,9 @@ parameters:
       namespace: syn-rook-ceph-${rook_ceph:ceph_cluster:name}
       node_count: 3
       block_storage_class: localblock
+      # Configure volume size here, if block storage PVs are provisioned
+      # dynamically
+      block_volume_size: 1
       # set to true if backing storage is SSD
       tune_fast_device_class: false
       # Rendered into rook-config-override CM
@@ -165,7 +168,7 @@ parameters:
                     - ReadWriteOnce
                   resources:
                     requests:
-                      storage: 1
+                      storage: ${rook_ceph:ceph_cluster:block_volume_size}
             encrypted: true
             tuneFastDeviceClass: ${rook_ceph:ceph_cluster:tune_fast_device_class}
 

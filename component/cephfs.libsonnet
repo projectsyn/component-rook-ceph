@@ -47,11 +47,8 @@ local metadataServerPlacement = {
 // Users are responsible for providing working cephfs configs, we don't
 // verify them here
 local cephfs_pools = [
-  kube._Object(
-    'ceph.rook.io/v1',
-    'CephFilesystem',
-    '%s-cephfs' % params.ceph_cluster.name
-  ) {
+  kube._Object('ceph.rook.io/v1', 'CephFilesystem', pool)
+  {
     metadata+: {
       namespace: params.ceph_cluster.namespace,
     },
@@ -83,10 +80,10 @@ local cephfs_pools = [
 // TODO: figure out if/how we want to create storageclasses for additional
 // pools configured on CephFS instances.
 local cephfs_storageclasses = [
-  local subpool = '%s-%s-data0' % [ params.ceph_cluster.name, fs ];
+  local subpool = '%s-data0' % [ fs ];
   sp.configure_storageclass('cephfs', fs, subpool) {
     parameters+: {
-      fsName: '%s-%s' % [ params.ceph_cluster.name, fs ],
+      fsName: fs,
     },
   }
   for fs in std.objectFields(cephfs_params)

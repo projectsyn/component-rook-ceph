@@ -31,17 +31,16 @@ local rbd_storageclasses = [
   for name in std.objectFields(rbd_params)
 ];
 
-local rbd_snapclasses = [
-  sp.configure_snapshotclass('rbd', name)
-  for name in std.objectFields(rbd_params)
+local rbd_snapclass = [
+  sp.configure_snapshotclass('rbd'),
 ];
 
 if params.ceph_cluster.rbd_enabled then {
   storagepools: rbd_blockpools,
   storageclasses: rbd_storageclasses,
-  snapshotclasses: rbd_snapclasses,
+  snapshotclass: rbd_snapclass,
 } else {
   storagepools: [],
   storageclasses: [],
-  snapshotclasses: [],
+  snapshotclass: [],
 }

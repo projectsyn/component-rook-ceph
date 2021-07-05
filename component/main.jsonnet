@@ -55,6 +55,6 @@ local namespaces =
     rbd_config.storageclasses +
     cephfs_config.storageclasses,
   '30_snapshotclasses':
-    rbd_config.snapshotclasses +
-    cephfs_config.snapshotclasses,
+    rbd_config.snapshotclass +
+    cephfs_config.snapshotclass,
 }

@@ -84,17 +84,16 @@ local cephfs_storageclasses = [
   sp.configure_storageclass('cephfs', pool)
   for pool in std.objectFields(cephfs_params)
 ];
-local cephfs_snapclasses = [
-  sp.configure_snapshotclass('cephfs', pool)
-  for pool in std.objectFields(cephfs_params)
+local cephfs_snapclass = [
+  sp.configure_snapshotclass('cephfs'),
 ];
 
 if params.ceph_cluster.cephfs_enabled then {
   storagepools: cephfs_pools,
   storageclasses: cephfs_storageclasses,
-  snapshotclasses: cephfs_snapclasses,
+  snapshotclass: cephfs_snapclass,
 } else {
   storagepools: [],
   storageclasses: [],
-  snapshotclasses: [],
+  snapshotclass: [],
 }

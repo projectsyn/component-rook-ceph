@@ -62,11 +62,18 @@ local load_snapclass(type) =
   assert std.length(manifest) == 1;
   manifest[0];
 
-local configure_snapclass(type, pool) =
+local configure_snapclass(type) =
+  local name = if type == 'rbd' then
+    'rook-ceph-rbd-%s' % params.ceph_cluster.name
+  else if type == 'cephfs' then
+    'rook-cephfs-%s' % params.ceph_cluster.name
+  else
+    error "unknown snapshotclass type '%s'" % type;
+
   local obj = load_snapclass(type);
   obj {
     metadata+: {
-      name: '%s-%s-%s' % [ type, pool, params.ceph_cluster.name ],
+      name: name,
     },
     driver: '%s.%s.csi.ceph.com' % [ params.namespace, type ],
     parameters+: {

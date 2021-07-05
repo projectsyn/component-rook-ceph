@@ -1,12 +1,44 @@
 parameters:
   kapitan:
+    dependencies:
+      - type: helm
+        source: https://charts.rook.io/release
+        chart_name: rook-ceph
+        version: ${rook_ceph:charts:rook-ceph}
+        output_path: dependencies/rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
+      - type: https
+        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
+        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/rbd-storageclass.yaml
+      - type: https
+        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/snapshotclass.yaml
+        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/rbd-snapshotclass.yaml
+      - type: https
+        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
+        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/cephfs-storageclass.yaml
+      - type: https
+        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/snapshotclass.yaml
+        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/cephfs-snapshotclass.yaml
     compile:
       - input_paths:
           - rook-ceph/component/app.jsonnet
         input_type: jsonnet
         output_path: apps/
       - input_paths:
+          - rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
+        input_type: helm
+        output_type: yaml
+        output_path: rook-ceph/01_rook_ceph_helmchart
+        helm_values: ${rook_ceph:operator_helm_values}
+        helm_params:
+          release_name: syn-rook-ceph
+          namespace: ${rook_ceph:namespace}
+      - input_paths:
           - rook-ceph/component/main.jsonnet
         input_type: jsonnet
         output_path: rook-ceph/
-
+  commodore:
+    postprocess:
+      filters:
+        - type: jsonnet
+          path: rook-ceph/01_rook_ceph_helmchart/rook-ceph/templates/
+          filter: postprocess/patch_operator_deployment.jsonnet

@@ -1,4 +1,177 @@
 parameters:
   rook_ceph:
     =_metadata: {}
-    namespace: syn-rook-ceph
+    namespace: syn-rook-ceph-operator
+
+    ceph_cluster:
+      name: cluster
+      namespace: syn-rook-ceph-${rook_ceph:ceph_cluster:name}
+      node_count: 3
+      block_storage_class: localblock
+      # Configure volume size here, if block storage PVs are provisioned
+      # dynamically
+      block_volume_size: 1
+      # set to true if backing storage is SSD
+      tune_fast_device_class: false
+      # Rendered into rook-config-override CM
+      config_override:
+        osd:
+          # We explicitly set bluefs_buffered_io to false to get good write
+          # bandwidth on Exoscale -> TODO: needs to be checked per
+          # infrastructure, maybe move the config to cloud/exoscale/params.yml
+          bluefs_buffered_io: false
+
+      # Whether to setup RBD CSI driver and pools
+      rbd_enabled: true
+      # Whether to setup CephFS CSI driver and pools
+      cephfs_enabled: false
+
+      storage_pools:
+        rbd:
+          storagepool:
+            config:
+              failureDomain: host
+              replicated:
+                size: 3
+                requireSafeReplicaSize: true
+            storage_class_config:
+              parameters:
+                csi.storage.k8s.io/fstype: ext4
+              allowVolumeExpansion: true
+        cephfs:
+          fspool:
+            data_pools:
+              pool0:
+                failureDomain: host
+                replicated:
+                  size: 3
+                  requireSafeReplicaSize: true
+                parameters:
+                  compression_mode: none
+            config:
+              metadataPool:
+                replicated:
+                  size: 3
+                  requireSafeReplicaSize: true
+              parameters:
+                compression_mode: none
+              # dataPools rendered from data_pools in Jsonnet
+              preserveFilesystemOnDelete: true
+              metadataServer:
+                activeCount: 1
+                activeStandby: true
+                # metadata server placement done in Jsonnet but can be
+                # extended here
+              mirroring:
+                enabled: false
+            storage_class_config:
+              allowVolumeExpansion: true
+
+
+    node_selector:
+      node-role.kubernetes.io/storage: ''
+
+    tolerations:
+      - key: storagenode
+        operator: Exists
+
+    images:
+      rook:
+        registry: docker.io
+        image: rook/ceph
+        tag: v1.6.6
+      ceph:
+        registry: docker.io
+        image: ceph/ceph
+        tag: v16.2.4
+      cephcsi:
+        registry: quay.io
+        image: cephcsi/cephcsi
+        tag: v3.3.1
+
+    charts:
+      rook-ceph: v1.6.6
+
+    operator_helm_values:
+      image:
+        repository: ${rook_ceph:images:rook:registry}/${rook_ceph:images:rook:image}
+        tag: ${rook_ceph:images:rook:tag}
+      nodeSelector: ${rook_ceph:node_selector}
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+        requests:
+          cpu: 750m
+          memory: 512Mi
+      tolerations: ${rook_ceph:tolerations}
+      csi:
+        enableCSIHostNetwork: false
+        cephcsi:
+          image: ${rook_ceph:images:cephcsi:registry}/${rook_ceph:images:cephcsi:image}:${rook_ceph:images:cephcsi:tag}
+
+    toolbox:
+      enabled: true
+      image: ${rook_ceph:images:rook}
+
+    cephClusterSpec:
+      cephVersion:
+        image: ${rook_ceph:images:ceph:registry}/${rook_ceph:images:ceph:image}:${rook_ceph:images:ceph:tag}
+        allowUnsupported: false
+      dataDirHostPath: /var/lib/rook
+      monitoring:
+        enabled: true
+        rulesNamespace: ${rook_ceph:ceph_cluster:namespace}
+      mon:
+        count: 3
+        allowMultiplePerNode: false
+      network:
+        provider: host
+      placement:
+        all:
+          # nodeAffinity is injected in Jsonnet,
+          # taking placement labels from ${rook_ceph:node_selector}
+          tolerations: ${rook_ceph:tolerations}
+      resources:
+        mgr:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: "1"
+            memory: 2Gi
+        mon:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: "1"
+            memory: 2Gi
+        osd:
+          limits:
+            cpu: "6"
+            memory: 5Gi
+          requests:
+            cpu: "4"
+            memory: 5Gi
+      storage:
+        useAllNodes: false
+        useAllDevices: false
+        storageClassDeviceSets:
+          - name: ${rook_ceph:ceph_cluster:name}
+            count: ${rook_ceph:ceph_cluster:node_count}
+            volumeClaimTemplates:
+              - spec:
+                  storageClassName: ${rook_ceph:ceph_cluster:block_storage_class}
+                  volumeMode: Block
+                  accessModes:
+                    - ReadWriteOnce
+                  resources:
+                    requests:
+                      storage: ${rook_ceph:ceph_cluster:block_volume_size}
+            encrypted: true
+            tuneFastDeviceClass: ${rook_ceph:ceph_cluster:tune_fast_device_class}
+
+      disruptionManagement:
+        managePodBudgets: true
+        osdMaintenanceTimeout: 30

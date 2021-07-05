@@ -1,0 +1,73 @@
+= Configuring and tuning Ceph
+
+This how-to gives some configuration snippets to configure and tune the Ceph cluster.
+
+See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html[the Rook.io `CephCluster`] documentation for Ceph configuration options which are exposed by the Rook-Ceph operator.
+See https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/[Ceph documentation] for the upstream Ceph configuration documentation.
+
+== Configure Ceph's backing storage
+
+To configure the component for an infrastructure which provides backing storage as storageclass `localblock-storage`, simply provide the following config.
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      block_storage_class: localblock-storage
+----
+
+=== Tune backing storage for SSDs
+
+If the backing storage provided for Ceph is itself backed by SSDs (or better), you can tune Ceph for "fast" devices with the following config.
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      tune_fast_device_class: true
+----
+
+== Configure target size of RBD block pool
+
+To tell the Ceph cluster that the default RBD block pool, which is named `storagepool`, is expected to take up 80% of the Ceph cluster's capacity, the following config can be provided.
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      storage_pools:
+        rbd:
+          storagepool:
+            config:
+              parameters:
+                target_size_ratio: "0.8"
+----
+
+== Configure Ceph options which aren't exposed by the Rook-Ceph operator
+
+To configure a Ceph option which isn't exposed by the operator, you can provide raw Ceph configuration entries in parameter xref:references/parameters.adoc#_config_override[`ceph_cluster.config_override`].
+
+For example, to change the OSD operations queue (`op_queue`) scheduler to the new `mclock_scheduler`, you can provide the following config.
+
+[IMPORTANT]
+====
+This configuration is only an example.
+We've not tested or benchmarked Ceph with the `mclock` scheduler.
+====
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      config_override:
+        osd:
+          osd_op_queue: mclock_scheduler
+----
+
+As discussed in xref:references/parameters.adoc#_config_override[the parameter's documentation], the contents of `ceph_cluster.config_override` are rendered into __ini__ style format by the component.
+
+Each key in the parameter is used as the name of a section in the resulting _ini_ style configuration file.

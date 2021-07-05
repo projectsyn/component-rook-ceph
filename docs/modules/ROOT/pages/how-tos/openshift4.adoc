@@ -1,0 +1,28 @@
+= Configuring the component for OpenShift 4
+
+The component mostly automatically configures itself for OpenShift 4.
+
+There are some configurations which are of particular interest on OpenShift 4.
+This how-to gives configuration snippets to customize OpenShift 4-specific configurations of the component.
+
+
+== Customize machine disruption budget configuration
+
+By default, the component enables machine disruption budget management on OpenShift 4.
+The component assumes that machine disruption budgets should be created in namespace `openshift-machine-api`.
+
+The default configuration of the `CephCluster` resource for OpenShift 4 is equivalent to applying the following configuration in the hierarchy.
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    cephClusterSpec:
+      disruptionManagement:
+        manageMachineDisruptionBudgets: true <1>
+        machineDisruptionBudgetNamespace: openshift-machine-api <2>
+----
+<1> Whether the component should create and manage machine disruption budgets.
+Change this value to `false` to disable machine disruption budgets on OCP4.
+<2> The namespace in which the operator creates the machine disruption budgets.
+Change this value if machine disruption budgets should be created in some other namespace.

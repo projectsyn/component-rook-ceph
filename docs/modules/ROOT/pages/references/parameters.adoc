@@ -89,10 +89,17 @@ osd:
   bluefs_buffered_io: false
 ----
 
-Additional Ceph configurations which are rendered in Ini format by the component.
-Each key in the dict is translated into a section in the resulting Ini file containing the key's value -- which is expected to be a dict -- as settings.
+Additional Ceph configurations which are rendered in _ini_ style format by the component.
+Each key in the dict is translated into a section in the resulting _ini_ style file containing the key's value -- which is expected to be a dict -- as settings.
 
-The default value is translated into the following Ini file:
+[IMPORTANT]
+====
+The component doesn't validate the resulting configuration.
+Please be aware that Ceph may fail to start if you provide an invalid configuration file.
+See the https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/[Ceph documentation] for a list of valid configuration sections and options.
+====
+
+The default value is translated into the following _ini_ style file:
 
 [source,ini]
 ----
@@ -100,7 +107,7 @@ The default value is translated into the following Ini file:
 bluefs_buffered_io = false
 ----
 
-The resulting Ini file is written to the ConfigMap `rook-config-override` in the Ceph cluster namespace.
+The resulting _ini_ style file is written to the ConfigMap `rook-config-override` in the Ceph cluster namespace.
 
 === `rbd_enabled`
 
@@ -333,36 +340,6 @@ The component expects that the provided storageclass for the backing storage sup
 See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#settings[the Rook.io `CephCluster` documentation] for a full list of configuration parameters.
 
 == Example configurations
-
-=== Configure and tune Ceph's backing storage
-
-To configure the component for an infrastructure which provides backing storage as storageclass `localblock-storage` and uses SSDs to provide local volumes the following config can be provided.
-
-[source,yaml]
-----
-parameters:
-  rook_ceph:
-    ceph_cluster:
-      block_storage_class: localblock-storage
-      tune_fast_device_class: true
-----
-
-=== Configure target size of RBD block pool
-
-To tell the Ceph cluster that the default RBD block pool, which is named `storagepool`, is expected to take up 80% of the Ceph cluster's capacity, the following config can be provided.
-
-[source,yaml]
-----
-parameters:
-  rook_ceph:
-    ceph_cluster:
-      storage_pools:
-        rbd:
-          storagepool:
-            config:
-              parameters:
-                target_size_ratio: "0.8"
-----
 
 === Configure the component for SElinux-enabled cluster nodes
 

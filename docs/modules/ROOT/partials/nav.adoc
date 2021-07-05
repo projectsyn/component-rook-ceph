@@ -4,6 +4,7 @@
 
 * xref:how-tos/quick-start.adoc[Quick start]
 * xref:how-tos/openshift4.adoc[Configuring the component for OpenShift 4]
+* xref:how-tos/configure-ceph.adoc[Configuring and tuning Ceph]
 
 .Technical reference
 

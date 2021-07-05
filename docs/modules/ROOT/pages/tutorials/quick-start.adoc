@@ -1,6 +1,6 @@
 = Quick start
 
-This how-to will guide you to a working Ceph setup using the default configuration.
+This tutorial will guide you to a working Ceph setup using the default configuration.
 
 == Prerequisites
 

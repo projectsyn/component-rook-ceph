@@ -6,6 +6,6 @@ For each storage pool (RBD blockpool or CephFS), the component creates a `Storag
 
 The component depends on the https://hub.syn.tools/storageclass/index.html[storageclass component] for managing StorageClasses.
 
-To get started with the component, see the xref:how-tos/quick-start.adoc[quick-start guide].
+To get started with the component, see the xref:tutorials/quick-start.adoc[quick-start guide].
 
 See the xref:references/parameters.adoc[parameters] reference for a documentation of all the parameters the component understands.

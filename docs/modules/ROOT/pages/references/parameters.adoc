@@ -108,9 +108,9 @@ The resulting Ini file is written to the ConfigMap `rook-config-override` in the
 type:: boolean
 default:: `true`
 
-This parameter controls whether the RBD CSI driver and any configured `CephBlockPool` resources and associated storage- and volumesnapshotclasses are provisioned.
+This parameter controls whether the RBD CSI driver, its associated volumesnapshotclass and any configured `CephBlockPool` resources and associated storageclasses are provisioned.
 
-The `CephBlockPool` resources are defined and configured in parameter <<_xrf_TODO,`storage_pools.rbd`>>.
+The `CephBlockPool` resources are defined and configured in parameter <<_storage_pools_rbd,`storage_pools.rbd`>>.
 
 
 === `cephfs_enabled`
@@ -119,9 +119,9 @@ The `CephBlockPool` resources are defined and configured in parameter <<_xrf_TOD
 type:: boolean
 default:: `false`
 
-This parameter controls whether the CephFS CSI driver and any configured `CephFilesystem` resources and associated storage- and volumesnapshotclasses are provisioned.
+This parameter controls whether the CephFS CSI driver, its associated volumesnapshotclass and any configured `CephFilesystem` resources and associated storageclasses are provisioned.
 
-The `CephFilesystem` resources are defined and configured in parameter <<_xrf_TODO,`storage_pools.cephfs`>>.
+The `CephFilesystem` resources are defined and configured in parameter <<_storage_pools_cephfs,`storage_pools.cephfs`>>.
 
 === `storage_pools.rbd`
 
@@ -276,6 +276,7 @@ A few Helm values are configured based on other component parameters by default:
 * The data in parameter `images` is used to set the `image.repository`, `image.tag`, and `csi.cephcsi.image` Helm values
 * The value of `node_selector` is used to set Helm value `nodeSelector`
 * The value of `tolerations` is used to set Helm value `tolerations`
+* The component ensures that `hostpathRequiresPrivileged` is enabled on OpenShift 4 regardless of the contents of the Helm value.
 
 See https://rook.io/docs/rook/v1.6/helm-operator.html#configuration[the Rook.io docs] for a full list of Helm values.
 

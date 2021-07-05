@@ -5,7 +5,7 @@ This how-to will guide you to a working Ceph setup using the default configurati
 == Prerequisites
 
 * Cluster is already managed by Project Syn
-* At least three (3) adequately sized nodes (minimum 8vCPU, 16GB RAM) are provisioned for the storage cluster
+* At least 3 adequately sized nodes (minimum 8 vCPU, 16GB RAM) are provisioned for the storage cluster
 ** The nodes are labeled with `node-role.kubernetes.io/storage=''` and tainted with `storagenode=True:NoSchedule`
 * Block storage volumes (`volumeMode=Block`) are available in the cluster
 * The block storage volumes are associated with a StorageClass

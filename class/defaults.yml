@@ -175,5 +175,3 @@ parameters:
       disruptionManagement:
         managePodBudgets: true
         osdMaintenanceTimeout: 30
-        manageMachineDisruptionBudgets: false
-        machineDisruptionBudgetNamespace: openshift-machine-api

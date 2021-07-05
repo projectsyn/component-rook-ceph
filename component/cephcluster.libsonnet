@@ -250,6 +250,10 @@ local cephcluster =
         placement: {
           all: nodeAffinity,
         },
+        disruptionManagement: {
+          manageMachineDisruptionBudgets: on_openshift,
+          machineDisruptionBudgetNamespace: 'openshift-machine-api',
+        },
       }
       + com.makeMergeable(params.cephClusterSpec),
   };

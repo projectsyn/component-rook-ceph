@@ -3,6 +3,7 @@
 .How-to guides
 
 * xref:how-tos/quick-start.adoc[Quick start]
+* xref:how-tos/openshift4.adoc[Configuring the component for OpenShift 4]
 
 .Technical reference
 

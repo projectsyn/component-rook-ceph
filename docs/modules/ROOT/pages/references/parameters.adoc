@@ -378,18 +378,3 @@ parameters:
 ----
 <1> The operator needs to be informed that deployments which use `hostPath` volume mounts need to run with `privileged` security context.
 This setting is required on any cluster which uses SELinux on the nodes.
-
-=== Disable machine disruption budgets on OpenShift 4
-
-By default, The component enables machine disruption budget management on OpenShift 4.
-Machine disruption budget management can be disabled by providing the following config.
-
-[source,yaml]
-----
-parameters:
-  rook_ceph:
-    cephClusterSpec:
-      disruptionManagement:
-        manageMachineDisruptionBudgets: false <1>
-----
-<1> Disable machine disruption budget management in the operator.

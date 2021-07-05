@@ -16,13 +16,13 @@ local metadataServerPlacement = {
       placement+: {
         podAntiAffinity+: {
           requiredDuringSchedulingIgnoredDuringExecution+: [ {
-            labelSelector: [ {
+            labelSelector: {
               matchExpressions: [ {
                 key: 'app',
                 operator: 'In',
                 values: [ 'rook-ceph-mds' ],
               } ],
-            } ],
+            },
             topologyKey: 'kubernetes.io/hostname',
           } ],
           preferredDuringSchedulingIgnoredDuringExecution+: [ {
@@ -34,8 +34,8 @@ local metadataServerPlacement = {
                   operator: 'In',
                   values: [ 'rook-ceph-mds' ],
                 } ],
-                topologyKey: 'topology.kubernetes.io/zone',
               },
+              topologyKey: 'topology.kubernetes.io/zone',
             },
           } ],
         },

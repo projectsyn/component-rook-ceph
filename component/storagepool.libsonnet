@@ -34,7 +34,8 @@ local get_sc_config(type, pool) =
     {}
   ));
 
-local configure_sc(type, pool) =
+// subpool used for CephFS
+local configure_sc(type, pool, subpool=null) =
   local obj = load_storageclass(type);
   local sc_config = get_sc_config(type, pool);
   com.makeMergeable(obj) +
@@ -46,7 +47,11 @@ local configure_sc(type, pool) =
     provisioner: '%s.%s.csi.ceph.com' % [ params.namespace, type ],
     parameters+: {
       clusterID: params.ceph_cluster.namespace,
-      pool: pool,
+      pool:
+        if subpool != null then
+          subpool
+        else
+          pool,
       'csi.storage.k8s.io/provisioner-secret-namespace':
         params.ceph_cluster.namespace,
       'csi.storage.k8s.io/controller-expand-secret-namespace':

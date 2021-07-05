@@ -80,9 +80,16 @@ local cephfs_pools = [
   for pool in std.objectFields(cephfs_params)
 ];
 
+// TODO: figure out if/how we want to create storageclasses for additional
+// pools configured on CephFS instances.
 local cephfs_storageclasses = [
-  sp.configure_storageclass('cephfs', pool)
-  for pool in std.objectFields(cephfs_params)
+  local subpool = '%s-%s-data0' % [ params.ceph_cluster.name, fs ];
+  sp.configure_storageclass('cephfs', fs, subpool) {
+    parameters+: {
+      fsName: '%s-%s' % [ params.ceph_cluster.name, fs ],
+    },
+  }
+  for fs in std.objectFields(cephfs_params)
 ];
 local cephfs_snapclass = [
   sp.configure_snapshotclass('cephfs'),

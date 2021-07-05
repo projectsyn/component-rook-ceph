@@ -363,11 +363,10 @@ parameters:
                 target_size_ratio: "0.8"
 ----
 
-=== Configure the component for OCP4
+=== Configure the component for SElinux-enabled cluster nodes
 
-The component automatically configures some parameters for OpenShift 4.
-However, the following configurations must be provided through the hierarchy.
-The hierarchy may set these parameters in the OpenShift 4 distribution class.
+The component automatically configures the operator on OpenShift 4.
+However, on other Kubernetes distributions on nodes which use SElinux, users need to enable `hostpathRequiresPrivileged` in the operator's helm values.
 
 [source,yaml]
 ----
@@ -375,10 +374,21 @@ parameters:
   rook_ceph:
     operator_helm_values:
       hostpathRequiresPrivileged: true <1>
-    cephClusterSpec:
-      disruptionManagement:
-        manageMachineDisruptionBudgets: true <2>
 ----
 <1> The operator needs to be informed that deployments which use `hostPath` volume mounts need to run with `privileged` security context.
 This setting is required on any cluster which uses SELinux on the nodes.
-<2> Tell the operator to create and manage MachineDisruptionBudgets.
+
+=== Enable machine disruption budgets on OpenShift 4
+
+The component automatically configures some things for OpenShift 4.
+However, users need to explicitly enable machine disruption budgets.
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    cephClusterSpec:
+      disruptionManagement:
+        manageMachineDisruptionBudgets: true <1>
+----
+<1> Tell the operator to create and manage MachineDisruptionBudgets.

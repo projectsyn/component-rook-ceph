@@ -9,6 +9,13 @@ local on_openshift =
 local cephcluster = import 'cephcluster.libsonnet';
 
 local ns_config =
+  {
+    metadata+: {
+      labels+: {
+        'syn.tools/component': 'rook-ceph',
+      },
+    },
+  } +
   if on_openshift then {
     metadata+: {
       annotations+: {

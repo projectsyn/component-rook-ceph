@@ -79,7 +79,7 @@ parameters:
       rook:
         registry: docker.io
         image: rook/ceph
-        tag: v1.6.6
+        tag: v1.6.7
       ceph:
         registry: docker.io
         image: ceph/ceph
@@ -90,7 +90,7 @@ parameters:
         tag: v3.3.1
 
     charts:
-      rook-ceph: v1.6.6
+      rook-ceph: v1.6.7
 
     operator_helm_values:
       image:

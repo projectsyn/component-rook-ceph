@@ -4,6 +4,8 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.rook_ceph;
 
+local helpers = import 'helpers.libsonnet';
+
 local on_openshift = inv.parameters.facts.distribution == 'openshift4';
 
 local serviceaccounts =
@@ -18,29 +20,14 @@ local serviceaccounts =
   else {};
 
 local roles =
-  (
-    // For OCP4 we need the metrics discovery role
-    if on_openshift then
-      {
-        metrics: kube.Role('rook-ceph-metrics') {
-          metadata+: {
-            namespace: params.ceph_cluster.namespace,
-          },
-          rules: [
-            {
-              apiGroups: [ '' ],
-              resources: [ 'services', 'endpoints', 'pods' ],
-              verbs: [ 'get', 'list', 'watch' ],
-            },
-          ],
-        },
-      }
-    else {}
-  ) +
   // the following roles are created by the operator helm chart in the
   // operator namespace. However, if we create the Ceph cluster in a different
   // namespace, we need to create them in that namespace instead.
   if params.ceph_cluster.namespace != params.namespace then {
+    // For OCP4 we need the metrics discovery role in the cluster
+    // namespace, if it differs from the operator namespace.
+    [if on_openshift then 'metrics']:
+      helpers.metrics_role(params.ceph_cluster.namespace),
     osd: kube.Role('rook-ceph-osd') {
       metadata+: {
         namespace: params.ceph_cluster.namespace,
@@ -108,89 +95,84 @@ local roles =
   else {};
 
 local rolebindings =
-  (
-    // For OCP4, we need the metrics discovery rolebinding
-    if on_openshift then
-      [
-        kube.RoleBinding('rook-ceph-metrics') {
-          metadata+: {
-            namespace: params.ceph_cluster.namespace,
-          },
-          roleRef_:: roles.metrics,
-          subjects: [ {
-            kind: 'ServiceAccount',
-            name: 'prometheus-k8s',
-            namespace: 'openshift-monitoring',
-          } ],
-        },
+  // Rolebindings in general are only required if cluster namespace
+  // differs from operator namespace.
+  if params.ceph_cluster.namespace != params.namespace then
+    (
+      // For OCP4, we need the metrics discovery rolebinding
+      if on_openshift then [
+        helpers.ocp_metrics_rolebinding(
+          params.ceph_cluster.namespace,
+          roles.metrics,
+        ),
       ]
-    else []
-  ) +
-  if params.ceph_cluster.namespace != params.namespace then [
-    // allow the operator to create resource in the cluster's namespace
-    kube.RoleBinding('rook-ceph-cluster-mgmt') {
-      metadata+: {
-        namespace: params.ceph_cluster.namespace,
+      else []
+    ) +
+    [
+      // allow the operator to create resource in the cluster's namespace
+      kube.RoleBinding('rook-ceph-cluster-mgmt') {
+        metadata+: {
+          namespace: params.ceph_cluster.namespace,
+        },
+        roleRef: {
+          apiGroup: 'rbac.authorization.k8s.io',
+          kind: 'ClusterRole',
+          name: 'rook-ceph-cluster-mgmt',
+        },
+        subjects: [ {
+          kind: 'ServiceAccount',
+          name: 'rook-ceph-system',
+          namespace: params.namespace,
+        } ],
       },
-      roleRef: {
-        apiGroup: 'rbac.authorization.k8s.io',
-        kind: 'ClusterRole',
-        name: 'rook-ceph-cluster-mgmt',
+      // allow the osd pods in the namespace to work with configmaps
+      kube.RoleBinding('rook-ceph-osd') {
+        metadata+: {
+          namespace: params.ceph_cluster.namespace,
+        },
+        roleRef_:: roles.osd,
+        subjects_:: [ serviceaccounts.osd ],
       },
-      subjects: [ {
-        kind: 'ServiceAccount',
-        name: 'rook-ceph-system',
-        namespace: params.namespace,
-      } ],
-    },
-    // allow the osd pods in the namespace to work with configmaps
-    kube.RoleBinding('rook-ceph-osd') {
-      metadata+: {
-        namespace: params.ceph_cluster.namespace,
+      // Allow the ceph mgr to access the cluster-specific resources necessary for the mgr modules
+      kube.RoleBinding('rook-ceph-mgr') {
+        metadata+: {
+          namespace: params.ceph_cluster.namespace,
+        },
+        roleRef_:: roles.mgr,
+        subjects_:: [ serviceaccounts.mgr ],
       },
-      roleRef_:: roles.osd,
-      subjects_:: [ serviceaccounts.osd ],
-    },
-    // Allow the ceph mgr to access the cluster-specific resources necessary for the mgr modules
-    kube.RoleBinding('rook-ceph-mgr') {
-      metadata+: {
-        namespace: params.ceph_cluster.namespace,
+      // Allow the ceph mgr to access the rook system resources necessary for the mgr modules
+      kube.RoleBinding('rook-ceph-mgr-system-%s' % params.ceph_cluster.name) {
+        metadata+: {
+          namespace: params.namespace,
+        },
+        roleRef: {
+          apiGroup: 'rbac.authorization.k8s.io',
+          kind: 'ClusterRole',
+          name: 'rook-ceph-mgr-system',
+        },
+        subjects_:: [ serviceaccounts.mgr ],
       },
-      roleRef_:: roles.mgr,
-      subjects_:: [ serviceaccounts.mgr ],
-    },
-    // Allow the ceph mgr to access the rook system resources necessary for the mgr modules
-    kube.RoleBinding('rook-ceph-mgr-system-%s' % params.ceph_cluster.name) {
-      metadata+: {
-        namespace: params.namespace,
+      kube.RoleBinding('rook-ceph-cmd-reporter') {
+        metadata+: {
+          namespace: params.ceph_cluster.namespace,
+        },
+        roleRef_:: roles.cmd_reporter,
+        subjects_:: [ serviceaccounts.cmd_reporter ],
       },
-      roleRef: {
-        apiGroup: 'rbac.authorization.k8s.io',
-        kind: 'ClusterRole',
-        name: 'rook-ceph-mgr-system',
+      // monitoring
+      kube.RoleBinding('rook-ceph-monitoring') {
+        metadata+: {
+          namespace: params.ceph_cluster.namespace,
+        },
+        roleRef_:: roles.monitoring,
+        subjects: [ {
+          kind: 'ServiceAccount',
+          name: 'rook-ceph-system',
+          namespace: params.namespace,
+        } ],
       },
-      subjects_:: [ serviceaccounts.mgr ],
-    },
-    kube.RoleBinding('rook-ceph-cmd-reporter') {
-      metadata+: {
-        namespace: params.ceph_cluster.namespace,
-      },
-      roleRef_:: roles.cmd_reporter,
-      subjects_:: [ serviceaccounts.cmd_reporter ],
-    },
-    // monitoring
-    kube.RoleBinding('rook-ceph-monitoring') {
-      metadata+: {
-        namespace: params.ceph_cluster.namespace,
-      },
-      roleRef_:: roles.monitoring,
-      subjects: [ {
-        kind: 'ServiceAccount',
-        name: 'rook-ceph-system',
-        namespace: params.namespace,
-      } ],
-    },
-  ]
+    ]
   else [];
 
 local clusterrolebindings =

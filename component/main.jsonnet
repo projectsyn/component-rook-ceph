@@ -31,6 +31,8 @@ local ocp_config = import 'openshift.libsonnet';
 local rbd_config = import 'rbd.libsonnet';
 local cephfs_config = import 'cephfs.libsonnet';
 
+local csi_metrics = import 'csi_metrics.libsonnet';
+
 local namespaces =
   [
     kube.Namespace(params.namespace) + ns_config,
@@ -83,5 +85,8 @@ std.mapWithKey(
     '30_snapshotclasses':
       rbd_config.snapshotclass +
       cephfs_config.snapshotclass,
+    '40_csi_driver_metrics':
+      csi_metrics.rbac +
+      csi_metrics.servicemonitor,
   }
 )

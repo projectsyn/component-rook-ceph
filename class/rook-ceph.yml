@@ -18,6 +18,9 @@ parameters:
       - type: https
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/snapshotclass.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/cephfs-snapshotclass.yaml
+      - type: https
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/monitoring/csi-metrics-service-monitor.yaml
+        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/csi-metrics-service-monitor.yaml
     compile:
       - input_paths:
           - rook-ceph/component/app.jsonnet

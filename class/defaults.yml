@@ -107,6 +107,8 @@ parameters:
       tolerations: ${rook_ceph:tolerations}
       csi:
         enableCSIHostNetwork: false
+        enableRbdDriver: ${rook_ceph:ceph_cluster:rbd_enabled}
+        enableCephfsDriver: ${rook_ceph:ceph_cluster:cephfs_enabled}
         cephcsi:
           image: ${rook_ceph:images:cephcsi:registry}/${rook_ceph:images:cephcsi:image}:${rook_ceph:images:cephcsi:tag}
 

@@ -27,15 +27,7 @@ local deployment = com.yaml_load(deployment_file) + {
           if c.name == 'rook-ceph-operator' then
             c {
               env: [
-                if e.name == 'ROOK_CSI_ENABLE_RBD' then
-                  e {
-                    value: '%s' % params.ceph_cluster.rbd_enabled,
-                  }
-                else if e.name == 'ROOK_CSI_ENABLE_CEPHFS' then
-                  e {
-                    value: '%s' % params.ceph_cluster.cephfs_enabled,
-                  }
-                else if e.name == 'ROOK_HOSTPATH_REQUIRES_PRIVILEGED' then
+                if e.name == 'ROOK_HOSTPATH_REQUIRES_PRIVILEGED' then
                   e {
                     value: '%s' % hostpath_requires_privileged,
                   }

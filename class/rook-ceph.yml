@@ -7,16 +7,16 @@ parameters:
         version: ${rook_ceph:charts:rook-ceph}
         output_path: dependencies/rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
       - type: https
-        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/rbd-storageclass.yaml
       - type: https
-        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/snapshotclass.yaml
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/snapshotclass.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/rbd-snapshotclass.yaml
       - type: https
-        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/cephfs-storageclass.yaml
       - type: https
-        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/snapshotclass.yaml
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/snapshotclass.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/cephfs-snapshotclass.yaml
     compile:
       - input_paths:

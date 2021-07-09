@@ -18,6 +18,19 @@ local ignore_alerts = [
   'CephNodeDown',
 ];
 
+// Alert rule patches.
+// Provide partial objects for alert rules that need to be tuned compared to
+// upstream. The keys in this object correspond to the `alert` field of the
+// rule for which the patch is intended.
+local patch_alerts = {
+  CephClusterWarningState: {
+    'for': '15m',
+  },
+  CephOSDDiskNotResponding: {
+    'for': '5m',
+  },
+};
+
 /* FROM HERE: should be provided as library function by
  * rancher-/openshift4-monitoring */
 // We shouldn't be expected to care how rancher-/openshift4-monitoring
@@ -40,6 +53,7 @@ local filter_patch_rules(g) =
     rules: std.map(
       // Patch rules to make sure they match the requirements.
       function(rule)
+        local rulepatch = com.getValueOrDefault(patch_alerts, rule.alert, {});
         rule {
           // Change alert names so we don't get multiple alerts with the same
           // name, as the rook-ceph operator deploys its own copy of these
@@ -56,7 +70,7 @@ local filter_patch_rules(g) =
             // can be used for inhibition rules
             syn_component: 'rook-ceph',
           },
-        },
+        } + rulepatch,
       std.filter(
         // Filter out unwanted rules
         function(rule)

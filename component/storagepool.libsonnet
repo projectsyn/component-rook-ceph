@@ -1,14 +1,11 @@
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local sc = import 'lib/storageclass.libsonnet';
-
 local inv = kap.inventory();
 local params = inv.parameters.rook_ceph;
 
-local load_manifest(name) =
-  std.parseJson(kap.yaml_load_stream(
-    'rook-ceph/manifests/%s/%s.yaml' % [ params.images.rook.tag, name ]
-  ));
+local helpers = import 'helpers.libsonnet';
+local load_manifest = helpers.load_manifest;
 
 local load_storageclass(type) =
   // load yaml

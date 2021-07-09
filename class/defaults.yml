@@ -25,6 +25,8 @@ parameters:
       rbd_enabled: true
       # Whether to setup CephFS CSI driver and pools
       cephfs_enabled: false
+      # Whether to enable monitoring
+      monitoring_enabled: true
 
       storage_pools:
         rbd:
@@ -127,7 +129,7 @@ parameters:
         allowUnsupported: false
       dataDirHostPath: /var/lib/rook
       monitoring:
-        enabled: true
+        enabled: ${rook_ceph:ceph_cluster:monitoring_enabled}
         rulesNamespace: ${rook_ceph:ceph_cluster:namespace}
       mon:
         count: 3

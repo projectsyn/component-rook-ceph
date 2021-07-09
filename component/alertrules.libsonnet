@@ -102,6 +102,28 @@ local ignore_groups = std.set([
   'persistent-volume-alert.rules',
 ]);
 
+local additional_rules = [
+  {
+    name: 'syn-rook-ceph-additional.alerts',
+    rules: [
+      {
+        alert: 'SYN_RookCephOperatorScaledDown',
+        expr: 'kube_deployment_spec_replicas{deployment="rook-ceph-operator", namespace="%s"} == 0' % params.namespace,
+        annotations: global_alert_params.customAnnotations {
+          summary: 'rook-ceph operator scaled to 0 for more than 1 hour.',
+          description: 'TODO',
+        },
+        labels: {
+          severity: 'warning',
+          syn_component: 'rook-ceph',
+          syn: 'true',
+        },
+        'for': '1h',
+      },
+    ],
+  },
+];
+
 local alert_rules = [
   local gs = std.filter(
     function(it) !std.member(ignore_groups, it.name),
@@ -120,7 +142,7 @@ local alert_rules = [
           if std.length(r.rules) > 0 then r
           for g in gs
         ]
-      ),
+      ) + additional_rules,
     },
   }
   for rule_manifest in alert_rules_manifests

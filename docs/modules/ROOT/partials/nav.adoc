@@ -2,7 +2,7 @@
 
 .Tutorials
 
-* xref:how-tos/quick-start.adoc[Quick start]
+* xref:tutorials/quick-start.adoc[Quick start]
 
 .How-to guides
 

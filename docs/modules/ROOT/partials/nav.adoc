@@ -9,6 +9,44 @@
 * xref:how-tos/openshift4.adoc[Configuring the component for OpenShift 4]
 * xref:how-tos/configure-ceph.adoc[Configuring and tuning Ceph]
 
+.Alert runbooks
+
+* Rook-Ceph operator
+** xref:runbooks/RookCephOperatorScaledDown.adoc[RookCephOperatorScaledDown]
+
+* Ceph Cluster
+** xref:runbooks/CephClusterErrorState.adoc[CephClusterErrorState]
+** xref:runbooks/CephClusterWarningState.adoc[CephClusterWarningState]
+** xref:runbooks/CephClusterNearFull.adoc[CephClusterNearFull]
+** xref:runbooks/CephClusterCriticallyFull.adoc[CephClusterCriticallyFull]
+** xref:runbooks/CephClusterReadOnly.adoc[CephClusterReadOnly]
+** xref:runbooks/CephDataRecoveryTakingTooLong.adoc[CephDataRecoveryTakingTooLong]
+** xref:runbooks/CephPGRepairTakingTooLong.adoc[CephPGRepairTakingTooLong]
+
+* Ceph pools
+** xref:runbooks/CephPoolQuotaBytesNearExhaustion.adoc[CephPoolQuotaBytesNearExhaustion]
+** xref:runbooks/CephPoolQuotaBytesCriticallyExhausted.adoc[CephPoolQuotaBytesCriticallyExhausted]
+
+* Ceph MGR
+** xref:runbooks/CephMgrIsAbsent.adoc[CephMgrIsAbsent]
+
+* Ceph MON
+** xref:runbooks/CephMonVersionMismatch.adoc[CephMonVersionMismatch]
+** xref:runbooks/CephMonQuorumAtRisk.adoc[CephMonQuorumAtRisk]
+** xref:runbooks/CephMonHighNumberOfLeaderChanges.adoc[CephMonHighNumberOfLeaderChanges]
+
+* Ceph OSD
+** xref:runbooks/CephOSDVersionMismatch.adoc[CephOSDVersionMismatch]
+** xref:runbooks/CephOSDNearFull.adoc[CephOSDNearFull]
+** xref:runbooks/CephOSDCriticallyFull.adoc[CephOSDCriticallyFull]
+** xref:runbooks/CephOSDFlapping.adoc[CephOSDFlapping]
+** xref:runbooks/CephOSDDiskNotResponding.adoc[CephOSDDiskNotResponding]
+** xref:runbooks/CephOSDDiskUnavailable.adoc[CephOSDDiskUnavailable]
+** xref:runbooks/CephOSDSlowOps.adoc[CephOSDSlowOps]
+
+* CephFS
+** xref:runbooks/CephMdsMissingReplicas.adoc[CephMdsMissingReplicas]
+
 .Technical reference
 
 * xref:references/parameters.adoc[Parameters]

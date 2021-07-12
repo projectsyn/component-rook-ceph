@@ -1,0 +1,6 @@
+= Alert rule: CephMdsMissingReplicas
+:icons: font
+
+== icon:glasses[] Overview
+
+== icon:bug[] Steps for debugging

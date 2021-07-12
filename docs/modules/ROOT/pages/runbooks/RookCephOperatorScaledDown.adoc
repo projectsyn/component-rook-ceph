@@ -2,8 +2,26 @@
 
 == icon:glasses[] Overview
 
-// Add overview over the condition which triggers the rule
+This alert fires if the Rook-Ceph operator deployment is scaled to 0 for more than an hour.
+While the operator is scaled to 0, the Ceph cluster isn't actively managed and could start degrading.
 
 == icon:bug[] Steps for debugging
 
-// Add detailed steps to debug and resolve the issue
+
+=== Check if the `rook-ceph` ArgoCD app is synced and healthy
+
+[source,shell]
+----
+$ kubectl -n syn get app rook-ceph
+NAME        SYNC STATUS   HEALTH STATUS
+rook-ceph   Synced        Healthy
+----
+
+If the output of the `kubectl` command indicates that the app isn't synced *and* healthy, check the app in ArgoCD.
+You can use the `argocd` CLI or the web interface to do so.
+
+=== Check configured replicas in cluster catalog
+
+Verify that the operator deployment manifest in the cluster catalog specifies `.spec.replicas=1` by inspecting the cluster catalog.
+The cluster catalog is linked in column "GitRepo URL" on https://control.vshn.net/syn/lieutenantclusters/vshn-lieutenant-prod[control.vshn.net].
+The operator deployment manifests can be found in `manifests/rook-ceph/01_rook_ceph_helmchart/rook-ceph/templates/deployment.yaml`.

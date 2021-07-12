@@ -2,8 +2,42 @@
 
 == icon:glasses[] Overview
 
-// Add overview over the condition which triggers the rule
+This alert is triggered when one or more degraded Ceph placement groups (PGs) take longer than two hours to recover.
+PGs may degrade when an OSD is down for a while, for example when a storage node is rebooted.
 
 == icon:bug[] Steps for debugging
 
+=== Find degraded PGs
+
+[source,shell]
+----
+ceph_cluster_ns=syn-rook-ceph-cluster
+kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph pg dump_stuck
+----
+
+=== Trigger a repeer of degraded PGs
+
+During initial testing and benchmarking, we've found that sometimes triggering a repeer of PGs in state `degraded+undersized` can unstick the recovery process.
+You can use the shell snippet below to trigger a repeer for all `degraded+undersized` PGs.
+
+[source,shell]
+----
+ceph_cluster_ns=syn-rook-ceph-cluster
+for pgid in $(kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools \
+              -- ceph pg dump_stuck undersized -f json | sed 's/}ok/}/' | \
+              jq -r '.stuck_pg_stats[] | .pgid')
+do
+    kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph pg repeer "${pgid}"
+done
+----
+
+=== Check Ceph status
+
+The following command should show a line starting with `recovery:` under `io:` if Ceph is making progress recovering the degraded PGs.
+
+[source,shell]
+----
+ceph_cluster_ns=syn-rook-ceph-cluster
+kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph status
+----
 // Add detailed steps to debug and resolve the issue

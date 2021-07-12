@@ -64,6 +64,9 @@ local patch_alerts = {
   },
 };
 
+local runbook(alertname) =
+  'https://hub.syn.tools/rook-ceph/runbooks/%s.html' % alertname;
+
 /* FROM HERE: should be provided as library function by
  * rancher-/openshift4-monitoring */
 // We shouldn't be expected to care how rancher-/openshift4-monitoring
@@ -89,13 +92,16 @@ local filter_patch_rules(g) =
       // Patch rules to make sure they match the requirements.
       function(rule)
         local rulepatch = com.getValueOrDefault(patch_alerts, rule.alert, {});
+        local runbook_url = runbook(rule.alert);
         rule {
           // Change alert names so we don't get multiple alerts with the same
           // name, as the rook-ceph operator deploys its own copy of these
           // rules.
           alert: 'SYN_%s' % super.alert,
           // add customAnnotations configured for all alerts on cluster
-          annotations+: global_alert_params.customAnnotations,
+          annotations+: global_alert_params.customAnnotations {
+            runbook_url: runbook_url,
+          },
           labels+: {
             // ensure the alerts are not silenced on OCP4
             // TODO: figure out how to ensure we don't get duplicate alerts on
@@ -149,6 +155,7 @@ local additional_rules = [
         annotations: global_alert_params.customAnnotations {
           summary: 'rook-ceph operator scaled to 0 for more than 1 hour.',
           description: 'TODO',
+          runbook_url: runbook('RookCephOperatorScaledDown'),
         },
         labels: {
           severity: 'warning',

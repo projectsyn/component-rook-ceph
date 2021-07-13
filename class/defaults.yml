@@ -44,6 +44,8 @@ parameters:
               replicated:
                 size: 3
                 requireSafeReplicaSize: true
+            mount_options:
+              discard: true
             storage_class_config:
               parameters:
                 csi.storage.k8s.io/fstype: ext4
@@ -74,6 +76,8 @@ parameters:
                 # extended here
               mirroring:
                 enabled: false
+            mount_options:
+              discard: true
             storage_class_config:
               allowVolumeExpansion: true
 

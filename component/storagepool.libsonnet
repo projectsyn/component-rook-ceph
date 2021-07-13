@@ -25,11 +25,31 @@ local get_sc_config(type, pool) =
   assert std.objectHas(
     params.ceph_cluster.storage_pools[type], pool
   );
+  local param_mount_options = com.getValueOrDefault(
+    params.ceph_cluster.storage_pools[type][pool],
+    'mount_options',
+    {},
+  );
+  local sc_mount_options = std.filter(
+    function(it) it != null,
+    [
+      if param_mount_options[opt] != null then (
+        if std.isString(param_mount_options[opt]) then
+          '%s=%s' % [ opt, param_mount_options[opt] ]
+        else if param_mount_options[opt] == true then
+          opt
+      )
+      for opt in std.objectFields(param_mount_options)
+    ]
+  );
   com.makeMergeable(com.getValueOrDefault(
     params.ceph_cluster.storage_pools[type][pool],
     'storage_class_config',
     {}
-  ));
+  )) +
+  {
+    mountOptions+: sc_mount_options,
+  };
 
 // subpool used for CephFS
 local configure_sc(type, pool, subpool=null) =

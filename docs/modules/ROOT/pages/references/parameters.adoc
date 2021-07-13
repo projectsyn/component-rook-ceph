@@ -169,7 +169,7 @@ ignore_alerts:
 [horizontal]
 type:: dict
 keys:: Names of `CephBlockPool` resources
-values:: dicts with keys `config` and `storage_class_config`
+values:: dicts with keys `config` and `mount_options`, and `storage_class_config`
 
 In this parameter `CephBlockPool` resources are configured.
 The component creates exactly one storageclass and volumesnapshotclass per block pool.
@@ -184,6 +184,8 @@ storagepool:
     replicated:
       size: 3
       requireSafeReplicaSize: true
+  mount_options:
+    discard: true
   storage_class_config:
     parameters:
       csi.storage.k8s.io/fstype: ext4
@@ -193,19 +195,24 @@ storagepool:
 This configuration results in
 
 * A `CephBlockPool` named `storagepool` which is configured with 3 replicas distributed on different hosts
-* A storageclass which creates PVs on this block pool, uses the `ext4` filesystem and supports volume expansion
-* A volumesnapshotclass associated with the storageclass
+* A storage class which creates PVs on this block pool, uses the `ext4` filesystem, supports volume expansion and configures PVs to be mounted with `-o discard`.
+* A `VolumeSnapshotClass` associated with the storage class
 
 See https://rook.io/docs/rook/v1.6/ceph-pool-crd.html[the Rook.io `CephBlockPool` CRD documentation] for all possible configurations in key `config`.
 
 The values in key `storage_class_config` are merged into the `StorageClass` resource.
+
+The values in key `mount_options` are transformed into an array which is injected into the `StorageClass` resource in field `mountOptions`.
+Providing a key with value `true` in `mount_options` results in an array entry which just consists of the key.
+Providing a key with string value results in an array entry which consists of `key=value`.
+Providing a key with value `false` or `null` will result in the key not being added to the storage class's mount options.
 
 === `storage_pools.cephfs`
 
 [horizontal]
 type:: dict
 keys:: Names of `CephFilesystem` resources
-values:: dicts with keys `data_pools`, `config` and `storage_class_config`
+values:: dicts with keys `data_pools`, `mount_options`, `config` and `storage_class_config`
 
 In this parameter `CephFilesystem` resources are configured.
 The component creates exactly one storageclass and volumesnapshotclass per CephFS.
@@ -239,12 +246,18 @@ fspool:
       # extended here
     mirroring:
       enabled: false
+  mount_options:
+    discard: true
   storage_class_config:
     allowVolumeExpansion: true
 ----
 
-This configuration creates one `CephFilesystem` resource named `fspool`.
+This configuration creates
+
+* One `CephFilesystem` resource named `fspool`.
 This CephFS instance is configured to have 3 replicas both for the metadata pool and its single data pool.
+* A storage class which creates PVs on the CephFS instance, supports volume expansion and configures PVs to be mounted with `-o discard`.
+* A `VolumeSnapshotClass` associated with the storage class
 
 The key `data_pools` is provided to avoid having to manage a list of data pools directly in the hierarchy.
 The values of each key in `data_pools` are placed in the resulting CephFS resource's field `.spec.dataPools`
@@ -253,6 +266,11 @@ The contents of key `config` are used as the base value of the resulting resourc
 Note that data pools given in `config` in the hierarchy will be overwritten by the pools configured in `data_pools`.
 
 The values in key `storage_class_config` are merged into the `StorageClass` resource which is for the CephFS instance.
+
+The values in key `mount_options` are transformed into an array which is injected into the `StorageClass` resource in field `mountOptions`.
+Providing a key with value `true` in `mount_options` results in an array entry which just consists of the key.
+Providing a key with string value results in an array entry which consists of `key=value`.
+Providing a key with value `false` or `null` will result in the key not being added to the storage class's mount options.
 
 See https://rook.io/docs/rook/v1.6/ceph-filesystem-crd.html[the Rook.io `CephFilesystem` CRD documentation] for all possible configurations in key `config`.
 

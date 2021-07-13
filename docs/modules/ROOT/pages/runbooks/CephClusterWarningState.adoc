@@ -2,8 +2,28 @@
 
 == icon:glasses[] Overview
 
-// Add overview over the condition which triggers the rule
+This alert is a general indicator that the Ceph cluster health is degraded.
+In some cases, this alert will be inhibited by other more specific alerts.
+Consider writing a more specific alert if you find a condition in which only this alert is firing.
 
 == icon:bug[] Steps for debugging
 
-// Add detailed steps to debug and resolve the issue
+=== Check Ceph status
+
+Check Ceph for detailed information why the cluster is in `HEALTH_WARN` state
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph status
+  cluster:
+    id:     92716509-0f84-4739-8d04-541d2e7c3e66
+    health: HEALTH_WARN <1>
+            1 osds down <2>
+            1 host (1 osds) down <2>
+            Degraded data redundancy: 44130/66195 objects degraded (66.667%), 128 pgs degraded <2>
+
+[ ... remaining output omitted ... ]
+----
+<1> General cluster health status
+<2> Detailed information (only available if health is degraded)

@@ -1,6 +1,16 @@
 = Alert rule: CephMdsMissingReplicas
-:icons: font
 
 == icon:glasses[] Overview
 
+This alert fires when the CephFS instance is missing a replica.
+
 == icon:bug[] Steps for debugging
+
+=== Check CephFS status
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph fs status
+[ ... OUTPUT TODO ... ]
+----

@@ -16,6 +16,10 @@ local ignore_alerts = [
   // Drop CephNodeDown alert, we already have plenty of alerts for
   // unresponsive nodes.
   'CephNodeDown',
+  // Drop CephMgrIsMissingReplicas since we're not running multiple MGR
+  // replicas at the moment, and the actual problem of the Mgr pod missing is
+  // covered by `CephMgrIsAbsent`.
+  'CephMgrIsMissingReplicas',
 ];
 
 // Alert rule patches.

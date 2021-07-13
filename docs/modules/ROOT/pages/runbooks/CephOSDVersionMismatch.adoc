@@ -1,9 +1,5 @@
 = Alert rule: CephOSDVersionMismatch
 
-== icon:glasses[] Overview
+:component: OSD
 
-// Add overview over the condition which triggers the rule
-
-== icon:bug[] Steps for debugging
-
-// Add detailed steps to debug and resolve the issue
+include::partial$runbooks/version_mismatch.adoc[]

@@ -1,0 +1,12 @@
+== icon:glasses[] Overview
+
+This alert fires if {component}s with differing Ceph versions are running in the cluster.
+This alert probably indicates that a Ceph upgrade didn't complete successfully.
+
+== icon:bug[] Steps for debugging
+
+=== Check the `CephCluster` resource status
+
+Check the list of running {component} versions in the  `CephCluster` resource.
+
+include::partial$runbooks/check_cephcluster_resource.adoc[]

@@ -27,6 +27,14 @@ parameters:
       cephfs_enabled: false
       # Whether to enable monitoring
       monitoring_enabled: true
+      # Ceph alerts to ignore
+      # The component supports removal of entries from this array by
+      # giving the entry prefixed with `~` (same syntax as for the
+      # applications array).
+      ignore_alerts:
+        # Disable Ceph pool quota alerts by default
+        - CephPoolQuotaBytesNearExhaustion
+        - CephPoolQuotaBytesCriticallyExhausted
 
       storage_pools:
         rbd:

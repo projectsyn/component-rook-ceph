@@ -138,6 +138,32 @@ default:: `true`
 
 This parameter controls whether the component enables monitoring on the `CephCluster` resource and sets up Ceph alert rules.
 
+=== `ignore_alerts`
+
+[horizontal]
+type:: list
+default::
++
+[source,yaml]
+----
+- CephPoolQuotaBytesNearExhaustion
+- CephPoolQuotaBytesCriticallyExhausted
+----
+
+This parameter can be used to disable alerts provided by Rook.io.
+The component supports removing entries in this parameter by providing the entry prefixed with `~`.
+
+By default, the component disables the CephPoolQuota alerts, since the default configuration doesn't configure any pool quotas.
+
+However, if the quota alerts are wanted, they can be re-enabled by removing the alerts from the parameter by providing the following configuration.
+
+[source,yaml]
+----
+ignore_alerts:
+  - ~CephPoolQuotaBytesNearExhaustion
+  - ~CephPoolQuotaBytesCriticallyExhausted
+----
+
 === `storage_pools.rbd`
 
 [horizontal]

@@ -1,0 +1,19 @@
+ifndef::state[]
+:state: HEALTH_WARN
+endif::state[]
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph status
+  cluster:
+    id:     92716509-0f84-4739-8d04-541d2e7c3e66
+    health: {state} <1>
+            [ ... detailed information ... ] <2>
+            [ ... detailed information ... ] <2>
+            [ ... detailed information ... ] <2>
+
+[ ... remaining output omitted ... ]
+----
+<1> General cluster health status
+<2> One or more lines of information giving details why the cluster state is degraded.
+Only available if the cluster health isn't `HEALTH_OK`.

@@ -41,20 +41,47 @@ local namespaces =
     ]
   else [];
 
-{
-  '00_namespaces': namespaces,
-  [if on_openshift then '02_openshift_sccs']: ocp_config.sccs,
-  '10_cephcluster_rbac': cephcluster.rbac,
-  '10_cephcluster_configoverride': cephcluster.configmap,
-  '10_cephcluster_cluster': cephcluster.cluster,
-  [if params.toolbox.enabled then '10_cephcluster_toolbox']: cephcluster.toolbox,
-  '20_storagepools':
-    rbd_config.storagepools +
-    cephfs_config.storagepools,
-  '30_storageclasses':
-    rbd_config.storageclasses +
-    cephfs_config.storageclasses,
-  '30_snapshotclasses':
-    rbd_config.snapshotclass +
-    cephfs_config.snapshotclass,
-}
+local common_labels(name) = {
+  'app.kubernetes.io/name': name,
+  'app.kubernetes.io/managed-by': 'commodore',
+  'app.kubernetes.io/component': 'rook-ceph',
+};
+
+local add_labels(manifests) = [
+  manifest {
+    metadata+: {
+      labels+: common_labels(super.name),
+    },
+  }
+  for manifest in manifests
+];
+
+std.mapWithKey(
+  function(field, value)
+    if std.isArray(value) then
+      add_labels(value)
+    else
+      value {
+        metadata+: {
+          labels+: common_labels(super.name),
+        },
+      },
+  {
+    '00_namespaces': namespaces,
+    [if on_openshift then '02_openshift_sccs']: ocp_config.sccs,
+    '10_cephcluster_rbac': cephcluster.rbac,
+    '10_cephcluster_configoverride': cephcluster.configmap,
+    '10_cephcluster_cluster': cephcluster.cluster,
+    [if params.toolbox.enabled then '10_cephcluster_toolbox']:
+      cephcluster.toolbox,
+    '20_storagepools':
+      rbd_config.storagepools +
+      cephfs_config.storagepools,
+    '30_storageclasses':
+      rbd_config.storageclasses +
+      cephfs_config.storageclasses,
+    '30_snapshotclasses':
+      rbd_config.snapshotclass +
+      cephfs_config.snapshotclass,
+  }
+)

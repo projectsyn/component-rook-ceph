@@ -130,6 +130,14 @@ This parameter controls whether the CephFS CSI driver, its associated volumesnap
 
 The `CephFilesystem` resources are defined and configured in parameter <<_storage_pools_cephfs,`storage_pools.cephfs`>>.
 
+=== `monitoring_enabled`
+
+[horizontal]
+type:: boolean
+default:: `true`
+
+This parameter controls whether the component enables monitoring on the `CephCluster` resource and sets up Ceph alert rules.
+
 === `storage_pools.rbd`
 
 [horizontal]

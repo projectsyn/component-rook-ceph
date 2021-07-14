@@ -2,8 +2,28 @@
 
 == icon:glasses[] Overview
 
-// Add overview over the condition which triggers the rule
+This alert fires if some Ceph OSD requests take too long to process.
 
 == icon:bug[] Steps for debugging
 
-// Add detailed steps to debug and resolve the issue
+=== Check Ceph status
+
+include::partial$runbooks/check_cephcluster_status.adoc[]
+
+=== Check OSD slow op log
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ osd_id=0 <1>
+$ kubectl -n "${ceph_cluster_ns}" exec -it -c osd deploy/rook-ceph-osd-${osd_id} -- \
+      bash -c "unset CEPH_ARGS; ceph daemon osd.${osd_id} dump_blocked_ops" <2>
+$ kubectl -n "${ceph_cluster_ns}" exec -it -c osd deploy/rook-ceph-osd-${osd_id} -- \
+      bash -c "unset CEPH_ARGS; ceph daemon osd.${osd_id} dump_historic_slow_ops" <3>
+$ kubectl -n "${ceph_cluster_ns}" exec -it -c osd deploy/rook-ceph-osd-${osd_id} -- \
+      bash -c "unset CEPH_ARGS; ceph daemon osd.${osd_id} ops" <4>
+----
+<1> Set variable `osd_id` to the ID (0,1,2,...) of the OSD which has been reported as having slow ops.
+<2> Show currently blocked ops on OSD
+<3> Show recent slow ops for OSD
+<4> Show all ops in flight on OSD

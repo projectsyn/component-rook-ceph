@@ -2,8 +2,11 @@
 
 == icon:glasses[] Overview
 
-// Add overview over the condition which triggers the rule
+This alert fires if an OSD isn't running.
+This alert can be caused because a storage node is unavailable.
 
 == icon:bug[] Steps for debugging
 
-// Add detailed steps to debug and resolve the issue
+:component: OSD
+
+include::partial$runbooks/check_component_pod_status.adoc[]

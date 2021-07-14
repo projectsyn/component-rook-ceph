@@ -2,7 +2,7 @@
 
 == icon:glasses[] Overview
 
-// Add overview over the condition which triggers the rule
+This alert fires if an OSD has been removed from the cluster with `ceph osd out` and its associated OSD pod isn't running.
 
 == icon:bug[] Steps for debugging
 

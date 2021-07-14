@@ -13,9 +13,6 @@ assert
 
 // Upstream alerts to ignore
 local ignore_alerts = [
-  // Drop CephNodeDown alert, we already have plenty of alerts for
-  // unresponsive nodes.
-  'CephNodeDown',
   // Drop CephMgrIsMissingReplicas since we're not running multiple MGR
   // replicas at the moment, and the actual problem of the Mgr pod missing is
   // covered by `CephMgrIsAbsent`.
@@ -104,6 +101,8 @@ local alert_rules_manifests = std.filter(
 local ignore_groups = std.set([
   // We don't need duplicate alerts for PVs that run full
   'persistent-volume-alert.rules',
+  // We don't need duplicate alerts for storage nodes
+  'ceph-node-alert.rules',
 ]);
 
 local additional_rules = [

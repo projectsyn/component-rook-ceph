@@ -1,0 +1,7 @@
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- \
+        ceph osd pool get-quota <POOLNAME> <1>
+----
+<1> The name of the pool for which the quotas should be displayed

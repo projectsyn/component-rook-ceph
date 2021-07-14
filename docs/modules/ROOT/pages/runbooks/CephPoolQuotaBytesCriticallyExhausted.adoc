@@ -2,8 +2,11 @@
 
 == icon:glasses[] Overview
 
-// Add overview over the condition which triggers the rule
+This alert fires when a Ceph pool's utilization is over 90% of the pool's quota.
+The alert fires only for pools which have a bytes quota configured.
 
 == icon:bug[] Steps for debugging
 
-// Add detailed steps to debug and resolve the issue
+=== Check the configured quota for a pool
+
+include::partial$runbooks/check_pool_quota.adoc[]

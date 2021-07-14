@@ -2,8 +2,26 @@
 
 == icon:glasses[] Overview
 
-// Add overview over the condition which triggers the rule
+This alert fires when there have been more than 0.95 MON quorum leader changes per minute.
+A high amount of leader changes indicates instability in the running MON pods.
 
 == icon:bug[] Steps for debugging
 
-// Add detailed steps to debug and resolve the issue
+=== Check MON pods for restarts
+
+:component: MON
+:investigate: Investigate pods with more than zero restarts.
+
+include::partial$runbooks/check_component_pod_status.adoc[]
+
+=== Check if pod restarts were caused by resource limits
+
+For pods with more than zero restarts, check if they were restarted due to resource consumption.
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" describe pod <POD_WITH_RESTARTS>
+----
+
+In particular, check whether section `State` for container `mon` has a note that the previous container was OOMKilled.

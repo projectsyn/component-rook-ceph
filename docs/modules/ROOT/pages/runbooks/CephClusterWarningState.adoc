@@ -8,22 +8,8 @@ Consider writing a more specific alert if you find a condition in which only thi
 
 == icon:bug[] Steps for debugging
 
-=== Check Ceph status
+=== Check Ceph cluster status
 
 Check Ceph for detailed information why the cluster is in `HEALTH_WARN` state
 
-[source,console]
-----
-$ ceph_cluster_ns=syn-rook-ceph-cluster
-$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph status
-  cluster:
-    id:     92716509-0f84-4739-8d04-541d2e7c3e66
-    health: HEALTH_WARN <1>
-            1 osds down <2>
-            1 host (1 osds) down <2>
-            Degraded data redundancy: 44130/66195 objects degraded (66.667%), 128 pgs degraded <2>
-
-[ ... remaining output omitted ... ]
-----
-<1> General cluster health status
-<2> Detailed information (only available if health is degraded)
+include::partial$runbooks/check_cephcluster_status.adoc[]

@@ -2,7 +2,11 @@
 
 == icon:glasses[] Overview
 
-// Add overview over the condition which triggers the rule
+This alert fires when utilization of a Ceph storage device (disk) is higher than 75% of the device's capacity.
+This alert may indicate that the cluster utilization will soon reach problematic levels.
+If this alert is caused by high cluster utilization, unused data should be deleted or the cluster size must be increased.
+
+Otherwise, investigate why this particular device has higher utilization than the other storage devices in the Ceph cluster.
 
 == icon:bug[] Steps for debugging
 

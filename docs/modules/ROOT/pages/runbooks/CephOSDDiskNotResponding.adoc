@@ -1,5 +1,7 @@
 = Alert rule: CephOSDDiskNotResponding
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires if an OSD isn't running.

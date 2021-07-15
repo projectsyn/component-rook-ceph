@@ -1,5 +1,7 @@
 = Alert rule: CephMgrIsAbsent
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires if Prometheus can't scrape metrics from Ceph.

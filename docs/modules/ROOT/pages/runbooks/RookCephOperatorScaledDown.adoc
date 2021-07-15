@@ -1,5 +1,7 @@
 = Alert rule: RookCephOperatorScaledDown
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires if the Rook-Ceph operator deployment is scaled to 0 for more than an hour.

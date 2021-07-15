@@ -1,5 +1,7 @@
 = Alert rule: CephMonHighNumberOfLeaderChanges
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires when there have been more than 0.95 MON quorum leader changes per minute.

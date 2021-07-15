@@ -1,5 +1,7 @@
 = Alert rule: CephOSDCriticallyFull
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires when utilization of a Ceph storage device (disk) is higher than 80% of the device's capacity.

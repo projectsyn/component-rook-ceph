@@ -1,5 +1,7 @@
 = Alert rule: CephPGRepairTakingTooLong
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires when Ceph takes longer than one hour to repair an inconsistent placement group (PG).

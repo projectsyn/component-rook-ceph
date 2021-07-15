@@ -1,5 +1,7 @@
 = Alert rule: CephOSDFlapping
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires if a Ceph OSD pod has restarted five or more times in the last five minutes.

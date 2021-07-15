@@ -1,5 +1,7 @@
 = Alert rule: CephMonQuorumAtRisk
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires if two or fewer MONs are active in the Ceph cluster.

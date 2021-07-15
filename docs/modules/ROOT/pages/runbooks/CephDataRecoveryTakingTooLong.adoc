@@ -1,5 +1,7 @@
 = Alert rule: CephDataRecoveryTakingTooLong
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert is triggered when one or more degraded Ceph placement groups (PGs) take longer than two hours to recover.

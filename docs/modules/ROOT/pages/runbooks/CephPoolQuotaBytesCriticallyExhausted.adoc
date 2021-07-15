@@ -1,5 +1,7 @@
 = Alert rule: CephPoolQuotaBytesCriticallyExhausted
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires when a Ceph pool's utilization is over 90% of the pool's quota.

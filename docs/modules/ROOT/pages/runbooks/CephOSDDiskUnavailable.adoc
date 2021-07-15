@@ -1,5 +1,7 @@
 = Alert rule: CephOSDDiskUnavailable
 
+include::partial$runbooks/contribution_note.adoc[]
+
 == icon:glasses[] Overview
 
 This alert fires if an OSD has been removed from the cluster with `ceph osd out` and its associated OSD pod isn't running.

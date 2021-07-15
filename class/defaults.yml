@@ -25,6 +25,16 @@ parameters:
       rbd_enabled: true
       # Whether to setup CephFS CSI driver and pools
       cephfs_enabled: false
+      # Whether to enable monitoring
+      monitoring_enabled: true
+      # Ceph alerts to ignore
+      # The component supports removal of entries from this array by
+      # giving the entry prefixed with `~` (same syntax as for the
+      # applications array).
+      ignore_alerts:
+        # Disable Ceph pool quota alerts by default
+        - CephPoolQuotaBytesNearExhaustion
+        - CephPoolQuotaBytesCriticallyExhausted
 
       storage_pools:
         rbd:
@@ -113,6 +123,7 @@ parameters:
         enableCSIHostNetwork: false
         enableRbdDriver: ${rook_ceph:ceph_cluster:rbd_enabled}
         enableCephfsDriver: ${rook_ceph:ceph_cluster:cephfs_enabled}
+        enableGrpcMetrics: true
         cephcsi:
           image: ${rook_ceph:images:cephcsi:registry}/${rook_ceph:images:cephcsi:image}:${rook_ceph:images:cephcsi:tag}
 
@@ -126,7 +137,7 @@ parameters:
         allowUnsupported: false
       dataDirHostPath: /var/lib/rook
       monitoring:
-        enabled: true
+        enabled: ${rook_ceph:ceph_cluster:monitoring_enabled}
         rulesNamespace: ${rook_ceph:ceph_cluster:namespace}
       mon:
         count: 3

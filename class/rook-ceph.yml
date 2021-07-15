@@ -7,17 +7,23 @@ parameters:
         version: ${rook_ceph:charts:rook-ceph}
         output_path: dependencies/rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
       - type: https
-        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/rbd-storageclass.yaml
       - type: https
-        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/snapshotclass.yaml
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/rbd/snapshotclass.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/rbd-snapshotclass.yaml
       - type: https
-        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/cephfs-storageclass.yaml
       - type: https
-        source: https://github.com/rook/rook/raw/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/snapshotclass.yaml
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/csi/cephfs/snapshotclass.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/cephfs-snapshotclass.yaml
+      - type: https
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/monitoring/csi-metrics-service-monitor.yaml
+        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/csi-metrics-service-monitor.yaml
+      - type: https
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/cluster/examples/kubernetes/ceph/monitoring/prometheus-ceph-v14-rules.yaml
+        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/prometheus-ceph-rules.yaml
     compile:
       - input_paths:
           - rook-ceph/component/app.jsonnet

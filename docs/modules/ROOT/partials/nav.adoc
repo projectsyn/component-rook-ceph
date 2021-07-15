@@ -11,6 +11,8 @@
 
 .Alert runbooks
 
+* xref:how-tos/add_alert_runbook.adoc[Adding a new alert runbook]
+
 * Rook-Ceph operator
 ** xref:runbooks/RookCephOperatorScaledDown.adoc[RookCephOperatorScaledDown]
 

@@ -1,0 +1,35 @@
+= Alert rule: CephOSDSlowOps
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+This alert fires if some Ceph OSD requests take too long to process.
+Slow OSD requests may be the cause of PVCs taking a long time to become bound to a PV.
+
+Most likely, slow requests will be caused by heavy load on the Ceph cluster.
+See the https://docs.ceph.com/en/latest/rados/troubleshooting/troubleshooting-osd/#blocked-requests-or-slow-requests[Ceph documentation] for a more detailed explanation of possible causes of slow requests.
+
+== icon:bug[] Steps for debugging
+
+=== Check Ceph status
+
+include::partial$runbooks/check_cephcluster_status.adoc[]
+
+=== Check OSD slow op log
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ osd_id=0 <1>
+$ kubectl -n "${ceph_cluster_ns}" exec -it -c osd deploy/rook-ceph-osd-${osd_id} -- \
+      bash -c "unset CEPH_ARGS; ceph daemon osd.${osd_id} dump_blocked_ops" <2>
+$ kubectl -n "${ceph_cluster_ns}" exec -it -c osd deploy/rook-ceph-osd-${osd_id} -- \
+      bash -c "unset CEPH_ARGS; ceph daemon osd.${osd_id} dump_historic_slow_ops" <3>
+$ kubectl -n "${ceph_cluster_ns}" exec -it -c osd deploy/rook-ceph-osd-${osd_id} -- \
+      bash -c "unset CEPH_ARGS; ceph daemon osd.${osd_id} ops" <4>
+----
+<1> Set variable `osd_id` to the ID (0,1,2,...) of the OSD which has been reported as having slow ops.
+<2> Show currently blocked ops on OSD
+<3> Show recent slow ops for OSD
+<4> Show all ops in flight on OSD

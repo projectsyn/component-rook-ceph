@@ -1,0 +1,67 @@
+ifndef::nonodes[]
+=== Check that all storage nodes are ready
+
+[source,console]
+----
+$ kubectl get nodes -l node-role.kubernetes.io/storage
+NAME           STATUS   ROLES            AGE     VERSION
+storage-9649   Ready    storage,worker   6d18h   v1.20.0+87cc9a4
+storage-96bf   Ready    storage,worker   6d18h   v1.20.0+87cc9a4
+storage-cbf0   Ready    storage,worker   6d19h   v1.20.0+87cc9a4
+----
+
+Investigate any nodes which show as `NotReady` in the output of the previous command
+endif::nonodes[]
+
+=== Check {component} pod status
+
+ifeval::["{component}" == "OSD"]
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" get pods -l app=rook-ceph-osd
+NAME                               READY   STATUS    RESTARTS   AGE
+rook-ceph-osd-0-7cb86cd754-hvbkm   1/1     Running   0          4d1h
+rook-ceph-osd-1-76c757c5f5-2xxrp   1/1     Running   0          3h47m
+rook-ceph-osd-2-6bcb99c85d-c7dmq   1/1     Running   0          3h44m
+----
+:count: 3
+endif::[]
+
+ifeval::["{component}" == "MON"]
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" get pods -l app=rook-ceph-mon
+NAME                               READY   STATUS    RESTARTS   AGE
+rook-ceph-mon-a-7d4d5899b9-8d2vq   1/1     Running   0          4d2h
+rook-ceph-mon-b-85f4f6599d-fp2wn   1/1     Running   0          6d3h
+rook-ceph-mon-c-64779b675-h9zw7    1/1     Running   0          6d4h
+----
+:count: 3
+endif::[]
+
+ifeval::["{component}" != "MON"]
+ifeval::["{component}" != "OSD"]
+TODO: provide command to list pods for component {component}
+endif::[]
+endif::[]
+
+ifdef::investigate[]
+{investigate}
+endif::investigate[]
+ifndef::investigate[]
+Investigate pods which aren't in state `Running` with `1/1` ready containers.
+
+The command should show {count} pods.
+If there are fewer than {count} pods, investigate the Ceph cluster and `CephCluster` resource status.
+
+=== Check Ceph cluster status
+
+include::partial$runbooks/check_cephcluster_status.adoc[]
+
+=== Check `CephCluster` resource status
+
+include::partial$runbooks/check_cephcluster_resource.adoc[]
+
+endif::investigate[]

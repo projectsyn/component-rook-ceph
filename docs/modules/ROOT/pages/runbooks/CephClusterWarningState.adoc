@@ -1,0 +1,17 @@
+= Alert rule: CephClusterWarningState
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+This alert is a general indicator that the Ceph cluster health is degraded.
+In some cases, this alert will be inhibited by other more specific alerts.
+Consider writing a more specific alert if you find a condition in which only this alert is firing.
+
+== icon:bug[] Steps for debugging
+
+=== Check Ceph cluster status
+
+Check Ceph for detailed information why the cluster is in `HEALTH_WARN` state
+
+include::partial$runbooks/check_cephcluster_status.adoc[]

@@ -1,0 +1,39 @@
+= Adding a new alert runbook
+
+This how-to shows how you can add a new alert runbook using the provided template.
+
+. Check out the component
++
+[source,console]
+----
+work_dir=$(mktemp -d)
+pushd ${work_dir}
+git clone git@github.com:projectsyn/component-rook-ceph.git . <1>
+----
+<1> If you don't have write access to the `projectsyn/component-rook-ceph` repository, fork the repository and clone your fork
+
+. Create new alert runbook from the template
++
+[source,console]
+----
+rule=MyAlertName <1>
+envsubst < docs/modules/ROOT/pages/runbooks/_RuleTemplate > docs/modules/ROOT/pages/runbooks/"${rule}.adoc"
+----
+<1> Replace with the name of the alert for which you want to generate an alert runbook page
+
+. Add content to the new alert runbook
+
+. Add the alert runbook to the navigation.
+Edit `docs/modules/ROOT/partials/nav.adoc` to add a link to your new runbook.
+
+. Create a feature branch, commit and push your changes
++
+[source,console]
+----
+git checkout -b feat/alert-runbook-${rule}
+git add docs
+git commit -m'Add runbook for alert ${rule}'
+git push origin feat/alert-runbook-${rule}
+----
+
+. Create a PR by clicking the link provided in the `git push` output.

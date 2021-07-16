@@ -1,0 +1,58 @@
+= Alert rule: CephOSDFlapping
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+This alert fires if a Ceph OSD pod has restarted five or more times in the last five minutes.
+
+== icon:bug[] Steps for debugging
+
+:component: OSD
+:nonodes: yes
+:investigate: Investigate pods which have more than zero restarts.
+
+include::partial$runbooks/check_component_pod_status.adoc[]
+
+=== Check if pod restarts were caused by resource limits
+
+For pods with more than zero restarts, check if they were restarted due to resource consumption.
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" describe pod <POD_WITH_RESTARTS>
+----
+
+In particular, check whether section `State` for container `osd` has a note that the previous container was OOMKilled.
+
+=== Check Ceph status
+
+include::partial$runbooks/check_cephcluster_status.adoc[]
+
+==== Check Ceph crash logs
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph crash ls <1>
+[ ... list of crash logs ... ]
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- \
+      ceph crash info <CRASH_ID> <2>
+[ ... detailed crash info ... ]
+----
+<1> List currently not archived crash logs
+<2> Show detailed information of crash log with id `<CRASH_ID>`
+
+==== Archive Ceph crash logs
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- \
+      ceph crash archive-all <1>
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- \
+      ceph crash archive <CRASH_ID> <2>
+----
+<1> Archive all currently not archived crash logs
+<2> Archive crash log with id `<CRASH_ID>`

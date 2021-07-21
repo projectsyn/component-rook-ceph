@@ -188,6 +188,8 @@ parameters:
                       storage: ${rook_ceph:ceph_cluster:block_volume_size}
             encrypted: true
             tuneFastDeviceClass: ${rook_ceph:ceph_cluster:tune_fast_device_class}
+      # Automatically remove OSDs that are down and whose data has been moved to other OSDs
+      removeOSDsIfOutAndSafeToRemove: true
 
       disruptionManagement:
         managePodBudgets: true

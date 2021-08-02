@@ -71,3 +71,40 @@ parameters:
 As discussed in xref:references/parameters.adoc#_config_override[the parameter's documentation], the contents of `ceph_cluster.config_override` are rendered into __ini__ style format by the component.
 
 Each key in the parameter is used as the name of a section in the resulting _ini_ style configuration file.
+
+== Configure Ceph full ratios
+
+Ceph has https://docs.ceph.com/en/latest/rados/configuration/mon-config-ref/#storage-capacity[configuration options] to control at which point the cluster starts warning about potential service interruptions due to running out of disk space.
+
+The component sets the config options `mon_osd_full_ratio=0.85`, `mon_osd_backfillfull_ratio=0.8` and `mon_osd_nearfull_ratio=0.75` in the Rook `config-override` configmap.
+With this configuration, the Ceph cluster will go into read-only mode when it's utilized to 85% of its capacity.
+
+You can tune these options before creating the Ceph cluster by providing the following config.
+
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      config_override:
+        global:
+          mon_osd_full_ratio: '0.9' <1>
+          mon_osd_nearfull_ratio: '0.8' <2>
+          mon_osd_backfillfull_ratio: '0.85' <3>
+----
+<1> Configure the cluster to become read-only (OSD status `full`) at 90% utilization.
+We give the ratios as strings to avoid the resulting configuration containing values like `0.90000000000000002` due to floating point rounding issues.
+<2> Configure the threshold at which the OSD status becomes `nearfull`.
+<3> Configure the threshold at which Ceph won't backfill more data to the OSD.
+
+At runtime, you can adjust the cluster's ratios with
+
+[source,bash]
+----
+kubectl --as=cluster-admin exec -it deploy/rook-ceph-tools -- ceph osd set-full-ratio 0.9 <1>
+kubectl --as=cluster-admin exec -it deploy/rook-ceph-tools -- ceph osd set-nearfull-ratio 0.8 <2>
+kubectl --as=cluster-admin exec -it deploy/rook-ceph-tools -- ceph osd set-backfillfull-ratio 0.85 <3>
+----
+<1> Configure the cluster to become read-only (OSD status `full`) at 90% utilization.
+<2> Configure the threshold at which the OSD status becomes `nearfull`.
+<3> Configure the threshold at which Ceph won't backfill more data to the OSD.

@@ -85,6 +85,10 @@ default::
 +
 [source,yaml]
 ----
+global:
+  mon_osd_full_ratio: '0.85'
+  mon_osd_backfillfull_ratio: '0.8'
+  mon_osd_nearfull_ratio: '0.75'
 osd:
   bluefs_buffered_io: false
 ----
@@ -99,10 +103,21 @@ Please be aware that Ceph may fail to start if you provide an invalid configurat
 See the https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/[Ceph documentation] for a list of valid configuration sections and options.
 ====
 
+[TIP]
+====
+Use strings to represent fractional values in `config_override`.
+Otherwise, the rendered values in the _ini_ style file may suffer from floating point rounding issues.
+For example, if the fractional value `0.8` is given as a number in YAML, it would be rendered as `0.80000000000000004` in the resulting _ini_ style file.
+====
+
 The default value is translated into the following _ini_ style file:
 
 [source,ini]
 ----
+[global]
+mon_osd_full_ratio = 0.85
+mon_osd_backfillfull_ratio = 0.8
+mon_osd_nearfull_ratio = 0.75
 [osd]
 bluefs_buffered_io = false
 ----

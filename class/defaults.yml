@@ -15,6 +15,17 @@ parameters:
       tune_fast_device_class: false
       # Rendered into rook-config-override CM
       config_override:
+        global:
+          # Configure full ratios to match the alerts shipped with Rook.
+          # With this config the cluster goes readonly at 85% utilization.
+          # These configs only apply at cluster creation.
+          # To adjust the ratios at run time, use
+          #   `ceph osd set-{nearfull,backfillfull,full}-ratio`
+          # NOTE: we're giving ratios as strings to avoid float rounding
+          # issues when manifesting the values in the resulting config file.
+          mon_osd_full_ratio: '0.85'
+          mon_osd_backfillfull_ratio: '0.8'
+          mon_osd_nearfull_ratio: '0.75'
         osd:
           # We explicitly set bluefs_buffered_io to false to get good write
           # bandwidth on Exoscale -> TODO: needs to be checked per

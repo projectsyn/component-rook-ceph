@@ -115,6 +115,7 @@ parameters:
         tag: v3.4.0
 
     charts:
+      # We do not support helm chart versions older than v1.7.0
       rook-ceph: v1.7.4
 
     operator_helm_values:

@@ -35,30 +35,10 @@ local deployment = com.yaml_load(deployment_file) + {
                   e
                 for e in super.env
               ],
-              volumeMounts+: [
-                {
-                  mountPath: '/var/lib/rook',
-                  name: 'rook-config',
-                },
-                {
-                  mountPath: '/etc/ceph',
-                  name: 'default-config-dir',
-                },
-              ],
             }
           else
             c
           for c in super.containers
-        ],
-        volumes+: [
-          {
-            name: 'rook-config',
-            emptyDir: {},
-          },
-          {
-            name: 'default-config-dir',
-            emptyDir: {},
-          },
         ],
       },
     },

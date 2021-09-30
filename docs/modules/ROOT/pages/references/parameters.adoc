@@ -342,6 +342,11 @@ default:: See https://github.com/projectsyn/component-rook-ceph/blob/master/clas
 
 This parameter allows selecting the Helm chart version for the `rook-ceph` operator.
 
+[NOTE]
+====
+`rook-ceph` Helm chart versions older than `v1.7.0` aren't supported.
+====
+
 == `operator_helm_values`
 
 [horizontal]

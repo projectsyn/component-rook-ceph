@@ -112,7 +112,7 @@ parameters:
       cephcsi:
         registry: quay.io
         image: cephcsi/cephcsi
-        tag: v3.3.1
+        tag: v3.4.0
 
     charts:
       rook-ceph: v1.7.4

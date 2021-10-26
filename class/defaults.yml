@@ -186,21 +186,22 @@ parameters:
       storage:
         useAllNodes: false
         useAllDevices: false
-        storageClassDeviceSets:
-          - name: ${rook_ceph:ceph_cluster:name}
-            count: ${rook_ceph:ceph_cluster:node_count}
-            volumeClaimTemplates:
-              - spec:
-                  storageClassName: ${rook_ceph:ceph_cluster:block_storage_class}
-                  volumeMode: Block
-                  accessModes:
-                    - ReadWriteOnce
-                  resources:
-                    requests:
-                      storage: ${rook_ceph:ceph_cluster:block_volume_size}
-            encrypted: true
-            tuneFastDeviceClass: ${rook_ceph:ceph_cluster:tune_fast_device_class}
 
       disruptionManagement:
         managePodBudgets: true
         osdMaintenanceTimeout: 30
+
+    storageClassDeviceSets:
+      cluster:
+        count: ${rook_ceph:ceph_cluster:node_count}
+        volumeClaimTemplates:
+          - spec:
+              storageClassName: ${rook_ceph:ceph_cluster:block_storage_class}
+              volumeMode: Block
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: ${rook_ceph:ceph_cluster:block_volume_size}
+        encrypted: true
+        tuneFastDeviceClass: ${rook_ceph:ceph_cluster:tune_fast_device_class}

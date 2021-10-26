@@ -236,6 +236,12 @@ local cephcluster =
           manageMachineDisruptionBudgets: on_openshift,
           machineDisruptionBudgetNamespace: 'openshift-machine-api',
         },
+        storage: {
+          storageClassDeviceSets: [
+            params.storageClassDeviceSets[name] { name: name }
+            for name in std.objectFields(params.storageClassDeviceSets)
+          ],
+        },
       }
       + com.makeMergeable(params.cephClusterSpec),
   };

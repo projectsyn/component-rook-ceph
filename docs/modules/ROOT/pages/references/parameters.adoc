@@ -83,9 +83,9 @@ See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-se
 type:: dict
 default:: {}
 
-Control placement of osd pods, empty by default.
+Control placement of the OSD pods, empty by default.
 
-See https://github.com/rook/rook/blob/master/Documentation/ceph-cluster-crd.md#storage-class-device-sets[Storage Class Device Sets] for a more detailed explanation.
+See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-sets[Storage Class Device Sets] for a more detailed explanation.
 
 === `config_override`
 

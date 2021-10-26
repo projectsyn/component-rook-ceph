@@ -13,6 +13,9 @@ parameters:
       block_volume_size: 1
       # set to true if backing storage is SSD
       tune_fast_device_class: false
+      # Control placement of osd pods.
+      osd_placement: {}
+
       # Rendered into rook-config-override CM
       config_override:
         global:
@@ -200,6 +203,7 @@ parameters:
                       storage: ${rook_ceph:ceph_cluster:block_volume_size}
             encrypted: true
             tuneFastDeviceClass: ${rook_ceph:ceph_cluster:tune_fast_device_class}
+            placement: ${rook_ceph:ceph_cluster:osd_placement}
 
       disruptionManagement:
         managePodBudgets: true

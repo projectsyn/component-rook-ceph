@@ -77,6 +77,16 @@ This parameter can be set to `true` to tune the Ceph cluster OSD parameters for 
 
 See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-sets[the Rook.io Ceph cluster CRD documentation] for a more detailed explanation.
 
+=== `osd_placement`
+
+[horizontal]
+type:: dict
+default:: {}
+
+Control placement of the OSD pods, empty by default.
+
+See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-sets[Storage Class Device Sets] for a more detailed explanation.
+
 === `config_override`
 
 [horizontal]

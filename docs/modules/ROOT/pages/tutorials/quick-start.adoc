@@ -10,7 +10,7 @@ This tutorial will guide you to a working Ceph setup using the default configura
 * Block storage volumes (`volumeMode=Block`) are available in the cluster
 * The block storage volumes are associated with a StorageClass
 * A working `commodore` command is available locally.
-See the https://syn.tools/commodore/running-commodore.html[Running Commodore] documentation for details.
+See the https://syn.tools/commodore/explanation/running-commodore.html[Running Commodore] documentation for details.
 
 == Steps
 

@@ -81,8 +81,8 @@ parameters:
                 replicated:
                   size: 3
                   requireSafeReplicaSize: true
-              parameters:
-                compression_mode: none
+                parameters:
+                  compression_mode: none
               # dataPools rendered from data_pools in Jsonnet
               preserveFilesystemOnDelete: true
               metadataServer:

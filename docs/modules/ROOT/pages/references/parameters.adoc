@@ -87,6 +87,20 @@ Control placement of the OSD pods, empty by default.
 
 See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-sets[Storage Class Device Sets] for a more detailed explanation.
 
+=== `osd_portable`
+
+[horizontal]
+type:: boolean
+default:: `false`
+
+Allows OSDs to move between nodes during failover (and initial setup).
+This requires a storage class that supports portability (such as the CSI-managed storageclasses on cloudscale.ch).
+
+If this is `false`, OSDs are assigned to a node permanently.
+This is the default configuration for the component.
+
+It's recommended to set this parameter to `true` when deploying the component on CSI-managed PersistentVolumes.
+
 === `config_override`
 
 [horizontal]

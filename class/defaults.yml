@@ -15,6 +15,8 @@ parameters:
       tune_fast_device_class: false
       # Control placement of osd pods.
       osd_placement: {}
+      # Mark OSDs as portable (doesn't bind OSD to a host)
+      osd_portable: false
 
       # Rendered into rook-config-override CM
       config_override:
@@ -204,6 +206,7 @@ parameters:
             encrypted: true
             tuneFastDeviceClass: ${rook_ceph:ceph_cluster:tune_fast_device_class}
             placement: ${rook_ceph:ceph_cluster:osd_placement}
+            portable: ${rook_ceph:ceph_cluster:osd_portable}
 
       disruptionManagement:
         managePodBudgets: true

@@ -6,6 +6,7 @@ local sc = import 'lib/storageclass.libsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.rook_ceph;
 
+local helpers = import 'helpers.libsonnet';
 local sp = import 'storagepool.libsonnet';
 
 local cephfs_params = params.ceph_cluster.storage_pools.cephfs;
@@ -39,7 +40,8 @@ local metadataServerPlacement = {
             },
           } ],
         },
-      },
+        tolerations+: params.tolerations,
+      } + helpers.nodeAffinity,
     },
   },
 };

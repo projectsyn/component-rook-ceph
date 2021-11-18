@@ -35,8 +35,25 @@ local ocp_metrics_rolebinding(namespace, metrics_role) =
     } ],
   };
 
+local nodeAffinity = {
+  nodeAffinity+: {
+    requiredDuringSchedulingIgnoredDuringExecution+: {
+      nodeSelectorTerms+: [ {
+        matchExpressions+: [
+          {
+            key: label,
+            operator: 'Exists',
+          }
+          for label in std.objectFields(params.node_selector)
+        ],
+      } ],
+    },
+  },
+};
+
 {
   load_manifest: load_manifest,
   metrics_role: metrics_role,
   ocp_metrics_rolebinding: ocp_metrics_rolebinding,
+  nodeAffinity: nodeAffinity,
 }

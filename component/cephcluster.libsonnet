@@ -205,22 +205,6 @@ local rbac =
   rolebindings +
   clusterrolebindings;
 
-local nodeAffinity = {
-  nodeAffinity+: {
-    requiredDuringSchedulingIgnoredDuringExecution+: {
-      nodeSelectorTerms+: [ {
-        matchExpressions+: [
-          {
-            key: label,
-            operator: 'Exists',
-          }
-          for label in std.objectFields(params.node_selector)
-        ],
-      } ],
-    },
-  },
-};
-
 local cephcluster =
   kube._Object('ceph.rook.io/v1', 'CephCluster', params.ceph_cluster.name)
   {
@@ -230,7 +214,7 @@ local cephcluster =
     spec:
       {
         placement: {
-          all: nodeAffinity,
+          all: helpers.nodeAffinity,
         },
         disruptionManagement: {
           manageMachineDisruptionBudgets: on_openshift,
@@ -302,7 +286,7 @@ local toolbox =
             },
           },
           tolerations: params.tolerations,
-          affinity: nodeAffinity,
+          affinity: helpers.nodeAffinity,
         },
       },
     },

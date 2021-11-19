@@ -310,6 +310,9 @@ The values of each key in `data_pools` are placed in the resulting CephFS resour
 The contents of key `config` are used as the base value of the resulting resource's `.spec` field.
 Note that data pools given in `config` in the hierarchy will be overwritten by the pools configured in `data_pools`.
 
+The component creates a placement configuration for the metadata server (MDS) pods based on the values of parameters `tolerations` and `node_selector`.
+Users can override the default placement configuration by providing their own configuration in key `config.metadataServer.placement`.
+
 See https://rook.io/docs/rook/v1.7/ceph-filesystem-crd.html[the Rook.io `CephFilesystem` CRD documentation] for all possible configurations in key `config`.
 
 The values in key `storage_class_config` are merged into the `StorageClass` resource which is for the CephFS instance.

@@ -1,0 +1,58 @@
+= Scale a PVC-based Ceph cluster
+
+NOTE: For specific instructions to scale a Ceph cluster running on OpenShift 4 on Exoscale see the VSHN OpenShift 4 Exoscale how-tos to https://kb.vshn.ch/oc4/how-tos/exoscale/add_storage_node.html[Add a storage node] and https://kb.vshn.ch/oc4/how-tos/exoscale/change_storage_node_size.html[Change storage node size].
+
+This how-to assumes that you've setup a PVC-based Ceph cluster on an infrastructure which has a CSI driver which supports both `volumeMode: Block` and support for volume expansion.
+
+== Preqrequisites
+
+* A local setup to compile a cluster catalog, see https://syn.tools/commodore/explanation/running-commodore.html[Running Commodore] for details.
+* An access token for the Lieutenant instance on which your cluster is registered.
+
+This guide assumes that you're familiar with making changes to a Project Syn cluster and compiling the cluster catalog to deploy those changes.
+
+== Scaling the OSD disks of a PVC-based Ceph cluster
+
+On infrastructures which support volume expansion, scaling the OSD disks of a PVC-based Ceph cluster is very straightforward.
+
+. Adjust the desired PVC size in the cluster config (in this example we're growing the cluster from 3x100Gi OSDs to 3x150Gi OSDs):
++
+.`c-cluster-id.yml` diff
+[source,diff]
+----
+   rook_ceph:
+     ceph_cluster:
+       block_storage_class: ssd
+-      block_volume_size: 100Gi
++      block_volume_size: 150Gi
+       tune_fast_device_class: true
+       rbd_enabled: true
+       cephfs_enabled: false
+----
+
+. Compile the cluster catalog
+. Wait until ArgoCD has updated the `CephCluster` resource and Rook has updated the OSD PVCs to match the `CephCluster` spec and restarted the OSDs.
+
+== Scaling the OSD count of a PVC-based Ceph cluster
+
+. Make sure you have sufficient compute resources in your cluster to add the desired amount of OSDs.
++
+TIP: By default, the component configures the resource requests for each OSD as 4 CPU and 5Gi of memory.
+
+. Update the cluster configuration to deploy more OSDs
++
+[source,diff]
+----
+
+   rook_ceph:
+     ceph_cluster:
++      node_count: 4 <1>
+       block_storage_class: ssd
+       block_volume_size: 110Gi
+       osd_portable: true
+----
+<1> Update the OSD count from 3 to 4.
+3 is the default value of the parameter.
+
+. Compile the cluster catalog
+. Wait until ArgoCD has updated the `CephCluster` resource and Rook has deployed the new OSDs.

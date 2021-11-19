@@ -272,6 +272,7 @@ fspool:
         requireSafeReplicaSize: true
       parameters:
         compression_mode: none
+        target_size_ratio: '0.8'
   config:
     metadataPool:
       replicated:
@@ -279,6 +280,7 @@ fspool:
         requireSafeReplicaSize: true
     parameters:
       compression_mode: none
+      target_size_ratio: '0.2'
     # dataPools rendered from data_pools in Jsonnet
     preserveFilesystemOnDelete: true
     metadataServer:
@@ -298,6 +300,7 @@ This configuration creates
 
 * One `CephFilesystem` resource named `fspool`.
 This CephFS instance is configured to have 3 replicas both for the metadata pool and its single data pool.
+By default, the CephFS instance is configured to assume that metadata will consume roughly 20% and data roughly 80% of the storage cluster.
 * A storage class which creates PVs on the CephFS instance, supports volume expansion and configures PVs to be mounted with `-o discard`.
 * A `VolumeSnapshotClass` associated with the storage class
 
@@ -307,7 +310,7 @@ The values of each key in `data_pools` are placed in the resulting CephFS resour
 The contents of key `config` are used as the base value of the resulting resource's `.spec` field.
 Note that data pools given in `config` in the hierarchy will be overwritten by the pools configured in `data_pools`.
 
-See https://rook.io/docs/rook/v1.6/ceph-filesystem-crd.html[the Rook.io `CephFilesystem` CRD documentation] for all possible configurations in key `config`.
+See https://rook.io/docs/rook/v1.7/ceph-filesystem-crd.html[the Rook.io `CephFilesystem` CRD documentation] for all possible configurations in key `config`.
 
 The values in key `storage_class_config` are merged into the `StorageClass` resource which is for the CephFS instance.
 

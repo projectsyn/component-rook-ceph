@@ -31,11 +31,6 @@ parameters:
           mon_osd_full_ratio: '0.85'
           mon_osd_backfillfull_ratio: '0.8'
           mon_osd_nearfull_ratio: '0.75'
-        osd:
-          # We explicitly set bluefs_buffered_io to false to get good write
-          # bandwidth on Exoscale -> TODO: needs to be checked per
-          # infrastructure, maybe move the config to cloud/exoscale/params.yml
-          bluefs_buffered_io: false
 
       # Whether to setup RBD CSI driver and pools
       rbd_enabled: true

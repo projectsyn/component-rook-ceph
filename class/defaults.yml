@@ -85,6 +85,13 @@ parameters:
               metadataServer:
                 activeCount: 1
                 activeStandby: true
+                resources:
+                  requests:
+                    cpu: "1"
+                    memory: 2Gi
+                  limits:
+                    cpu: "1"
+                    memory: 2Gi
                 # metadata server placement done in Jsonnet but can be
                 # extended here
               mirroring:

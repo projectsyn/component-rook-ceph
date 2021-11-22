@@ -7,6 +7,8 @@
 .How-to guides
 
 * xref:how-tos/openshift4.adoc[Configuring the component for OpenShift 4]
+* xref:how-tos/setup-cluster.adoc[Setup a PVC-based Ceph cluster]
+* xref:how-tos/scale-cluster.adoc[Scale a PVC-based Ceph cluster]
 * xref:how-tos/configure-ceph.adoc[Configuring and tuning Ceph]
 
 .Alert runbooks

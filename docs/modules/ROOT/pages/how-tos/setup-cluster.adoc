@@ -1,0 +1,83 @@
+= Setup a PVC-based Ceph cluster
+
+NOTE: For specific instructions to setup a Ceph cluster running on OpenShift 4 on Exoscale see the VSHN OpenShift 4 Exoscale https://kb.vshn.ch/oc4/how-tos/exoscale/install.html[cluster installation] how-to
+
+This how-to assumes that you're setting up a PVC-based Ceph cluster on an infrastructure which has a CSI driver which supports both `volumeMode: Block` and volume expansion.
+
+== Prerequisites
+
+* A local setup to compile a cluster catalog, see https://syn.tools/commodore/explanation/running-commodore.html[Running Commodore] for details.
+* An access token for the Lieutenant instance on which your cluster is registered.
+
+This guide assumes that you're familiar with making changes to a Project Syn cluster and compiling the cluster catalog to deploy those changes.
+
+== Cluster prerequisites
+
+We strongly recommend that you setup dedicated nodes for Ceph in your cluster.
+Ceph requires a minimum of three nodes so that the three MON replicas can be scheduled on separate hosts.
+By default, the component configures the following resource requirements and limits for the different Ceph cluster components:
+
+|===
+|Component  | Requests        | Limits
+|MGR        | 1 CPU, 2GiB RAM | 1 CPU, 2GiB RAM
+|MON        | 1 CPU, 2GiB RAM | 1 CPU, 2GiB RAM
+|OSD        | 4 CPU, 5GiB RAM | 6 CPU, 5GiB RAM
+|CephFS MDS | 1 CPU, 2GiB RAM | 1 CPU, 2GiB RAM |
+|===
+
+Additionally, to accommodate running Ceph on dedicated nodes, the component will configure all Ceph pods to have a node selector of `node-role.kubernetes.io/storage=""` and a toleration for node taint `storagenode`.
+
+== Steps
+
+. Check that your cluster has suitable nodes for the default configuration.
+The command should list at least three nodes.
++
+[source,bash]
+----
+kubectl get nodes -l node-role.kubernetes.io/storage=""
+----
+
+. Enable component `rook-ceph` for your cluster
++
+[source,yaml]
+----
+applications:
+  - rook-ceph
+----
+
+. Configure component `rook_ceph` to setup the cluster by requesting PVCs from the CSI driver
++
+[source,yaml]
+----
+parameters:
+  rook_ceph:
+    ceph_cluster:
+      block_storage_class: ssd <1>
+      block_volume_size: 500Gi <2>
+      tune_fast_device_class: true <3>
+      osd_portable: true <4>
+      osd_placement: <5>
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+            labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - rook-ceph-osd
+----
+<1> The name of the storage class to use to provision the OSD PVCs
+<2> The size of each OSD PVC
+<3> Tune Ceph for SSD or better backing storage.
+Set this to `false` if you're provisioning your cluster on a storage class which is backed by HDDs.
+<4> Tell Rook to configure Ceph to not permanently assign each OSD to a specific cluster node.
+This allows cluster nodes to be replaced without having to recreate the OSDs hosted on the decommissioned node.
+<5> Configure the OSDs to be scheduled across the available nodes.
+By using `topologySpreadConstraints`, we're allowing multiple OSDs to be scheduled on the same node as long as the node is big enough while still ensuring that the OSDs are evenly spread across the available nodes.
++
+See the xref:reference/parameters.adoc[component parameters] reference documentation for the full set of available configuration options.
+
+. Compile the cluster catalog
+. Wait until the cluster is provisioned

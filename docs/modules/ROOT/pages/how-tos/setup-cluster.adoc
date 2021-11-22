@@ -11,7 +11,31 @@ This how-to assumes that you're setting up a PVC-based Ceph cluster on an infras
 
 This guide assumes that you're familiar with making changes to a Project Syn cluster and compiling the cluster catalog to deploy those changes.
 
+== Cluster prerequisites
+
+We strongly recommend that you setup dedicated nodes for Ceph in your cluster.
+Ceph requires a minimum of three nodes so that the three MON replicas can be scheduled on separate hosts.
+By default, the component configures the following resource requirements and limits for the different Ceph cluster components:
+
+|===
+|Component  | Requests        | Limits
+|MGR        | 1 CPU, 2GiB RAM | 1 CPU, 2GiB RAM
+|MON        | 1 CPU, 2GiB RAM | 1 CPU, 2GiB RAM
+|OSD        | 4 CPU, 5GiB RAM | 6 CPU, 5GiB RAM
+|CephFS MDS | 1 CPU, 2GiB RAM | 1 CPU, 2GiB RAM |
+|===
+
+Additionally, to accommodate running Ceph on dedicated nodes, the component will configure all Ceph pods to have a node selector of `node-role.kubernetes.io/storage=""` and a toleration for node taint `storagenode`.
+
 == Steps
+
+. Check that your cluster has suitable nodes for the default configuration.
+The command should list at least three nodes.
++
+[source,bash]
+----
+kubectl get nodes -l node-role.kubernetes.io/storage=""
+----
 
 . Enable component `rook-ceph` for your cluster
 +

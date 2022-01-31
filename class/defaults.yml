@@ -113,7 +113,7 @@ parameters:
       rook:
         registry: docker.io
         image: rook/ceph
-        tag: v1.7.7
+        tag: v1.8.3
       ceph:
         registry: quay.io
         image: ceph/ceph

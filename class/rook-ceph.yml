@@ -36,7 +36,7 @@ parameters:
         output_path: rook-ceph/01_rook_ceph_helmchart
         helm_values: ${rook_ceph:operator_helm_values}
         helm_params:
-          release_name: syn-rook-ceph
+          name: syn-rook-ceph
           namespace: ${rook_ceph:namespace}
       - input_paths:
           - rook-ceph/component/main.jsonnet

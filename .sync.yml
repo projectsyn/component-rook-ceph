@@ -1,0 +1,7 @@
+:global:
+  componentName: rook-ceph
+  feature_goldenTests: true
+
+docs/antora.yml:
+  name: rook-ceph
+  title: Rook Ceph

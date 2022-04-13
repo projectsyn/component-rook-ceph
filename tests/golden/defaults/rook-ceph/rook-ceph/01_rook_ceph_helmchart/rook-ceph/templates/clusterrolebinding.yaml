@@ -1,0 +1,266 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    operator: rook
+    storage-backend: ceph
+  name: rook-ceph-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-system
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-system
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    chart: rook-ceph-v1.7.7
+    operator: rook
+    storage-backend: ceph
+  name: rook-ceph-global
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-global
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-system
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rook-ceph-mgr-cluster
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-mgr-cluster
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-mgr
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rook-ceph-osd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-osd
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-osd
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rook-ceph-object-bucket
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-object-bucket
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-system
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cephfs-csi-nodeplugin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cephfs-csi-nodeplugin
+subjects:
+  - kind: ServiceAccount
+    name: rook-csi-cephfs-plugin-sa
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cephfs-csi-provisioner-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cephfs-external-provisioner-runner
+subjects:
+  - kind: ServiceAccount
+    name: rook-csi-cephfs-provisioner-sa
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rbd-csi-provisioner-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rbd-external-provisioner-runner
+subjects:
+  - kind: ServiceAccount
+    name: rook-csi-rbd-provisioner-sa
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    chart: rook-ceph-v1.7.7
+    operator: rook
+    storage-backend: ceph
+  name: rook-ceph-system-psp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:rook
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-system
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rook-csi-cephfs-provisioner-sa-psp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:rook
+subjects:
+  - kind: ServiceAccount
+    name: rook-csi-cephfs-provisioner-sa
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rook-csi-cephfs-plugin-sa-psp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:rook
+subjects:
+  - kind: ServiceAccount
+    name: rook-csi-cephfs-plugin-sa
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rook-csi-rbd-plugin-sa-psp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:rook
+subjects:
+  - kind: ServiceAccount
+    name: rook-csi-rbd-plugin-sa
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rook-csi-rbd-provisioner-sa-psp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:rook
+subjects:
+  - kind: ServiceAccount
+    name: rook-csi-rbd-provisioner-sa
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rbd-csi-nodeplugin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rbd-csi-nodeplugin
+subjects:
+  - kind: ServiceAccount
+    name: rook-csi-rbd-plugin-sa
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rook-ceph-admission-controller-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-admission-controller-role
+subjects:
+  - apiGroup: ''
+    kind: ServiceAccount
+    name: rook-ceph-admission-controller
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    chart: rook-ceph-v1.7.7
+    operator: rook
+    storage-backend: ceph
+  name: rook-ceph-default-psp
+  namespace: syn-rook-ceph-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:rook
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rook-ceph-osd-psp
+  namespace: syn-rook-ceph-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:rook
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-osd
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rook-ceph-mgr-psp
+  namespace: syn-rook-ceph-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:rook
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-mgr
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rook-ceph-cmd-reporter-psp
+  namespace: syn-rook-ceph-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:rook
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-cmd-reporter
+    namespace: syn-rook-ceph-operator

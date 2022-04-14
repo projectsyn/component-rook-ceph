@@ -328,6 +328,30 @@ Providing a key with value `false` or `null` will result in the key not being ad
 See the https://docs.ceph.com/en/latest/man/8/mount.ceph/#advanced[`mount.ceph` documentation] for all possible CephFS mount options.
 
 
+== `alerts`
+
+Configurations related to alerts.
+
+=== `patch_rules`
+
+[horizontal]
+type:: dict
+default::
++
+[source,yaml]
+----
+CephClusterWarningState:
+  for: 15m
+CephOSDDiskNotResponding:
+  for: 5m
+----
+
+This parameter allows users to patch alerts provided by Rook.io.
+The keys in the parameter correspond to the field `alertname` of the alert to patch.
+The component expects valid partial Prometheus alert rule objects as values.
+
+IMPORTANT: The provided values aren't validated, they're applied to the corresponding upstream alert as-is.
+
 == `node_selector`
 
 [horizontal]

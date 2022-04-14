@@ -51,19 +51,6 @@ local ignore_alerts = std.set(
   user_ignore_alerts
 );
 
-// Alert rule patches.
-// Provide partial objects for alert rules that need to be tuned compared to
-// upstream. The keys in this object correspond to the `alert` field of the
-// rule for which the patch is intended.
-local patch_alerts = {
-  CephClusterWarningState: {
-    'for': '15m',
-  },
-  CephOSDDiskNotResponding: {
-    'for': '5m',
-  },
-};
-
 local runbook(alertname) =
   'https://hub.syn.tools/rook-ceph/runbooks/%s.html' % alertname;
 
@@ -91,7 +78,13 @@ local filter_patch_rules(g) =
     rules: std.map(
       // Patch rules to make sure they match the requirements.
       function(rule)
-        local rulepatch = com.getValueOrDefault(patch_alerts, rule.alert, {});
+        local rulepatch = com.makeMergeable(
+          com.getValueOrDefault(
+            params.alerts.patchRules,
+            rule.alert,
+            {}
+          )
+        );
         local runbook_url = runbook(rule.alert);
         rule {
           // Change alert names so we don't get multiple alerts with the same

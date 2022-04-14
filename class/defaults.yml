@@ -101,6 +101,16 @@ parameters:
             storage_class_config:
               allowVolumeExpansion: true
 
+    alerts:
+      # Alert rule patches.
+      # Provide partial objects for alert rules that need to be tuned compared to
+      # upstream. The keys in this object correspond to the `alert` field of the
+      # rule for which the patch is intended.
+      patchRules:
+        CephClusterWarningState:
+          for: 15m
+        CephOSDDiskNotResponding:
+          for: 5m
 
     node_selector:
       node-role.kubernetes.io/storage: ''

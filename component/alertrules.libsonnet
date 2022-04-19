@@ -36,7 +36,19 @@ local render_array(arr) =
 
 // Keep only alerts from params.ceph_cluster.ignore_alerts for which the last
 // array entry wasn't prefixed with `~`.
-local user_ignore_alerts = render_array(params.ceph_cluster.ignore_alerts);
+local user_ignore_alerts =
+  local legacyIgnores =
+    if std.objectHas(params.ceph_cluster, 'ignore_alerts') then
+      std.trace(
+        'Parameter `ceph_cluster.ignore_alerts` is deprecated, please '
+        + 'migrate your config to use parameter `alerts.ignoreNames` instead',
+        params.ceph_cluster.ignore_alerts
+      )
+    else
+      [];
+  render_array(
+    legacyIgnores + params.alerts.ignoreNames
+  );
 
 // Upstream alerts to ignore
 local ignore_alerts = std.set(
@@ -47,7 +59,7 @@ local ignore_alerts = std.set(
     'CephMgrIsMissingReplicas',
   ] +
   // Add set of upstream alerts that should be ignored from processed value of
-  // `params.ceph_cluster.ignore_alerts`
+  // `params.alerts.ignoreNames`
   user_ignore_alerts
 );
 

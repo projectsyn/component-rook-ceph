@@ -3,7 +3,7 @@
   feature_goldenTests: true
   testMatrix:
     key: provider
-    values:
+    entries:
       - defaults
       - openshift4
 

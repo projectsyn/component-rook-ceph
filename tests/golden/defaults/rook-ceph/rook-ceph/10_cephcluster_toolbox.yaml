@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations: {}
   labels:
     app.kubernetes.io/component: rook-ceph
     app.kubernetes.io/managed-by: commodore
@@ -10,9 +9,7 @@ metadata:
   name: rook-ceph-tools
   namespace: syn-rook-ceph-cluster
 spec:
-  minReadySeconds: 30
   replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app.kubernetes.io/component: rook-ceph
@@ -26,7 +23,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      annotations: {}
       labels:
         app.kubernetes.io/component: rook-ceph
         app.kubernetes.io/managed-by: commodore
@@ -42,45 +38,45 @@ spec:
                     operator: Exists
       containers:
         - args:
-            - -g
-            - --
+            - -m
+            - -c
             - /usr/local/bin/toolbox.sh
           command:
-            - /tini
+            - /bin/bash
           env:
-            - name: ROOK_CEPH_SECRET
-              valueFrom:
-                secretKeyRef:
-                  key: ceph-secret
-                  name: rook-ceph-mon
             - name: ROOK_CEPH_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: ceph-username
                   name: rook-ceph-mon
+            - name: ROOK_CEPH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: ceph-secret
+                  name: rook-ceph-mon
           image: docker.io/rook/ceph:v1.8.8
           imagePullPolicy: IfNotPresent
           name: rook-ceph-tools
-          ports: []
-          stdin: false
-          tty: false
+          securityContext:
+            runAsGroup: 2016
+            runAsNonRoot: true
+            runAsUser: 2016
+          tty: true
           volumeMounts:
             - mountPath: /etc/ceph
               name: ceph-config
             - mountPath: /etc/rook
               name: mon-endpoint-volume
-      imagePullSecrets: []
-      initContainers: []
-      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirstWithHostNet
       tolerations:
         - key: storagenode
           operator: Exists
       volumes:
-        - emptyDir: {}
-          name: ceph-config
         - configMap:
             items:
               - key: data
                 path: mon-endpoints
             name: rook-ceph-mon-endpoints
           name: mon-endpoint-volume
+        - emptyDir: {}
+          name: ceph-config

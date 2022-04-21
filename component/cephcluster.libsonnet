@@ -236,55 +236,46 @@ local configmap =
     },
   };
 
+local toolboxManifest = helpers.load_manifest('toolbox');
+
 local toolbox =
-  kube.Deployment('rook-ceph-tools')
-  {
+  assert
+    std.length(toolboxManifest) == 1 :
+    'More than one object in upstream toolbox YAML, make sure to update the component logic.';
+  toolboxManifest[0] {
+    local deployment = self,
     metadata+: {
+      labels: std.prune(toolboxManifest[0].metadata.labels {
+        app: null,
+        name: super.app,
+      }),
       namespace: params.ceph_cluster.namespace,
     },
     spec+: {
+      selector: {
+        matchLabels: deployment.metadata.labels,
+      },
+      strategy: {
+        rollingUpdate: {
+          maxSurge: '25%',
+          maxUnavailable: '25%',
+        },
+        type: 'RollingUpdate',
+      },
       template+: {
+        metadata+: {
+          labels: deployment.metadata.labels,
+        },
         spec+: {
-          containers_:: {
-            rook_ceph_tools: kube.Container('rook-ceph-tools') {
-              image: '%(registry)s/%(image)s:%(tag)s' % params.toolbox.image,
-              command: [ '/tini' ],
-              args: [ '-g', '--', '/usr/local/bin/toolbox.sh' ],
-              imagePullPolicy: 'IfNotPresent',
-              env_:: {
-                ROOK_CEPH_USERNAME: {
-                  secretKeyRef: {
-                    name: 'rook-ceph-mon',
-                    key: 'ceph-username',
-                  },
-                },
-                ROOK_CEPH_SECRET: {
-                  secretKeyRef: {
-                    name: 'rook-ceph-mon',
-                    key: 'ceph-secret',
-                  },
-                },
+          containers:
+            assert std.length(super.containers) == 1;
+            [
+              super.containers[0] {
+                image: '%(registry)s/%(image)s:%(tag)s' % params.images.rook,
+                // Remove securityContext config on OCP4
+                [if on_openshift then 'securityContext']: {},
               },
-              volumeMounts_:: {
-                ceph_config: { mountPath: '/etc/ceph' },
-                mon_endpoint_volume: { mountPath: '/etc/rook' },
-              },
-            },
-          },
-          volumes_:: {
-            mon_endpoint_volume: {
-              configMap: {
-                name: 'rook-ceph-mon-endpoints',
-                items: [ {
-                  key: 'data',
-                  path: 'mon-endpoints',
-                } ],
-              },
-            },
-            ceph_config: {
-              emptyDir: {},
-            },
-          },
+            ],
           tolerations: params.tolerations,
           affinity: helpers.nodeAffinity,
         },

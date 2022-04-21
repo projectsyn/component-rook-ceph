@@ -34,6 +34,10 @@ parameters:
         # version.
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/operator-openshift.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/operator-openshift.yaml
+      - type: https
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/toolbox.yaml
+        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/toolbox.yaml
+
     compile:
       - input_paths:
           - rook-ceph/component/app.jsonnet

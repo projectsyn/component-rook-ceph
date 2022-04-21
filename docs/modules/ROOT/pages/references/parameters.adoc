@@ -290,7 +290,7 @@ Note that data pools given in `config` in the hierarchy will be overwritten by t
 The component creates a placement configuration for the metadata server (MDS) pods based on the values of parameters `tolerations` and `node_selector`.
 Users can override the default placement configuration by providing their own configuration in key `config.metadataServer.placement`.
 
-See https://rook.io/docs/rook/v1.7/ceph-filesystem-crd.html[the Rook.io `CephFilesystem` CRD documentation] for all possible configurations in key `config`.
+See https://rook.io/docs/rook/v1.8/ceph-filesystem-crd.html[the Rook.io `CephFilesystem` CRD documentation] for all possible configurations in key `config`.
 
 The values in key `storage_class_config` are merged into the `StorageClass` resource which is for the CephFS instance.
 
@@ -392,6 +392,11 @@ default:: See https://github.com/projectsyn/component-rook-ceph/blob/master/clas
 This parameter allows selecting the Docker images to use for Rook.io, Ceph, and Ceph-CSI.
 Each image is specified using keys `registry`, `image` and `tag`.
 This structure allows easily injecting a registry mirror, if required.
+
+[NOTE]
+====
+`rook-ceph` container image versions older than `v1.8.0` aren't supported.
+====
 
 == `charts`
 

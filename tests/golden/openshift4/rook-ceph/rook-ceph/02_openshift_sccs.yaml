@@ -1,26 +1,23 @@
 allowHostDirVolumePlugin: true
 allowHostIPC: true
 allowHostNetwork: true
-allowHostPID: true
+allowHostPID: false
 allowHostPorts: true
 allowPrivilegedContainer: true
-allowedCapabilities: []
-allowedFlexVolumes:
-  - driver: ceph.rook.io/rook
-  - driver: ceph.rook.io/rook-ceph
+allowedCapabilities:
+  - MKNOD
 apiVersion: security.openshift.io/v1
 defaultAddCapabilities: []
 fsGroup:
   type: MustRunAs
 kind: SecurityContextConstraints
 metadata:
-  annotations: {}
   labels:
     app.kubernetes.io/component: rook-ceph
     app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/name: rook-ceph
-    name: rook-ceph
   name: rook-ceph
+priority: null
 readOnlyRootFilesystem: false
 requiredDropCapabilities: []
 runAsUser:
@@ -38,7 +35,6 @@ volumes:
   - configMap
   - downwardAPI
   - emptyDir
-  - flexVolume
   - hostPath
   - persistentVolumeClaim
   - projected
@@ -51,25 +47,19 @@ allowHostPID: true
 allowHostPorts: true
 allowPrivilegedContainer: true
 allowedCapabilities:
-  - '*'
-allowedFlexVolumes:
-  - driver: ceph.rook.io/rook
-  - driver: ceph.rook.io/rook-ceph
+  - SYS_ADMIN
 apiVersion: security.openshift.io/v1
-defaultAddCapabilities: []
 fsGroup:
   type: RunAsAny
 kind: SecurityContextConstraints
 metadata:
-  annotations: {}
   labels:
     app.kubernetes.io/component: rook-ceph
     app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/name: rook-ceph-csi
-    name: rook-ceph-csi
   name: rook-ceph-csi
+priority: null
 readOnlyRootFilesystem: false
-requiredDropCapabilities: []
 runAsUser:
   type: RunAsAny
 seLinuxContext:
@@ -82,4 +72,7 @@ users:
   - system:serviceaccount:syn-rook-ceph-operator:rook-csi-cephfs-plugin-sa
   - system:serviceaccount:syn-rook-ceph-operator:rook-csi-cephfs-provisioner-sa
 volumes:
-  - '*'
+  - configMap
+  - emptyDir
+  - hostPath
+  - projected

@@ -2,6 +2,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
+    app.kubernetes.io/created-by: helm
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: rook-ceph-operator
+    helm.sh/chart: rook-ceph-v1.8.8
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -13,76 +17,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: rook-ceph-system
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-cluster-mgmt
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: rook-ceph-cluster-mgmt
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-system
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-osd
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: rook-ceph-osd
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-osd
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-mgr
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: rook-ceph-mgr
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-mgr
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-mgr-system
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: rook-ceph-mgr-system
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-mgr
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-cmd-reporter
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: rook-ceph-cmd-reporter
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-cmd-reporter
     namespace: syn-rook-ceph-operator
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -111,17 +45,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: rook-csi-rbd-provisioner-sa
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-purge-osd
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: rook-ceph-purge-osd
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-purge-osd
     namespace: syn-rook-ceph-operator

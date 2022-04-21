@@ -2,6 +2,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
+    app.kubernetes.io/created-by: helm
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: rook-ceph-operator
+    helm.sh/chart: rook-ceph-v1.8.8
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -25,6 +29,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
+    app.kubernetes.io/created-by: helm
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: rook-ceph-operator
+    helm.sh/chart: rook-ceph-v1.8.8
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -54,6 +62,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
+    app.kubernetes.io/created-by: helm
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: rook-ceph-operator
+    helm.sh/chart: rook-ceph-v1.8.8
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -65,6 +77,8 @@ rules:
       - nodes
       - nodes/proxy
       - services
+      - secrets
+      - configmaps
     verbs:
       - get
       - list
@@ -107,15 +121,66 @@ rules:
   - apiGroups:
       - ceph.rook.io
     resources:
-      - '*'
+      - cephclients
+      - cephclusters
+      - cephblockpools
+      - cephfilesystems
+      - cephnfses
+      - cephobjectstores
+      - cephobjectstoreusers
+      - cephobjectrealms
+      - cephobjectzonegroups
+      - cephobjectzones
+      - cephbuckettopics
+      - cephbucketnotifications
+      - cephrbdmirrors
+      - cephfilesystemmirrors
+      - cephfilesystemsubvolumegroups
     verbs:
-      - '*'
+      - get
+      - list
+      - watch
+      - update
   - apiGroups:
-      - rook.io
+      - ceph.rook.io
     resources:
-      - '*'
+      - cephclients/status
+      - cephclusters/status
+      - cephblockpools/status
+      - cephfilesystems/status
+      - cephnfses/status
+      - cephobjectstores/status
+      - cephobjectstoreusers/status
+      - cephobjectrealms/status
+      - cephobjectzonegroups/status
+      - cephobjectzones/status
+      - cephbuckettopics/status
+      - cephbucketnotifications/status
+      - cephrbdmirrors/status
+      - cephfilesystemmirrors/status
+      - cephfilesystemsubvolumegroups/status
     verbs:
-      - '*'
+      - update
+  - apiGroups:
+      - ceph.rook.io
+    resources:
+      - cephclients/finalizers
+      - cephclusters/finalizers
+      - cephblockpools/finalizers
+      - cephfilesystems/finalizers
+      - cephnfses/finalizers
+      - cephobjectstores/finalizers
+      - cephobjectstoreusers/finalizers
+      - cephobjectrealms/finalizers
+      - cephobjectzonegroups/finalizers
+      - cephobjectzones/finalizers
+      - cephbuckettopics/finalizers
+      - cephbucketnotifications/finalizers
+      - cephrbdmirrors/finalizers
+      - cephfilesystemmirrors/finalizers
+      - cephfilesystemsubvolumegroups/finalizers
+    verbs:
+      - update
   - apiGroups:
       - policy
       - apps
@@ -125,7 +190,13 @@ rules:
       - deployments
       - replicasets
     verbs:
-      - '*'
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+      - deletecollection
   - apiGroups:
       - healthchecking.openshift.io
     resources:
@@ -168,6 +239,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
+    app.kubernetes.io/created-by: helm
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: rook-ceph-operator
+    helm.sh/chart: rook-ceph-v1.8.8
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -220,6 +295,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
+    app.kubernetes.io/created-by: helm
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: rook-ceph-operator
+    helm.sh/chart: rook-ceph-v1.8.8
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -230,21 +309,50 @@ rules:
       - secrets
       - configmaps
     verbs:
-      - '*'
+      - get
+      - create
+      - update
+      - delete
   - apiGroups:
       - storage.k8s.io
     resources:
       - storageclasses
     verbs:
       - get
-      - list
-      - watch
   - apiGroups:
       - objectbucket.io
     resources:
-      - '*'
+      - objectbucketclaims
     verbs:
-      - '*'
+      - list
+      - watch
+      - get
+      - update
+  - apiGroups:
+      - objectbucket.io
+    resources:
+      - objectbuckets
+    verbs:
+      - list
+      - watch
+      - get
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - objectbucket.io
+    resources:
+      - objectbucketclaims/status
+      - objectbuckets/status
+    verbs:
+      - update
+  - apiGroups:
+      - objectbucket.io
+    resources:
+      - objectbucketclaims/finalizers
+      - objectbuckets/finalizers
+    verbs:
+      - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -395,6 +503,7 @@ rules:
       - get
       - list
       - watch
+      - update
       - patch
   - apiGroups:
       - snapshot.storage.k8s.io
@@ -407,6 +516,7 @@ rules:
       - watch
       - update
       - delete
+      - patch
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
@@ -421,27 +531,25 @@ rules:
       - volumesnapshotcontents/status
     verbs:
       - update
-  - apiGroups:
-      - apiextensions.k8s.io
-    resources:
-      - customresourcedefinitions
-    verbs:
-      - create
-      - list
-      - watch
-      - delete
-      - get
-      - update
+      - patch
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
       - volumesnapshots/status
     verbs:
       - update
+      - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  labels:
+    app.kubernetes.io/created-by: helm
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: rook-ceph-operator
+    helm.sh/chart: rook-ceph-v1.8.8
+    operator: rook
+    storage-backend: ceph
   name: rbd-csi-nodeplugin
 rules:
   - apiGroups:
@@ -582,6 +690,7 @@ rules:
       - get
       - list
       - watch
+      - update
       - patch
   - apiGroups:
       - snapshot.storage.k8s.io
@@ -594,6 +703,7 @@ rules:
       - watch
       - update
       - delete
+      - patch
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
@@ -608,23 +718,14 @@ rules:
       - volumesnapshotcontents/status
     verbs:
       - update
-  - apiGroups:
-      - apiextensions.k8s.io
-    resources:
-      - customresourcedefinitions
-    verbs:
-      - create
-      - list
-      - watch
-      - delete
-      - get
-      - update
+      - patch
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
       - volumesnapshots/status
     verbs:
       - update
+      - patch
   - apiGroups:
       - ''
     resources:
@@ -677,35 +778,3 @@ rules:
       - serviceaccounts
     verbs:
       - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    chart: rook-ceph-v1.7.7
-    operator: rook
-    storage-backend: ceph
-  name: psp:rook
-rules:
-  - apiGroups:
-      - policy
-    resourceNames:
-      - 00-rook-ceph-operator
-    resources:
-      - podsecuritypolicies
-    verbs:
-      - use
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: rook-ceph-admission-controller-role
-rules:
-  - apiGroups:
-      - ceph.rook.io
-    resources:
-      - '*'
-    verbs:
-      - get
-      - watch
-      - list

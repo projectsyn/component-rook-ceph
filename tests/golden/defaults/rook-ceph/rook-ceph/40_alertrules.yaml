@@ -256,7 +256,7 @@ spec:
             syn_component: rook-ceph
         - alert: SYN_CephClusterWarningState
           annotations:
-            description: Storage cluster is in warning state for more than 10m.
+            description: Storage cluster is in warning state for more than 15m.
             message: Storage cluster is in degraded state
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephClusterWarningState.html
             severity_level: warning

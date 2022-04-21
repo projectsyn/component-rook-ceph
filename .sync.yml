@@ -1,6 +1,12 @@
 :global:
   componentName: rook-ceph
   feature_goldenTests: true
+  testMatrix:
+    key: provider
+    values:
+      - defaults
+      - openshift4
+
 
 docs/antora.yml:
   name: rook-ceph

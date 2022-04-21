@@ -1,0 +1,21 @@
+apiVersion: v1
+data:
+  config: '[global]
+
+    mon_osd_backfillfull_ratio = 0.8
+
+    mon_osd_full_ratio = 0.85
+
+    mon_osd_nearfull_ratio = 0.75
+
+    '
+kind: ConfigMap
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: rook-config-override
+    name: rook-config-override
+  name: rook-config-override
+  namespace: syn-rook-ceph-cluster

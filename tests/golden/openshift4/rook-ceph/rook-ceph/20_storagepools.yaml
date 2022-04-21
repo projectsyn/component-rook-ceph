@@ -1,0 +1,16 @@
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: storagepool
+    name: storagepool
+  name: storagepool
+  namespace: syn-rook-ceph-cluster
+spec:
+  failureDomain: host
+  replicated:
+    requireSafeReplicaSize: true
+    size: 3

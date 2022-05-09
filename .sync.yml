@@ -11,3 +11,6 @@
 docs/antora.yml:
   name: rook-ceph
   title: Rook Ceph
+
+.github/workflows/test.yaml:
+  goldenTest_makeTarget: golden-diff -e instance=${{ matrix.instance }}

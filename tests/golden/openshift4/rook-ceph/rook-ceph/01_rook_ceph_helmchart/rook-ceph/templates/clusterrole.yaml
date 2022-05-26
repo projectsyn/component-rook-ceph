@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.8.9
+    helm.sh/chart: rook-ceph-v1.9.4
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -24,6 +24,15 @@ rules:
       - pods/exec
     verbs:
       - create
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingwebhookconfigurations
+    verbs:
+      - create
+      - get
+      - delete
+      - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -32,7 +41,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.8.9
+    helm.sh/chart: rook-ceph-v1.9.4
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -65,7 +74,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.8.9
+    helm.sh/chart: rook-ceph-v1.9.4
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -136,6 +145,7 @@ rules:
       - cephrbdmirrors
       - cephfilesystemmirrors
       - cephfilesystemsubvolumegroups
+      - cephblockpoolradosnamespaces
     verbs:
       - get
       - list
@@ -159,6 +169,7 @@ rules:
       - cephrbdmirrors/status
       - cephfilesystemmirrors/status
       - cephfilesystemsubvolumegroups/status
+      - cephblockpoolradosnamespaces/status
     verbs:
       - update
   - apiGroups:
@@ -179,6 +190,7 @@ rules:
       - cephrbdmirrors/finalizers
       - cephfilesystemmirrors/finalizers
       - cephfilesystemsubvolumegroups/finalizers
+      - cephblockpoolradosnamespaces/finalizers
     verbs:
       - update
   - apiGroups:
@@ -242,7 +254,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.8.9
+    helm.sh/chart: rook-ceph-v1.9.4
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -298,7 +310,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.8.9
+    helm.sh/chart: rook-ceph-v1.9.4
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -379,7 +391,7 @@ rules:
     verbs:
       - get
       - list
-      - update
+      - watch
   - apiGroups:
       - ''
     resources:
@@ -547,7 +559,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.8.9
+    helm.sh/chart: rook-ceph-v1.9.4
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin
@@ -566,7 +578,7 @@ rules:
     verbs:
       - get
       - list
-      - update
+      - watch
   - apiGroups:
       - ''
     resources:

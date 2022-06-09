@@ -135,7 +135,7 @@ parameters:
 
     charts:
       # We do not support helm chart versions older than v1.7.0
-      rook-ceph: v1.8.9
+      rook-ceph: v1.9.4
 
     operator_helm_values:
       image:

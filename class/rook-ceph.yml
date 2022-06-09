@@ -22,11 +22,7 @@ parameters:
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/monitoring/csi-metrics-service-monitor.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/csi-metrics-service-monitor.yaml
       - type: https
-        # NOTE(sg): prometheus-ceph-v16-rules.yaml is a symlink to #
-        # prometheus-ceph-v14-rules.yaml, so we directly fetch the v14 file,
-        # as fetching symlinks via raw.githubusercontent doesn't work
-        # properly.
-        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/monitoring/prometheus-ceph-v14-rules.yaml
+        source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/monitoring/localrules.yaml
         output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/prometheus-ceph-rules.yaml
       - type: https
         # Only for SCCs. By reading the SCCs from the manifest, we

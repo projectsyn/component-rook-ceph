@@ -1,5 +1,5 @@
 :global:
-  componentName: rook-ceph
+  componentName: Rook Ceph
   feature_goldenTests: true
   testMatrix:
     key: instance
@@ -7,10 +7,6 @@
       - defaults
       - openshift4
 
-
-docs/antora.yml:
-  name: rook-ceph
-  title: Rook Ceph
 
 .github/workflows/test.yaml:
   makeTarget: test -e instance=${{ matrix.instance }}

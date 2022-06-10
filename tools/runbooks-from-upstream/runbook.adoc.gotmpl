@@ -1,0 +1,17 @@
+= Alert rule: {{ .Rule.Alert }}
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+{{ .Rule.Annotations.description }}
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+
+{{ if .Rule.Annotations.documentation -}}
+== icon:book[] Upstream documentation
+
+{{ .Rule.Annotations.documentation }}
+{{- end -}}

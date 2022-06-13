@@ -15,3 +15,48 @@ Consider writing a more specific alert if you find a condition in which only thi
 Check Ceph for detailed information why the cluster is in `HEALTH_WARN` state
 
 include::partial$runbooks/check_cephcluster_status.adoc[]
+
+=== Check possible crashes
+
+If Ceph status shows recent crashes
+
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph status
+  cluster:
+    id:     92716509-0f84-4739-8d04-541d2e7c3e66
+    health: HEALTH_WARN
+            1 daemons have recently crashed <2>
+
+[ ... remaining output omitted ... ]
+----
+<1> General cluster health status.
+<2> One or more lines indicating recent crashes.
+
+Get list of recent crashes
+
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph crash ls
+ID                                                                ENTITY        NEW
+[... some date and uuid ...]                                      mds.fspool-b  * <1>
+----
+<1> ID and affected entity of crash
+
+Get more information about the nature of the crash
+
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph crash info {ID}
+----
+
+If the issue is resolved and the warning is still present, clear crash list
+
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph crash archive {ID}
+----

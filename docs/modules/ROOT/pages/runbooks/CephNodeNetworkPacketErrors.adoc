@@ -1,0 +1,12 @@
+= Alert rule: CephNodeNetworkPacketErrors
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+Node experiences packet errors > 0.01% or > 10 packets/s on given interface.
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+

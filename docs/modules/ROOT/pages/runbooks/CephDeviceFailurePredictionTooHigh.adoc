@@ -1,0 +1,25 @@
+= Alert rule: CephDeviceFailurePredictionTooHigh
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The device health module has determined that the number of devices predicted to fail can not be remediated automatically, since it would take too many OSDs out of the cluster, impacting performance and potentially availability.
+You should add new OSDs to the cluster to allow data to be relocated to avoid the data integrity issues.
+
+== icon:bug[] Steps for debugging
+
+. Check which OSD is failing.
++
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+# Show life expectancy of the OSD
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph device ls
+----
+
+. Increase cluster size.
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#device-health-toomany

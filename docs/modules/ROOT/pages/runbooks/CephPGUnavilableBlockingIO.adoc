@@ -1,0 +1,19 @@
+// Yes there is a typo upstream
+= Alert rule: CephPGUnavilableBlockingIO
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+Data availability is reduced impacting the clusters ability to service I/O to some data.
+One or more placement groups (PGs) are in a state that blocks IO.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_cephcluster_status.adoc[]
+
+include::partial$runbooks/rollback_damaged_pgs.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-availability

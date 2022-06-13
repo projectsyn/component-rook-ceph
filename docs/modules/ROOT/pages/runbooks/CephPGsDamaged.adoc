@@ -1,0 +1,28 @@
+= Alert rule: CephPGsDamaged
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+During data consistency checks (scrub), at least one PG has been flagged as being damaged or inconsistent.
+Check to see which PG is affected, and attempt a manual repair if necessary.
+
+== icon:bug[] Steps for debugging
+
+=== Repair damaged PGs
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+# List pools
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- rados ceph osd pool ls
+
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- rados list-inconsistent-pg <POOL> <1>
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph pg repair <PG_NUM> <2>
+----
+<1> Execute for the pool shown in the alert or all pools if no pool is shown.
+<2> Tries to repair the PG.
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-damaged

@@ -1,0 +1,25 @@
+= Alert rule: CephPGNotDeepScrubbed
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+One or more PGs have not been deep scrubbed recently.
+Deep scrub is a data integrity feature, protecting against bit-rot.
+It compares the contents of objects and their replicas for inconsistency.
+When PGs miss their deep scrub window, it may indicate that the window is too small or PGs were not in a 'clean' state during the deep-scrub window.
+
+== icon:bug[] Steps for debugging
+
+=== Initiate a deep scrub
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph health detail
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph pg deep-scrub <PG_ID_FROM_ALERT>
+----
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-not-deep-scrubbed

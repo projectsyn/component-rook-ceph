@@ -1,0 +1,18 @@
+= Alert rule: CephHealthError
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+Ceph in HEALTH_ERROR state for more than 5 minutes. Please check "ceph health detail" for more information.
+
+
+== icon:bug[] Steps for debugging
+
+=== Check Ceph cluster status
+
+Check Ceph for detailed information why the cluster is in `HEALTH_ERROR` state
+
+:state: HEALTH_ERROR
+include::partial$runbooks/check_cephcluster_status.adoc[]
+

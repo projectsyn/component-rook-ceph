@@ -98,7 +98,12 @@ parameters:
       # The component supports removal of entries from this array by
       # giving the entry prefixed with `~` (same syntax as for the
       # applications array).
-      ignoreNames: []
+      ignoreNames:
+        # Ignored because the Kubernetes monitoring should already provide node disk usage alerts
+        - CephMonDiskspaceCritical
+        - CephMonDiskspaceLow
+        - CephNodeDiskspaceWarning
+
       # Alert rule patches.
       # Provide partial objects for alert rules that need to be tuned compared to
       # upstream. The keys in this object correspond to the `alert` field of the

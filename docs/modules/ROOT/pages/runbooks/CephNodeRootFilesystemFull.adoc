@@ -1,0 +1,13 @@
+= Alert rule: CephNodeRootFilesystemFull
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+Root volume (OSD and MON store) is dangerously full.
+You should increase the space available to the node.
+The default location for the store sits under /var/lib/rook/ as a `hostPath` volume.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_mon_low_disk.adoc[]

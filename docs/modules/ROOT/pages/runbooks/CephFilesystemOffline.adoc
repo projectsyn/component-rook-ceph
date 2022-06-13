@@ -1,0 +1,16 @@
+= Alert rule: CephFilesystemOffline
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+All metadata (MDS) daemons are unavailable.
+The filesystem is offline.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_missing_mds.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-all-down

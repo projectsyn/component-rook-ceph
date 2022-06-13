@@ -1,0 +1,28 @@
+= Alert rule: CephMgrPrometheusModuleInactive
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The MGR/Prometheus module is unreachable.
+This could mean that the module has been disabled or the MGR itself is down.
+Without the MGR/Prometheus module metrics and alerts will no longer function.
+
+== icon:bug[] Steps for debugging
+
+=== Check if the MGR is active
+
+Check if the MGR shows as active.
+
+include::partial$runbooks/check_cephcluster_status.adoc[]
+
+=== Activate the MGR/Prometheus module
+
+[source,console]
+----
+# Check if the module is enabled
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph mgr module ls | jq '.enabled_modules'
+# Enable the module
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph mgr module enable prometheus
+----

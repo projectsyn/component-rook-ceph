@@ -1,0 +1,12 @@
+= Alert rule: CephOSDTimeoutsPublicNetwork
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+OSD heartbeats on the cluster's 'public' network (frontend) are running slow.
+Investigate the network for any latency issues on this subnet.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_cephcluster_status.adoc[]

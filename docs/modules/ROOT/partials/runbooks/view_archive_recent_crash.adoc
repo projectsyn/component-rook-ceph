@@ -1,0 +1,10 @@
+=== View and archive the recent crash
+
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+# List ceph crashes
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph crash ls-new
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph crash archive <ID> <1>
+----
+<1> Find the ID of the crash to archive in the above command.

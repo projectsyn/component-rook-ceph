@@ -1,0 +1,14 @@
+= Alert rule: CephPGsInactive
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+PGs have been inactive for more than 5 minutes in pool.
+Inactive placement groups aren't able to serve read/write requests.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_cephcluster_status.adoc[]
+
+include::partial$runbooks/rollback_damaged_pgs.adoc[]

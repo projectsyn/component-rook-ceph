@@ -1,0 +1,18 @@
+= Alert rule: CephFilesystemDamaged
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The filesystems metadata has been corrupted.
+Data access may be blocked.
+You may analyse the output from the mds daemon admin socket.
+
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_damaged_metadata.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/cephfs/health-messages#cephfs-health-messages

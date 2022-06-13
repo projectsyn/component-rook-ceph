@@ -1,0 +1,18 @@
+= Alert rule: CephMonDown
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+This alert fires if some MONs are down.
+Quorum is still intact, but the loss of further monitors could make your cluster inoperable.
+
+== icon:bug[] Steps for debugging
+
+:component: MON
+
+include::partial$runbooks/check_component_pod_status.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-down

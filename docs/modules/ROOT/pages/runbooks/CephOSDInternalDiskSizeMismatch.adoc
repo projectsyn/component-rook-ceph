@@ -1,0 +1,17 @@
+= Alert rule: CephOSDInternalDiskSizeMismatch
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+One or more OSDs have an internal inconsistency between the size of the physical device and it's metadata.
+This could lead to the OSD(s) crashing in future.
+You should redeploy the effected OSDs.
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#bluestore-disk-size-mismatch

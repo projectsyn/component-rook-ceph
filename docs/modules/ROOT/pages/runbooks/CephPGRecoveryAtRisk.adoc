@@ -1,0 +1,16 @@
+= Alert rule: CephPGRecoveryAtRisk
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+Data redundancy may be reduced, or is at risk, since one or more OSDs are at or above their 'full' threshold.
+Add more capacity to the cluster, or delete unwanted data.
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-recovery-full

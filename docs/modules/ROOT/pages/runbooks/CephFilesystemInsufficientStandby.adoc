@@ -1,0 +1,17 @@
+= Alert rule: CephFilesystemInsufficientStandby
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The minimum number of standby daemons determined by standby_count_wanted is less than the actual number of standby daemons.
+Adjust the standby count or increase the number of mds daemons within the filesystem.
+
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_missing_mds.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-insufficient-standby

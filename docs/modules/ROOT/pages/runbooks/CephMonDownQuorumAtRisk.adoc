@@ -1,0 +1,18 @@
+= Alert rule: CephMonDownQuorumAtRisk
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+This alert fires if two or fewer MONs are active in the Ceph cluster.
+If one more MON becomes inactive, the Ceph cluster will lose the MON Quorum which is required to ensure data consistency.
+
+== icon:bug[] Steps for debugging
+
+:component: MON
+
+include::partial$runbooks/check_component_pod_status.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-down

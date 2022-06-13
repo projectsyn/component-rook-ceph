@@ -13,3 +13,7 @@ Otherwise, investigate why this particular device has higher utilization than th
 == icon:bug[] Steps for debugging
 
 // Add detailed steps to debug and resolve the issue
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-nearfull

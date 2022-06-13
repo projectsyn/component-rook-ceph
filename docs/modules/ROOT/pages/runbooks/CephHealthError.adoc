@@ -15,4 +15,3 @@ Check Ceph for detailed information why the cluster is in `HEALTH_ERROR` state
 
 :state: HEALTH_ERROR
 include::partial$runbooks/check_cephcluster_status.adoc[]
-

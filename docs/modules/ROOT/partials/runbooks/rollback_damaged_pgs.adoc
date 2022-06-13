@@ -9,7 +9,7 @@ $ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph health d
 HEALTH_WARN 1 pgs degraded; 78/3778 unfound (2.065%)
 pg 2.4 is active+degraded, 78 unfound <1>
 ----
-<1> Shows the placement group that is missing an object.
+<1> Shows the placement group that's missing an object.
 
 . Check if other OSDs might have the object.
 +

@@ -15,4 +15,3 @@ Check Ceph for detailed information why the cluster is in `HEALTH_WARN` state
 
 :state: HEALTH_WARN
 include::partial$runbooks/check_cephcluster_status.adoc[]
-

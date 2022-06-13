@@ -9,7 +9,7 @@ $ kubectl -n ${ceph_cluster_ns} get deploy -lapp=rook-ceph-mon,mon=${ceph_mon_na
   "kubernetes.io/hostname": "storage-XXXX" <2>
 }
 ----
-<1> The name of the monitor that is alerting.
+<1> The name of the monitor that's alerting.
 <2> The node that the monitor is running on.
 
 === Increase the size of the node's disk

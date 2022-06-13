@@ -171,7 +171,6 @@ parameters:
       dataDirHostPath: /var/lib/rook
       monitoring:
         enabled: ${rook_ceph:ceph_cluster:monitoring_enabled}
-        rulesNamespace: ${rook_ceph:ceph_cluster:namespace}
       mon:
         count: 3
         allowMultiplePerNode: false

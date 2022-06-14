@@ -1,4 +1,8 @@
-=== Rollback missing object to a prior version
+=== Rollback damaged or missing object to a prior version
+
+[IMPORTANT]
+This procedure leads to a **loss of data**.
+It should be used as a **last resort only**.
 
 . Find placement groups with missing objects.
 +
@@ -32,4 +36,4 @@ $ pg_with_missing_objects=<PG> # e.g. "2.4" <1>
 $ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph pg ${pg_with_missing_objects} mark_unfound_lost revert <2>
 ----
 <1> Placement group with irrecoverable missing object.
-<2> `delete` might be the safer option for system that get confused if they see an older version of the object.
+<2> `delete` might be the safer option for systems that get confused if they see an older version of the object.

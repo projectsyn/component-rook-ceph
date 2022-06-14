@@ -10,7 +10,7 @@ One or more placement groups (PGs) are in a state that blocks IO.
 
 == icon:bug[] Steps for debugging
 
-include::partial$runbooks/check_cephcluster_status.adoc[]
+include::partial$runbooks/pg_degraded_general_steps.adoc[]
 
 include::partial$runbooks/rollback_damaged_pgs.adoc[]
 

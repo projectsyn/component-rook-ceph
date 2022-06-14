@@ -9,6 +9,6 @@ Unclean PGs haven't been able to completely recover from a previous failure.
 
 == icon:bug[] Steps for debugging
 
-include::partial$runbooks/check_cephcluster_status.adoc[]
+include::partial$runbooks/pg_degraded_general_steps.adoc[]
 
 include::partial$runbooks/rollback_damaged_pgs.adoc[]

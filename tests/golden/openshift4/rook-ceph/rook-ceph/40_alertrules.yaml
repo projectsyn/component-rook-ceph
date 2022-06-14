@@ -889,21 +889,6 @@ spec:
             syn: 'true'
             syn_component: rook-ceph
             type: ceph_default
-        - alert: SYN_CephNodeInconsistentMTU
-          annotations:
-            description: 'Node {{ $labels.instance }} has a different MTU size ({{
-              $value }}) than the median value on device {{ $labels.device }}.
-
-              '
-            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephNodeInconsistentMTU.html
-            summary: MTU settings across Ceph hosts are inconsistent
-          expr: node_network_mtu_bytes{device!="lo"} * (node_network_up{device!="lo"}
-            > 0) != on() group_left() (quantile(0.5, node_network_mtu_bytes{device!="lo"}))
-          labels:
-            severity: warning
-            syn: 'true'
-            syn_component: rook-ceph
-            type: ceph_default
     - name: pools
       rules:
         - alert: SYN_CephPoolBackfillFull

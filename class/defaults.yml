@@ -103,6 +103,8 @@ parameters:
         - CephMonDiskspaceCritical
         - CephMonDiskspaceLow
         - CephNodeDiskspaceWarning
+        # Managed by the cluster, fires on OCP but seems to be a false positive
+        - CephNodeInconsistentMTU
 
       # Alert rule patches.
       # Provide partial objects for alert rules that need to be tuned compared to

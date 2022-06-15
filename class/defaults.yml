@@ -105,6 +105,10 @@ parameters:
         - CephNodeDiskspaceWarning
         # Managed by the cluster, fires on OCP but seems to be a false positive
         - CephNodeInconsistentMTU
+        # We tend to run Ceph on virtual discs so we don't have S.M.A.R.T. information
+        - CephDeviceFailurePredicted
+        - CephDeviceFailurePredictionTooHigh
+        - CephDeviceFailureRelocationIncomplete
 
       # Alert rule patches.
       # Provide partial objects for alert rules that need to be tuned compared to

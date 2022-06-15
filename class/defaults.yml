@@ -140,6 +140,10 @@ parameters:
         registry: quay.io
         image: cephcsi/cephcsi
         tag: v3.6.2
+      kubectl:
+        registry: docker.io
+        image: bitnami/kubectl
+        tag: '1.24.1@sha256:18f98f705ee7ff7fd9aadc6db6c18af64ec296aa5c08d080a40ca2efa10eb984'
 
     charts:
       # We do not support helm chart versions older than v1.7.0

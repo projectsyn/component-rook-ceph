@@ -86,7 +86,7 @@ spec:
           env:
             - name: HOME
               value: /home
-          image: docker.io/bitnami/kubectl:1.24.1@sha256:18f98f705ee7ff7fd9aadc6db6c18af64ec296aa5c08d080a40ca2efa10eb984
+          image: docker.io/bitnami/kubectl:1.24.1@sha256:77b081817ad5eaaa3f6a6e25a44746377535e66657cb55ec47e9b22ea472112f
           imagePullPolicy: IfNotPresent
           name: cleanup-alertrules
           ports: []

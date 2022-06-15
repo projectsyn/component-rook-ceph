@@ -1,0 +1,17 @@
+=== Check node low on disk space
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ ceph_mon_name=a <1>
+$ kubectl -n ${ceph_cluster_ns} get deploy -lapp=rook-ceph-mon,mon=${ceph_mon_name}  -ojson | jq '.items[].spec.template.spec.nodeSelector'
+{
+  "kubernetes.io/hostname": "storage-XXXX" <2>
+}
+----
+<1> The name of the monitor that's alerting.
+<2> The node that the monitor is running on.
+
+=== Increase the size of the node's disk
+
+Increase the size of the node's disk according to your cloud provider's documentation.

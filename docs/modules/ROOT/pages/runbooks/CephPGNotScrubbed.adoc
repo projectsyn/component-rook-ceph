@@ -1,0 +1,23 @@
+= Alert rule: CephPGNotScrubbed
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+One or more PGs haven't been scrubbed recently.
+The scrub process is a data integrity feature, protectng against bit-rot.
+It checks that objects and their metadata (size and attributes) match across object replicas.
+When PGs miss their scrub window, it may indicate the scrub window is too small, or PGs weren't in a 'clean' state during the scrub window.
+
+== icon:bug[] Steps for debugging
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph health detail
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph pg scrub <PG_ID_FROM_ALERT>
+----
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-not-scrubbed

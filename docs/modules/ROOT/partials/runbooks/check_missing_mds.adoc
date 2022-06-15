@@ -1,0 +1,76 @@
+=== Check CephFS MDS pods
+
+[source,console]
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" get pods -lapp=rook-ceph-mds
+
+=== Check CephFS status
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph fs status
+fspool - 0 clients <1>
+======
+RANK      STATE         MDS        ACTIVITY     DNS    INOS   DIRS   CAPS <2>
+ 0        active      fspool-a  Reqs:    0 /s  1237    308    307      0  <2>
+0-s   standby-replay  fspool-b  Evts:    0 /s  1601    306    305      0  <2>
+      POOL         TYPE     USED  AVAIL <3>
+fspool-metadata  metadata  55.0M  83.8G <3>
+  fspool-data0     data       0   83.8G <3>
+MDS version: ceph version 16.2.6 (ee28fb57e47e9f88813e24bbf4c14496ca299d31) pacific (stable) <4>
+----
+<1> Name of the filesystem and amount of connected clients
+<2> List of MDS replicas.
+See the https://docs.ceph.com/en/latest/cephfs/mds-states/[Ceph documentation on MDS states] for more information about the values shown in the `STATE` column.
+<3> Filesystem metadata and data usage and remaining capacity.
+<4> Metadata server Ceph version
+
+If a Rook-managed Ceph upgrade goes wrong and leaves one of the MDS replicas in `CrashLoopBackOff` for too long the MDS cluster can go into state `failed`.
+In that case, you should be able to recover the MDS cluster with the following commands:
+
+NOTE: These commands may make the CephFS filesystem temporarily unavailable.
+
+. First, get the filesystem into a state where you can promote one of the MDS replicas to `active`
++
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ cephfs_name=fspool <1>
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph fs dump <2>
+[ ... truncated ... ]
+Filesystem 'fspool' (1)
+fs_name	fspool
+[ ... truncated ... ]
+max_mds	1 <2>
+in	0
+up	{0=23899}
+[ ... truncated ... ]
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph fs set "${cephfs_name}" allow_standby_replay false <3>
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph fs set "${cephfs_name}" max_mds 1 <4>
+----
+<1> Change to the name of the filesystem you want to recover
+<2> Show filesystem status, and make a note of `max_mds` for your target filesystem.
+<3> Disable standby-replay MDS replicas. This allows safely restarting the MDS cluster.
+<4> This is only required if `dump` showed `max_mds > 1`
+
+. Check if one of the MDS replicas got promoted to `active` by the MONs.
++
+[source,console]
+----
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph fs status
+----
++
+If not, scale down all but one of the filesystem's MDS replicas.
+You may have to temporarily disable the rook-ceph operator to be able to scale down MDS replicas.
+To disable the rook-ceph operator, you need to disable auto sync for the `root` and `rook-ceph` apps in ArgoCD and then scale the operator deployment to 0 replicas.
+
+. Once the filesystem is back to state `active`, enable standby replicas again
++
+[source,console]
+----
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph fs set "${cephfs_name}" allow_standby_replay true <1>
+$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph fs set "${cephfs_name}" max_mds <orig_max_mds> <2>
+----
+<1> Enable standby-replay MDS replicas for the filesystem
+<2> If your filesystem originally had `max_mds > 1`, reconfigure it to have the original value of `max_mds`.

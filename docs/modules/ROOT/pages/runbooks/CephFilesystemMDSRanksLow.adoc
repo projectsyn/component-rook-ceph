@@ -1,0 +1,16 @@
+= Alert rule: CephFilesystemMDSRanksLow
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The filesystem's "max_mds" setting defined the number of MDS ranks in the filesystem.
+The current number of active MDS daemons is less than this setting.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_missing_mds.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-up-less-than-max

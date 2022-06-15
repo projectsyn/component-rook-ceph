@@ -1,0 +1,28 @@
+= Alert rule: CephPGsHighPerOSD
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The number of placement groups per OSD is too high (exceeds the mon_max_pg_per_osd setting).
+Autoscale might be disabled or there are too few nodes in the cluster.
+
+== icon:bug[] Steps for debugging
+
+=== Check autoscale status
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+# List pools
+POOL                     SIZE [...] BIAS  PG_NUM  NEW PG_NUM  AUTOSCALE  PROFILE
+fspool-data0               0  [...]  1.0      32              on         scale-down <1>
+device_health_metrics  937.0k [...]  1.0       8              on         scale-down
+fspool-metadata        23363k [...]  4.0      32              on         scale-down
+storagepool            20199  [...]  1.0      32              on         scale-down
+----
+<1> Autoscale should be on for the pool.
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks/#too-many-pgs

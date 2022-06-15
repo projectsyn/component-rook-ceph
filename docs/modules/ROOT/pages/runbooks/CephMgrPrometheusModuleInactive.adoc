@@ -1,0 +1,49 @@
+= Alert rule: CephMgrPrometheusModuleInactive
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The MGR/Prometheus module is unreachable.
+This could mean that the module has been disabled or the MGR itself is down.
+Without the MGR/Prometheus module metrics and alerts will no longer function.
+
+== icon:bug[] Steps for debugging
+
+=== Check if the MGR is active
+
+Check if the MGR shows as active.
+
+include::partial$runbooks/check_cephcluster_status.adoc[]
+
+=== Activate the MGR/Prometheus module
+
+[source,console]
+----
+# Check if the module is enabled
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph mgr module ls | jq '.enabled_modules'
+# Enable the module
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph mgr module enable prometheus
+----
+
+=== Check that Prometheus can scrape the MGR pod
+
+If the `kubectl exec` command in the snippet below hangs or otherwise fails, check:
+
+* Node to node firewall rules, since we're running Ceph in host network mode
+* Network policies between the Prometheus namespace and the Ceph cluster namespace
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ mgr_ip=$(kubectl -n "${ceph_cluster_ns}" get pods -l app=rook-ceph-mgr \
+      -o jsonpath='{.items[0].status.podIP}')
+$ monitoring_ns=openshift-monitoring <1>
+$ prometheus_pod=$(kubectl -n ${monitoring_ns} get pods -l app=prometheus \
+      -o jsonpath='{.items[0].metadata.name}')
+$ kubectl -n "${monitoring_ns}" exec -it "${prometheus_pod}" -- \
+      curl "http://${mgr_ip}:9283/metrics"
+[ ... metrics output omitted ... ]
+----
+<1> Replace the namespace depending on your K8s distribution

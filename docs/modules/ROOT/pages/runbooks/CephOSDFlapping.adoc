@@ -56,3 +56,7 @@ $ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- \
 ----
 <1> Archive all currently not archived crash logs
 <2> Archive crash log with id `<CRASH_ID>`
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/troubleshooting/troubleshooting-osd#flapping-osds

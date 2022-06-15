@@ -1,0 +1,17 @@
+= Alert rule: CephFilesystemDegraded
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+One or more metadata daemons (MDS ranks) are failed or in a damaged state.
+At best the filesystem is partially available, worst case is the filesystem is completely unusable.
+
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_damaged_metadata.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/cephfs/health-messages/#fs-degraded

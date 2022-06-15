@@ -1,0 +1,22 @@
+= Alert rule: CephMonClockSkew
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The ceph monitors rely on a consistent time reference to maintain quorum and cluster consistency.
+This event indicates that at least one of your MONs isn't sync'd correctly.
+
+== icon:bug[] Steps for debugging
+
+=== Check which hosts time isn't synced
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph status
+----
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-clock-skew

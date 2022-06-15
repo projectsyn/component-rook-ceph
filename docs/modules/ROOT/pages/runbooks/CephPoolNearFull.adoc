@@ -1,0 +1,16 @@
+= Alert rule: CephPoolNearFull
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+This alert fires when the Ceph cluster utilization is close to 75% of the cluster capacity.
+Writes may continue, but you are at risk of the pool going read only if more capacity isn't made available.
+
+To resolve this alert, unused data should be deleted or the cluster size must be increased.
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+See the how-to on xref:how-tos/scale-cluster.adoc[scaling a PVC-based Ceph cluster] for instructions to resize the cluster.
+

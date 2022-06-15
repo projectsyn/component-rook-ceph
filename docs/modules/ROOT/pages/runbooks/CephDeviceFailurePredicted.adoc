@@ -1,0 +1,41 @@
+= Alert rule: CephDeviceFailurePredicted
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The device health module has determined that one or more devices will fail soon.
+
+== icon:bug[] Steps for debugging
+
+. Check which OSD is failing.
++
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+# Show life expectancy of the OSD
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph device ls
+----
+
+. If usage is high, or you have three or less OSDs, you may need to add new OSDs to the cluster.
++
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+# Show amount of active OSDs
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph osd stat
+# Show available space in cluster
+ka -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph pg stat
+----
+
+. Mark the OSD as out, so data may migrate to other OSDs in the cluster.
++
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph osd out <osd id>
+----
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#id2

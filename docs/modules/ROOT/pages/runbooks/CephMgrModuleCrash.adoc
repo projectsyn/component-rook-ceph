@@ -1,0 +1,16 @@
+= Alert rule: CephMgrModuleCrash
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+One or more mgr modules have crashed and are yet to be acknowledged.
+A crashed module may impact functionality within the cluster.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/view_archive_recent_crash.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#recent-mgr-module-crash

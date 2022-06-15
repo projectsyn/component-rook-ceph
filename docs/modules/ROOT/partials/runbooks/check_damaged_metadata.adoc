@@ -1,0 +1,21 @@
+=== Check for damaged metadata
+
+. List pools with damaged metadata
++
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph mds metadata
+----
+
+. Check for damaged metadata in the mds admin socket
++
+[source,console,subs="+attributes"]
+----
+# Find the mds daemon pod
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ damaged_fspool=<FSPOOL> # e.g. fspool-a
+$ kubectl -n ${ceph_cluster_ns} get pods | grep ceph-mds | grep ${damaged_fspool}
+# Query the mds admin socket for damaged metadata
+$ ka -n ${ceph_cluster_ns} exec -it <POD> -- ceph daemon /var/run/ceph/ceph-mds.fspool-a.asok damage ls
+----

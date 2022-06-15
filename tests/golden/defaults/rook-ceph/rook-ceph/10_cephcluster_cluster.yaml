@@ -24,7 +24,6 @@ spec:
     count: 3
   monitoring:
     enabled: true
-    rulesNamespace: syn-rook-ceph-cluster
   network:
     provider: host
   placement:

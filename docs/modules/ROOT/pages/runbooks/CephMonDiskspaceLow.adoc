@@ -1,0 +1,17 @@
+= Alert rule: CephMonDiskspaceLow
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The space available to a monitor's store is approaching full (>70% is the default).
+You should increase the space available to the monitor(s).
+The default location for the store sits under /var/lib/rook/<MON_NAME>/data as a `hostPath` volume.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_mon_low_disk.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-disk-low

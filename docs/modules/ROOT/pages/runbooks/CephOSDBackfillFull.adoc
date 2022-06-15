@@ -1,0 +1,33 @@
+= Alert rule: CephOSDBackfillFull
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+An OSD has reached it's BACKFILL FULL threshold.
+This will prevent rebalance operations completing for some pools. Check the current capacity utilisation with 'ceph df'
+
+To resolve, either add capacity to the cluster, or delete unwanted data
+
+== icon:bug[] Steps for debugging
+
+=== Check current capacity utilisation
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph df
+--- RAW STORAGE ---
+[...]
+
+--- POOLS ---
+POOL                   ID  PGS   STORED  OBJECTS     USED  %USED  MAX AVAIL
+device_health_metrics   1    8  937 KiB        3  2.7 MiB      0     93 GiB
+fspool-metadata         2   32   23 MiB       29   69 MiB   0.02     93 GiB
+fspool-data0            3   32      0 B        0      0 B      0     93 GiB
+storagepool             4   32   20 KiB        5   71 KiB      0     93 GiB
+----
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-backfillfull

@@ -1,0 +1,27 @@
+= Alert rule: CephDeviceFailureRelocationIncomplete
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The device health module has determined that one or more devices will fail soon, but the normal process of relocating the data on the device to other OSDs in the cluster is blocked.
+
+Check the the cluster has available freespace.
+It may be necessary to add more disks to the cluster to allow the data from the failing device to successfully migrate.
+
+== icon:bug[] Steps for debugging
+
+. Check which OSD is failing.
++
+[source,console,subs="+attributes"]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+# Show life expectancy of the OSD
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph device ls
+----
+
+. Increase cluster size.
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#device-health-in-use

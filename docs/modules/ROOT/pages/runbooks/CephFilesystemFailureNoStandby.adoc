@@ -1,0 +1,16 @@
+= Alert rule: CephFilesystemFailureNoStandby
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+An MDS daemon has failed, leaving only one active rank without further standby.
+Investigate the cause of the failure or add a standby daemon.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_missing_mds.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/cephfs/health-messages/#fs-with-failed-mds

@@ -99,9 +99,17 @@ parameters:
       # giving the entry prefixed with `~` (same syntax as for the
       # applications array).
       ignoreNames:
-        # Disable Ceph pool quota alerts by default
-        - CephPoolQuotaBytesNearExhaustion
-        - CephPoolQuotaBytesCriticallyExhausted
+        # Ignored because the Kubernetes monitoring should already provide node disk usage alerts
+        - CephMonDiskspaceCritical
+        - CephMonDiskspaceLow
+        - CephNodeDiskspaceWarning
+        # Managed by the cluster, fires on OCP but seems to be a false positive
+        - CephNodeInconsistentMTU
+        # We tend to run Ceph on virtual discs so we don't have S.M.A.R.T. information
+        - CephDeviceFailurePredicted
+        - CephDeviceFailurePredictionTooHigh
+        - CephDeviceFailureRelocationIncomplete
+
       # Alert rule patches.
       # Provide partial objects for alert rules that need to be tuned compared to
       # upstream. The keys in this object correspond to the `alert` field of the
@@ -123,7 +131,7 @@ parameters:
       rook:
         registry: docker.io
         image: rook/ceph
-        tag: v1.8.9
+        tag: v1.9.5
       ceph:
         registry: quay.io
         image: ceph/ceph
@@ -132,6 +140,10 @@ parameters:
         registry: quay.io
         image: cephcsi/cephcsi
         tag: v3.6.2
+      kubectl:
+        registry: docker.io
+        image: bitnami/kubectl
+        tag: '1.24.1@sha256:18f98f705ee7ff7fd9aadc6db6c18af64ec296aa5c08d080a40ca2efa10eb984'
 
     charts:
       # We do not support helm chart versions older than v1.7.0
@@ -169,7 +181,6 @@ parameters:
       dataDirHostPath: /var/lib/rook
       monitoring:
         enabled: ${rook_ceph:ceph_cluster:monitoring_enabled}
-        rulesNamespace: ${rook_ceph:ceph_cluster:namespace}
       mon:
         count: 3
         allowMultiplePerNode: false

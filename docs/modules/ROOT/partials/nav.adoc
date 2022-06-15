@@ -19,37 +19,71 @@
 ** xref:runbooks/RookCephOperatorScaledDown.adoc[RookCephOperatorScaledDown]
 
 * Ceph Cluster
-** xref:runbooks/CephClusterErrorState.adoc[CephClusterErrorState]
-** xref:runbooks/CephClusterWarningState.adoc[CephClusterWarningState]
-** xref:runbooks/CephClusterNearFull.adoc[CephClusterNearFull]
-** xref:runbooks/CephClusterCriticallyFull.adoc[CephClusterCriticallyFull]
-** xref:runbooks/CephClusterReadOnly.adoc[CephClusterReadOnly]
-** xref:runbooks/CephDataRecoveryTakingTooLong.adoc[CephDataRecoveryTakingTooLong]
-** xref:runbooks/CephPGRepairTakingTooLong.adoc[CephPGRepairTakingTooLong]
+** xref:runbooks/CephDaemonCrash.adoc[CephDaemonCrash]
+** xref:runbooks/CephHealthError.adoc[CephHealthError]
+** xref:runbooks/CephHealthWarning.adoc[CephHealthWarning]
+** xref:runbooks/CephNodeDiskspaceWarning.adoc[CephNodeDiskspaceWarning]
+** xref:runbooks/CephNodeInconsistentMTU.adoc[CephNodeInconsistentMTU]
+** xref:runbooks/CephNodeNetworkPacketDrops.adoc[CephNodeNetworkPacketDrops]
+** xref:runbooks/CephNodeNetworkPacketErrors.adoc[CephNodeNetworkPacketErrors]
+** xref:runbooks/CephNodeRootFilesystemFull.adoc[CephNodeRootFilesystemFull]
+** xref:runbooks/CephPGBackfillAtRisk.adoc[CephPGBackfillAtRisk]
+** xref:runbooks/CephPGImbalance.adoc[CephPGImbalance]
+** xref:runbooks/CephPGNotDeepScrubbed.adoc[CephPGNotDeepScrubbed]
+** xref:runbooks/CephPGNotScrubbed.adoc[CephPGNotScrubbed]
+** xref:runbooks/CephPGRecoveryAtRisk.adoc[CephPGRecoveryAtRisk]
+** xref:runbooks/CephPGUnavilableBlockingIO.adoc[CephPGUnavilableBlockingIO]
+** xref:runbooks/CephPGsDamaged.adoc[CephPGsDamaged]
+** xref:runbooks/CephPGsHighPerOSD.adoc[CephPGsHighPerOSD]
+** xref:runbooks/CephPGsInactive.adoc[CephPGsInactive]
+** xref:runbooks/CephPGsUnclean.adoc[CephPGsUnclean]
+** xref:runbooks/CephSlowOps.adoc[CephSlowOps]
 
 * Ceph pools
-** xref:runbooks/CephPoolQuotaBytesNearExhaustion.adoc[CephPoolQuotaBytesNearExhaustion]
-** xref:runbooks/CephPoolQuotaBytesCriticallyExhausted.adoc[CephPoolQuotaBytesCriticallyExhausted]
+** xref:runbooks/CephPoolBackfillFull.adoc[CephPoolBackfillFull]
+** xref:runbooks/CephPoolFull.adoc[CephPoolFull]
+** xref:runbooks/CephPoolNearFull.adoc[CephPoolNearFull]
+
+* Ceph MDS
+** xref:runbooks/CephFilesystemFailureNoStandby.adoc[CephFilesystemFailureNoStandby]
+** xref:runbooks/CephFilesystemInsufficientStandby.adoc[CephFilesystemInsufficientStandby]
+** xref:runbooks/CephFilesystemMDSRanksLow.adoc[CephFilesystemMDSRanksLow]
+** xref:runbooks/CephFilesystemOffline.adoc[CephFilesystemOffline]
+** xref:runbooks/CephFilesystemReadOnly.adoc[CephFilesystemReadOnly]
 
 * Ceph MGR
-** xref:runbooks/CephMgrIsAbsent.adoc[CephMgrIsAbsent]
+** xref:runbooks/CephMgrModuleCrash.adoc[CephMgrModuleCrash]
+** xref:runbooks/CephMgrPrometheusModuleInactive.adoc[CephMgrPrometheusModuleInactive]
 
 * Ceph MON
-** xref:runbooks/CephMonVersionMismatch.adoc[CephMonVersionMismatch]
-** xref:runbooks/CephMonQuorumAtRisk.adoc[CephMonQuorumAtRisk]
-** xref:runbooks/CephMonHighNumberOfLeaderChanges.adoc[CephMonHighNumberOfLeaderChanges]
+** xref:runbooks/CephMonDiskspaceCritical.adoc[CephMonDiskspaceCritical]
+** xref:runbooks/CephMonDiskspaceLow.adoc[CephMonDiskspaceLow]
+** xref:runbooks/CephMonDown.adoc[CephMonDown]
+** xref:runbooks/CephMonDownQuorumAtRisk.adoc[CephMonDownQuorumAtRisk]
 
 * Ceph OSD
-** xref:runbooks/CephOSDVersionMismatch.adoc[CephOSDVersionMismatch]
-** xref:runbooks/CephOSDNearFull.adoc[CephOSDNearFull]
-** xref:runbooks/CephOSDCriticallyFull.adoc[CephOSDCriticallyFull]
+** xref:runbooks/CephOSDBackfillFull.adoc[CephOSDBackfillFull]
+** xref:runbooks/CephOSDDown.adoc[CephOSDDown]
+** xref:runbooks/CephOSDDownHigh.adoc[CephOSDDownHigh]
 ** xref:runbooks/CephOSDFlapping.adoc[CephOSDFlapping]
-** xref:runbooks/CephOSDDiskNotResponding.adoc[CephOSDDiskNotResponding]
-** xref:runbooks/CephOSDDiskUnavailable.adoc[CephOSDDiskUnavailable]
-** xref:runbooks/CephOSDSlowOps.adoc[CephOSDSlowOps]
+** xref:runbooks/CephOSDFull.adoc[CephOSDFull]
+** xref:runbooks/CephOSDHostDown.adoc[CephOSDHostDown]
+** xref:runbooks/CephOSDInternalDiskSizeMismatch.adoc[CephOSDInternalDiskSizeMismatch]
+** xref:runbooks/CephOSDNearFull.adoc[CephOSDNearFull]
+** xref:runbooks/CephOSDReadErrors.adoc[CephOSDReadErrors]
+** xref:runbooks/CephOSDTimeoutsClusterNetwork.adoc[CephOSDTimeoutsClusterNetwork]
+** xref:runbooks/CephOSDTimeoutsPublicNetwork.adoc[CephOSDTimeoutsPublicNetwork]
+** xref:runbooks/CephOSDTooManyRepairs.adoc[CephOSDTooManyRepairs]
+** xref:runbooks/CephObjectMissing.adoc[CephObjectMissing]
 
 * CephFS
-** xref:runbooks/CephMdsMissingReplicas.adoc[CephMdsMissingReplicas]
+** xref:runbooks/CephFilesystemDamaged.adoc[CephFilesystemDamaged]
+** xref:runbooks/CephFilesystemDegraded.adoc[CephFilesystemDegraded]
+
+* Ceph devices
+** xref:runbooks/CephDeviceFailurePredicted.adoc[CephDeviceFailurePredicted]
+** xref:runbooks/CephDeviceFailurePredictionTooHigh.adoc[CephDeviceFailurePredictionTooHigh]
+** xref:runbooks/CephDeviceFailureRelocationIncomplete.adoc[CephDeviceFailureRelocationIncomplete]
 
 .Technical reference
 

@@ -1,0 +1,15 @@
+= Alert rule: CephOSDTooManyRepairs
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+Reads from an OSD have used a secondary PG to return data to the client, indicating a potential failing disk.
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-too-many-repairs

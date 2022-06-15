@@ -1,7 +1,0 @@
-= Alert rule: CephOSDVersionMismatch
-
-include::partial$runbooks/contribution_note.adoc[]
-
-:component: OSD
-
-include::partial$runbooks/version_mismatch.adoc[]

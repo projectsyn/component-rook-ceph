@@ -1,0 +1,42 @@
+=== Check possible crashes
+
+If Ceph status shows recent crashes
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph status
+  cluster:
+    id:     92716509-0f84-4739-8d04-541d2e7c3e66
+    health: HEALTH_WARN
+            1 daemons have recently crashed <1>
+[ ... remaining output omitted ... ]
+----
+<1> One or more lines indicating recent crashes.
+
+Get list of recent crashes.
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph crash ls-new
+ID                                                                ENTITY        NEW
+[... some date and uuid ...]                                      mds.fspool-b  * <1>
+----
+<1> ID and affected entity of crash
+
+Get more information about the nature of the crash.
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph crash info {ID}
+----
+
+If the issue is resolved and the warning is still present, clear crash list.
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph crash archive {ID}
+----

@@ -1,0 +1,17 @@
+= Alert rule: CephPGBackfillAtRisk
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+Data redundancy may be at risk due to lack of free space within the cluster.
+One or more OSDs have breached their 'backfillfull' threshold.
+Add more capacity, or delete unwanted data.
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-backfill-full

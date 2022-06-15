@@ -1,0 +1,17 @@
+= Alert rule: CephOSDDownHigh
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+More than 10% of the OSDs are down.
+
+== icon:bug[] Steps for debugging
+
+:component: OSD
+
+include::partial$runbooks/check_component_pod_status.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-down

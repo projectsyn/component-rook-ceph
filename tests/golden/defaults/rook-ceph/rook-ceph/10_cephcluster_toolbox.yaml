@@ -54,7 +54,7 @@ spec:
                 secretKeyRef:
                   key: ceph-secret
                   name: rook-ceph-mon
-          image: docker.io/rook/ceph:v1.8.9
+          image: docker.io/rook/ceph:v1.9.5
           imagePullPolicy: IfNotPresent
           name: rook-ceph-tools
           securityContext:

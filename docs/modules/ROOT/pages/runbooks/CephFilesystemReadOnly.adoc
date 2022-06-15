@@ -1,0 +1,15 @@
+= Alert rule: CephFilesystemReadOnly
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The filesystem has switched to READ ONLY due to an unexpected write error, when writing to the metadata pool.
+
+== icon:bug[] Steps for debugging
+
+include::partial$runbooks/check_missing_mds.adoc[]
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/cephfs/health-messages#cephfs-health-messages

@@ -43,7 +43,7 @@ local job = kube.Job(name) {
         serviceAccountName: serviceAccount.metadata.name,
         containers_+: {
           patch_crds: kube.Container(name) {
-            image: '%s/%s:%s' % [ params.images.kubectl.registry, params.images.kubectl.image, params.images.kubectl.tag ],
+            image: '%(registry)s/%(image)s:%(tag)s' % params.images.kubectl,
             workingDir: '/home',
             command: [ 'kubectl' ],
             args: [

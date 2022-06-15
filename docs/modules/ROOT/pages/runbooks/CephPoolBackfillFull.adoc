@@ -12,4 +12,4 @@ To resolve this alert, unused data should be deleted or the cluster size must be
 == icon:bug[] Steps for debugging
 
 // Add detailed steps to debug and resolve the issue
-
+See the how-to on xref:how-tos/scale-cluster.adoc[scaling a PVC-based Ceph cluster] for instructions to resize the cluster.

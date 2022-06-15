@@ -13,6 +13,7 @@ Otherwise, investigate why this particular device has higher utilization than th
 == icon:bug[] Steps for debugging
 
 // Add detailed steps to debug and resolve the issue
+See the how-to on xref:how-tos/scale-cluster.adoc[scaling a PVC-based Ceph cluster] for instructions to resize the cluster.
 
 == icon:book[] Upstream documentation
 

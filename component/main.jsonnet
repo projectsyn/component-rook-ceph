@@ -35,6 +35,8 @@ local csi_metrics = import 'csi_metrics.libsonnet';
 
 local alert_rules = import 'alertrules.libsonnet';
 
+local aggregated_rbac = import 'aggregated_rbac.libsonnet';
+
 local namespaces =
   [
     kube.Namespace(params.namespace) + ns_config,
@@ -72,6 +74,7 @@ std.mapWithKey(
       },
   {
     '00_namespaces': namespaces,
+    '01_aggregated_rbac': aggregated_rbac.cluster_roles,
     [if on_openshift then '02_openshift_sccs']: ocp_config.sccs,
     '10_cephcluster_rbac': cephcluster.rbac,
     '10_cephcluster_configoverride': cephcluster.configmap,

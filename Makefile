@@ -37,7 +37,7 @@ lint_adoc: ## Lint documentation
 
 .PHONY: lint_prometheus
 lint_prometheus: ## Lint Prometheus alert rules
-	$(PINT_LINT_CMD) $(PINT_LINT_ARGS)
+	./scripts/lint-prometheus.sh
 
 .PHONY: format
 format: format_jsonnet ## All-in-one formatting

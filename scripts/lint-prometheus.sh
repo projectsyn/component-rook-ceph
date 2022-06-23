@@ -24,4 +24,4 @@ result=$?
 ${cmd} kill proxy
 ${cmd} network rm ${name}
 
-exit $?
+exit ${result}

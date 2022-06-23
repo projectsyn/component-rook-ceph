@@ -9,6 +9,8 @@ env:
 
 jobs:
   linting:
+    env:
+      KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
     runs-on: ubuntu-latest
     strategy:
       matrix:

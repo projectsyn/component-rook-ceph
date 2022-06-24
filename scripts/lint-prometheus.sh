@@ -16,7 +16,7 @@ args="run --rm -u $(id -u):$(id -g) ${userns} -w /${name} -e HOME=/${name} -v ${
 
 ${cmd} network create ${name}
 
-${cmd} ${args} --name proxy bitnami/kubectl --server=https://api.cloudscale-lpg-2.appuio.cloud:6443 --token="${KUBE_TOKEN}" --as=cluster-admin -n openshift-monitoring port-forward --address 0.0.0.0 pod/prometheus-k8s-0 9090 &
+${cmd} ${args} --name proxy bitnami/kubectl --server=https://api.cloudscale-lpg-2.appuio.cloud:6443 --token="${KUBE_TOKEN}" -n openshift-monitoring port-forward --address 0.0.0.0 pod/prometheus-k8s-0 9090 &
 
 ${cmd} ${args} ghcr.io/cloudflare/pint:0.22.2 pint lint tests/golden
 result=$?

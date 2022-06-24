@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: github-com-projectsyn-componponent-rook-ceph
+  namespace: openshift-monitoring
+  labels:
+    app.kubernetes.io/created-by: christian.haeusler
+    app.kubernetes.io/part-of: "github.com-projectsyn-component-rook-ceph"

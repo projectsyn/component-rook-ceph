@@ -41,6 +41,7 @@ data:
   CSI_PLUGIN_PRIORITY_CLASSNAME: system-node-critical
   CSI_PROVISIONER_PRIORITY_CLASSNAME: system-cluster-critical
   CSI_PROVISIONER_REPLICAS: '2'
+  CSI_PROVISIONER_TOLERATIONS: "- key: storagenode\n  operator: Exists"
   CSI_RBD_FSGROUPPOLICY: ReadWriteOnceWithFSType
   CSI_RBD_PLUGIN_RESOURCE: "- name : driver-registrar\n  resource:\n    requests:\n\
     \      memory: 128Mi\n      cpu: 50m\n    limits:\n      memory: 256Mi\n     \

@@ -163,6 +163,7 @@ parameters:
           memory: 512Mi
       tolerations: ${rook_ceph:tolerations}
       csi:
+        provisionerTolerations: ${rook_ceph:tolerations}
         enableCSIHostNetwork: false
         enableRbdDriver: ${rook_ceph:ceph_cluster:rbd_enabled}
         enableCephfsDriver: ${rook_ceph:ceph_cluster:cephfs_enabled}

@@ -9,6 +9,8 @@ env:
 
 jobs:
   linting:
+    env:
+      KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -16,6 +18,7 @@ jobs:
           - lint_jsonnet
           - lint_yaml
           - lint_adoc
+          - lint_prometheus
     steps:
       - uses: actions/checkout@v3
       - name: Run ${{ matrix.command }}

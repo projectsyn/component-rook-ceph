@@ -50,7 +50,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.5
+    helm.sh/chart: rook-ceph-v1.9.6
     operator: rook
     storage-backend: ceph
   name: psp:rook
@@ -71,7 +71,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.5
+    helm.sh/chart: rook-ceph-v1.9.6
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system-psp

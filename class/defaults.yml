@@ -131,7 +131,7 @@ parameters:
       rook:
         registry: docker.io
         image: rook/ceph
-        tag: v1.9.5
+        tag: v1.9.6
       ceph:
         registry: quay.io
         image: ceph/ceph
@@ -147,7 +147,7 @@ parameters:
 
     charts:
       # We do not support helm chart versions older than v1.7.0
-      rook-ceph: v1.9.5
+      rook-ceph: v1.9.6
 
     operator_helm_values:
       image:

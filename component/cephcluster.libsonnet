@@ -207,6 +207,13 @@ local rbac =
 
 
 local devicesets = params.ceph_cluster.storageClassDeviceSets;
+local getDeviceset(name) =
+  if devicesets[name] != null then
+    devicesets[name] {
+      name: name,
+      volumeClaimTemplates: std.objectValues(devicesets[name].volumeClaimTemplates),
+    };
+
 local cephcluster =
   kube._Object('ceph.rook.io/v1', 'CephCluster', params.ceph_cluster.name)
   {
@@ -225,14 +232,7 @@ local cephcluster =
         storage+: {
           storageClassDeviceSets: std.filter(
             function(it) it != null,
-            [
-              if devicesets[name] != null then
-                devicesets[name] {
-                  name: name,
-                  volumeClaimTemplates: std.objectValues(devicesets[name].volumeClaimTemplates),
-                }
-              for name in std.objectFields(devicesets)
-            ]
+            [ getDeviceset(name) for name in std.objectFields(devicesets) ]
           ),
         },
       }

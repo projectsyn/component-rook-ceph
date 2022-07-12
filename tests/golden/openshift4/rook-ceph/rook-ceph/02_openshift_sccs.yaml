@@ -71,6 +71,7 @@ users:
   - system:serviceaccount:syn-rook-ceph-operator:rook-csi-rbd-provisioner-sa
   - system:serviceaccount:syn-rook-ceph-operator:rook-csi-cephfs-plugin-sa
   - system:serviceaccount:syn-rook-ceph-operator:rook-csi-cephfs-provisioner-sa
+  - system:serviceaccount:syn-rook-ceph-operator:default
 volumes:
   - configMap
   - emptyDir

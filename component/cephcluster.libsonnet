@@ -205,6 +205,15 @@ local rbac =
   rolebindings +
   clusterrolebindings;
 
+
+local devicesets = params.ceph_cluster.storageClassDeviceSets;
+local getDeviceset(name) =
+  if devicesets[name] != null then
+    devicesets[name] {
+      name: name,
+      volumeClaimTemplates: std.objectValues(devicesets[name].volumeClaimTemplates),
+    };
+
 local cephcluster =
   kube._Object('ceph.rook.io/v1', 'CephCluster', params.ceph_cluster.name)
   {
@@ -219,6 +228,12 @@ local cephcluster =
         disruptionManagement: {
           manageMachineDisruptionBudgets: on_openshift,
           machineDisruptionBudgetNamespace: 'openshift-machine-api',
+        },
+        storage+: {
+          storageClassDeviceSets: std.filter(
+            function(it) it != null,
+            [ getDeviceset(name) for name in std.objectFields(devicesets) ]
+          ),
         },
       }
       + com.makeMergeable(params.cephClusterSpec),

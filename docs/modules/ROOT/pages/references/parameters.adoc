@@ -180,8 +180,8 @@ type:: dict
 keys:: Names of `storageClassDeviceSet` resources
 values:: Spec of `storageClassDeviceSet` resources
 
-The component creates adds a storage class device sets to the cluster object for every entry.
-The key is used as the name of the storage class device set and the value is used as the specification with the `volumeClaimTemplates` key coverted from a dictionary to a list.
+The component adds a storage class device set to the cluster object for every entry.
+The key is used as the name of the storage class device set and the value is used as the specification with the `volumeClaimTemplates` key converted from a dictionary to a list.
 
 This means the following example configuration:
 

@@ -173,6 +173,60 @@ default:: `true`
 
 This parameter controls whether the component enables monitoring on the `CephCluster` resource and sets up Ceph alert rules.
 
+=== `storageClassDeviceSets`[[ceph_cluster_storageclass]]
+
+[horizontal]
+type:: dict
+keys:: Names of `storageClassDeviceSet` resources
+values:: Spec of `storageClassDeviceSet` resources
+
+The component creates adds a storage class device sets to the cluster object for every entry.
+The key is used as the name of the storage class device set and the value is used as the specification with the `volumeClaimTemplates` key coverted from a dictionary to a list.
+
+This means the following example configuration:
+
+[source,yaml]
+----
+storageClassDeviceSets:
+  foo:
+    count: 3
+    volumeClaimTemplates:
+      default:
+        spec:
+          storageClassName: localblock
+          volumeMode: Block
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 100Gi
+----
+
+Would be converted to the following specification
+
+[source,yaml]
+----
+storageClassDeviceSets:
+  - name: foo
+    count: 3
+    volumeClaimTemplates:
+      - spec:
+          storageClassName: localblock
+          volumeMode: Block
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 100Gi
+----
+
+See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-sets[Storage Class Device Sets] for a more detailed explanation on how to configure them.
+
+NOTE: The default storage class device set is called `cluster` and can also be configured through this parameter.
+
+IMPORTANT: If you set `cephClusterSpec.storage.storageClassDeviceSets`, making changes to this parameter isn't supported.
+
+
 === `storage_pools.rbd`
 
 [horizontal]
@@ -473,10 +527,8 @@ requiredDuringSchedulingIgnoredDuringExecution:
 <1> The component creates an entry in `matchExpressions` with `key` equal to the node selector key and `operator=Exists` for each key in parameter <<_node_selector,`node_selector`>>.
 
 * `placement.all.tolerations` is set to the value of parameter <<_tolerations,`tolerations`>>.
-* The component creates as single entry for `storage.storageClassDeviceSets` based on values given in parameter <<_ceph_cluster,`ceph_cluster`>>.
-Users are encouraged to use the parameter <<_ceph_cluster,`ceph_cluster`>> to configure the Ceph cluster's backing storage.
-+
-The component expects that the provided storageclass for the backing storage supports `volumeMode=Block`.
+* `storage.storageClassDeviceSets` based on values given in parameter <<ceph_cluster_storageclass,`ceph_cluster.storageClassDeviceSets`>>.
+Users are encouraged to use the parameter <<ceph_cluster_storageclass,`ceph_cluster.storageClassDeviceSets`>> to configure the Ceph cluster's backing storage.
 
 See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#settings[the Rook.io `CephCluster` documentation] for a full list of configuration parameters.
 

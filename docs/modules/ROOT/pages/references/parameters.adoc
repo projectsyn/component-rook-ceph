@@ -75,7 +75,7 @@ default:: `false`
 
 This parameter can be set to `true` to tune the Ceph cluster OSD parameters for SSDs (or better).
 
-See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-sets[the Rook.io Ceph cluster CRD documentation] for a more detailed explanation.
+See https://rook.io/docs/rook/v1.9/ceph-cluster-crd.html#storage-class-device-sets[the Rook.io Ceph cluster CRD documentation] for a more detailed explanation.
 
 === `osd_placement`
 
@@ -85,7 +85,7 @@ default:: {}
 
 Control placement of the OSD pods, empty by default.
 
-See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-sets[Storage Class Device Sets] for a more detailed explanation.
+See https://rook.io/docs/rook/v1.9/ceph-cluster-crd.html#storage-class-device-sets[Storage Class Device Sets] for a more detailed explanation.
 
 === `osd_portable`
 
@@ -220,7 +220,7 @@ storageClassDeviceSets:
               storage: 100Gi
 ----
 
-See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#storage-class-device-sets[Storage Class Device Sets] for a more detailed explanation on how to configure them.
+See https://rook.io/docs/rook/v1.9/ceph-cluster-crd.html#storage-class-device-sets[Storage Class Device Sets] for a more detailed explanation on how to configure them.
 
 NOTE: The default storage class device set is called `cluster` and can also be configured through this parameter.
 
@@ -261,7 +261,7 @@ This configuration results in
 * A storage class which creates PVs on this block pool, uses the `ext4` filesystem, supports volume expansion and configures PVs to be mounted with `-o discard`.
 * A `VolumeSnapshotClass` associated with the storage class
 
-See https://rook.io/docs/rook/v1.6/ceph-pool-crd.html[the Rook.io `CephBlockPool` CRD documentation] for all possible configurations in key `config`.
+See https://rook.io/docs/rook/v1.9/ceph-pool-crd.html[the Rook.io `CephBlockPool` CRD documentation] for all possible configurations in key `config`.
 
 The values in key `storage_class_config` are merged into the `StorageClass` resource.
 
@@ -480,7 +480,7 @@ A few Helm values are configured based on other component parameters by default:
 * The value of `tolerations` is used to set Helm value `tolerations`
 * The component ensures that `hostpathRequiresPrivileged` is enabled on OpenShift 4 regardless of the contents of the Helm value.
 
-See https://rook.io/docs/rook/v1.6/helm-operator.html#configuration[the Rook.io docs] for a full list of Helm values.
+See https://rook.io/docs/rook/v1.9/helm-operator.html#configuration[the Rook.io docs] for a full list of Helm values.
 
 == `toolbox`
 
@@ -530,7 +530,7 @@ requiredDuringSchedulingIgnoredDuringExecution:
 * `storage.storageClassDeviceSets` based on values given in parameter <<ceph_cluster_storageclass,`ceph_cluster.storageClassDeviceSets`>>.
 Users are encouraged to use the parameter <<ceph_cluster_storageclass,`ceph_cluster.storageClassDeviceSets`>> to configure the Ceph cluster's backing storage.
 
-See https://rook.io/docs/rook/v1.6/ceph-cluster-crd.html#settings[the Rook.io `CephCluster` documentation] for a full list of configuration parameters.
+See https://rook.io/docs/rook/v1.9/ceph-cluster-crd.html#settings[the Rook.io `CephCluster` documentation] for a full list of configuration parameters.
 
 == Example configurations
 

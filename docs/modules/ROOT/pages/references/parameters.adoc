@@ -224,7 +224,7 @@ See https://rook.io/docs/rook/v1.9/ceph-cluster-crd.html#storage-class-device-se
 
 NOTE: The default storage class device set is called `cluster` and can also be configured through this parameter.
 
-IMPORTANT: If you set `cephClusterSpec.storage.storageClassDeviceSets`, making changes to this parameter isn't supported.
+IMPORTANT: Storage class device sets added by `cephClusterSpec.storage.storageClassDeviceSets` can't be modified through this parameter.
 
 
 === `storage_pools.rbd`

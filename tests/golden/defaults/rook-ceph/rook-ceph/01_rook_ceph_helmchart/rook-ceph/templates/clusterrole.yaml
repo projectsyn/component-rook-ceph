@@ -3,9 +3,9 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -39,9 +39,9 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -72,9 +72,9 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -252,9 +252,9 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -308,9 +308,9 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -557,9 +557,9 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin

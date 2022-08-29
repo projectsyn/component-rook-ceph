@@ -3,9 +3,9 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-operator
@@ -14,11 +14,13 @@ spec:
   selector:
     matchLabels:
       app: rook-ceph-operator
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: rook-ceph-operator
-        helm.sh/chart: rook-ceph-v1.9.6
+        helm.sh/chart: rook-ceph-v1.9.10
     spec:
       containers:
       - args:
@@ -52,6 +54,10 @@ spec:
         image: docker.io/rook/ceph:v1.9.6
         imagePullPolicy: IfNotPresent
         name: rook-ceph-operator
+        ports:
+        - containerPort: 9443
+          name: https-webhook
+          protocol: TCP
         resources:
           limits:
             cpu: 1000m

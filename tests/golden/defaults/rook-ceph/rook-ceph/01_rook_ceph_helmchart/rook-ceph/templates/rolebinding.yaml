@@ -3,9 +3,9 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system

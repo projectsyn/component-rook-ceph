@@ -54,10 +54,10 @@ spec:
         memory: 2Gi
     osd:
       limits:
-        cpu: '6'
+        cpu: '2'
         memory: 5Gi
       requests:
-        cpu: '4'
+        cpu: '2'
         memory: 5Gi
   storage:
     storageClassDeviceSets:

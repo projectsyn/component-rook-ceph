@@ -222,10 +222,10 @@ parameters:
             memory: "512Mi"
         mon:
           limits:
-            cpu: "1"
+            cpu: "500m"
             memory: 2Gi
           requests:
-            cpu: "1"
+            cpu: "250m"
             memory: 2Gi
         osd:
           limits:

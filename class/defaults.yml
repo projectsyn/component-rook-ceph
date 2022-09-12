@@ -100,10 +100,10 @@ parameters:
                 resources:
                   requests:
                     cpu: "1"
-                    memory: 8Gi
+                    memory: 4Gi
                   limits:
                     cpu: "1"
-                    memory: 8Gi
+                    memory: 4Gi
                 # metadata server placement done in Jsonnet but can be
                 # extended here
               mirroring:
@@ -215,24 +215,24 @@ parameters:
       resources:
         mgr:
           limits:
-            cpu: "1"
-            memory: 2Gi
+            cpu: "500m"
+            memory: "1Gi"
           requests:
-            cpu: "1"
-            memory: 2Gi
+            cpu: "250m"
+            memory: "512Mi"
         mon:
           limits:
-            cpu: "1"
+            cpu: "500m"
             memory: 2Gi
           requests:
-            cpu: "1"
+            cpu: "250m"
             memory: 2Gi
         osd:
           limits:
-            cpu: "6"
+            cpu: "2"
             memory: 5Gi
           requests:
-            cpu: "4"
+            cpu: "2"
             memory: 5Gi
       storage:
         useAllNodes: false

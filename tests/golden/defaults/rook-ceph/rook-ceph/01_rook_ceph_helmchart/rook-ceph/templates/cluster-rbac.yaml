@@ -3,9 +3,9 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-osd
@@ -16,9 +16,9 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr
@@ -29,9 +29,9 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cmd-reporter
@@ -48,9 +48,9 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
+    helm.sh/chart: rook-ceph-v1.9.10
     operator: rook
     storage-backend: ceph
   name: rook-ceph-rgw
@@ -236,97 +236,6 @@ rules:
       - update
       - delete
       - list
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/created-by: helm
-    app.kubernetes.io/managed-by: helm
-    app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.6
-    operator: rook
-    storage-backend: ceph
-  name: rook-ceph-default-psp
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: psp:rook
-subjects:
-  - kind: ServiceAccount
-    name: default
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-osd-psp
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: psp:rook
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-osd
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-rgw-psp
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: psp:rook
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-rgw
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-mgr-psp
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: psp:rook
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-mgr
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-cmd-reporter-psp
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: psp:rook
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-cmd-reporter
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-purge-osd-psp
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: psp:rook
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-purge-osd
-    namespace: syn-rook-ceph-operator
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

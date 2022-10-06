@@ -1,0 +1,31 @@
+= Alert rule: CephPoolGrowthWarning
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+This alert triggers if a CephFS pool is predicted to fill up above 95% within five days based on the data growth over the last two days.
+
+Either delete unused data or increase the Ceph cluster size to address this alert.
+
+== icon:bug[] Steps for debugging
+
+Check the CephFS pool utilization with
+
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph fs status
+fspool - 0 clients
+======
+RANK      STATE         MDS        ACTIVITY     DNS    INOS   DIRS   CAPS
+ 0        active      fspool-b  Reqs:    0 /s   276     62     61      0
+0-s   standby-replay  fspool-a  Evts:    0 /s   276     62     61      0
+      POOL         TYPE     USED  AVAIL
+fspool-metadata  metadata   733M   504G
+  fspool-data0     data       0    504G <1>
+MDS version: ceph version 16.2.10 (45fa1a083152e41a408d15505f594ec5f1b4fe17) pacific (stable)
+----
+<1> Pool utilization is listed here
+
+If necessary, see the how-to on xref:how-tos/scale-cluster.adoc[scaling a PVC-based Ceph cluster] for instructions to resize the cluster.

@@ -191,6 +191,7 @@ parameters:
         enableLiveness: true
         cephcsi:
           image: ${rook_ceph:images:cephcsi:registry}/${rook_ceph:images:cephcsi:image}:${rook_ceph:images:cephcsi:tag}
+      pspEnable: false
 
     toolbox:
       enabled: true

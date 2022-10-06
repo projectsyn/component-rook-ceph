@@ -821,8 +821,9 @@ spec:
               '
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPoolGrowthWarning.html
             summary: Pool growth rate may soon exceed capacity
-          expr: "(predict_linear(ceph_pool_percent_used[2d], 3600 * 24 * 5) * on(pool_id)\n\
-            \    group_right ceph_pool_metadata) >= 95\n"
+          expr: "(predict_linear((max(ceph_pool_percent_used) without (pod, instance))[2d:1h],\
+            \ 3600 * 24 * 5) * on(pool_id)\n    group_right ceph_pool_metadata) >=\
+            \ 95\n"
           labels:
             oid: 1.3.6.1.4.1.50495.1.2.1.9.2
             severity: warning

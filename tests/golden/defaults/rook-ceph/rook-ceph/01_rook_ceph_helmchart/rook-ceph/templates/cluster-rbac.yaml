@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.4
     operator: rook
     storage-backend: ceph
   name: rook-ceph-osd
@@ -18,7 +18,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.4
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr
@@ -31,7 +31,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.4
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cmd-reporter
@@ -50,7 +50,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.4
     operator: rook
     storage-backend: ceph
   name: rook-ceph-rgw
@@ -163,9 +163,29 @@ rules:
   - apiGroups:
       - ceph.rook.io
     resources:
-      - '*'
+      - cephclients
+      - cephclusters
+      - cephblockpools
+      - cephfilesystems
+      - cephnfses
+      - cephobjectstores
+      - cephobjectstoreusers
+      - cephobjectrealms
+      - cephobjectzonegroups
+      - cephobjectzones
+      - cephbuckettopics
+      - cephbucketnotifications
+      - cephrbdmirrors
+      - cephfilesystemmirrors
+      - cephfilesystemsubvolumegroups
+      - cephblockpoolradosnamespaces
     verbs:
-      - '*'
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
   - apiGroups:
       - apps
     resources:

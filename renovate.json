@@ -14,5 +14,11 @@
   "suppressNotifications": [ "artifactErrors" ],
   "labels": [
     "dependency"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["rook-ceph", "docker.io/rook/ceph"],
+      "groupName": "rook"
+    }
   ]
 }

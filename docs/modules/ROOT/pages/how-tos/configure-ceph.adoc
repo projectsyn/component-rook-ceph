@@ -50,13 +50,19 @@ parameters:
 
 To configure a Ceph option which isn't exposed by the operator, you can provide raw Ceph configuration entries in parameter xref:references/parameters.adoc#_config_override[`ceph_cluster.config_override`].
 
-For example, to change the OSD operations queue (`op_queue`) scheduler to the new `mclock_scheduler`, you can provide the following config.
+For example, to change the OSD operations queue (`op_queue`) scheduler to `wpq` for a Ceph v17 cluster, you can provide the following config.
 
-[IMPORTANT]
+[TIP]
 ====
-This configuration is only an example.
-We've not tested or benchmarked Ceph with the `mclock` scheduler.
+Ceph v17 has switched to `mclock_scheduler` by default.
+We've benchmarked both the `wpq` and `mclock_scheduler` for Ceph v17 and didn't see significant differences on an idle cluster.
+
+`mclock_scheduler` should provide improved client workload performance during recovery events if the cluster is heavily utilized.
+Additionally, recovery events should be able to consume more capacity when there's little client load on the cluster.
+
+See the https://docs.ceph.com/en/quincy/rados/configuration/osd-config-ref/#dmclock-qos[Ceph documentation] for more details.
 ====
+
 
 [source,yaml]
 ----
@@ -65,7 +71,7 @@ parameters:
     ceph_cluster:
       config_override:
         osd:
-          osd_op_queue: mclock_scheduler
+          osd_op_queue: wpq
 ----
 
 As discussed in xref:references/parameters.adoc#_config_override[the parameter's documentation], the contents of `ceph_cluster.config_override` are rendered into __ini__ style format by the component.

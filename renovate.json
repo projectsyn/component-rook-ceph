@@ -18,7 +18,7 @@
   "packageRules": [
     {
       "matchPackageNames": ["rook-ceph", "docker.io/rook/ceph"],
-      "groupName": "Rook"
+      "groupName": "dependency Rook"
     }
   ]
 }

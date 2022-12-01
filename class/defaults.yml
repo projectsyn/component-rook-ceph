@@ -31,6 +31,10 @@ parameters:
           mon_osd_full_ratio: '0.85'
           mon_osd_backfillfull_ratio: '0.8'
           mon_osd_nearfull_ratio: '0.75'
+          # Adjust mon data store free percentage to match the default
+          # Kubernetes imageGCHigh threshold, since we're using the node's
+          # `/var` for the mon data store.
+          mon_data_avail_warn: '15'
 
       # Whether to setup RBD CSI driver and pools
       rbd_enabled: true

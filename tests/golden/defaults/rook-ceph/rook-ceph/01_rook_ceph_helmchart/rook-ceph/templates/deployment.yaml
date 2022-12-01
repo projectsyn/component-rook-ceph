@@ -23,69 +23,69 @@ spec:
         helm.sh/chart: rook-ceph-v1.9.11
     spec:
       containers:
-      - args:
-        - ceph
-        - operator
-        env:
-        - name: ROOK_CURRENT_NAMESPACE_ONLY
-          value: 'false'
-        - name: ROOK_HOSTPATH_REQUIRES_PRIVILEGED
-          value: 'false'
-        - name: ROOK_ENABLE_SELINUX_RELABELING
-          value: 'true'
-        - name: ROOK_DISABLE_DEVICE_HOTPLUG
-          value: 'false'
-        - name: ROOK_ENABLE_DISCOVERY_DAEMON
-          value: 'false'
-        - name: ROOK_DISABLE_ADMISSION_CONTROLLER
-          value: 'false'
-        - name: NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: docker.io/rook/ceph:v1.9.11
-        imagePullPolicy: IfNotPresent
-        name: rook-ceph-operator
-        ports:
-        - containerPort: 9443
-          name: https-webhook
-          protocol: TCP
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 1Gi
-          requests:
-            cpu: 750m
-            memory: 512Mi
-        securityContext:
-          runAsGroup: 2016
-          runAsNonRoot: true
-          runAsUser: 2016
-        volumeMounts:
-        - mountPath: /var/lib/rook
-          name: rook-config
-        - mountPath: /etc/ceph
-          name: default-config-dir
-        - mountPath: /etc/webhook
-          name: webhook-cert
+        - args:
+            - ceph
+            - operator
+          env:
+            - name: ROOK_CURRENT_NAMESPACE_ONLY
+              value: 'false'
+            - name: ROOK_HOSTPATH_REQUIRES_PRIVILEGED
+              value: 'false'
+            - name: ROOK_ENABLE_SELINUX_RELABELING
+              value: 'true'
+            - name: ROOK_DISABLE_DEVICE_HOTPLUG
+              value: 'false'
+            - name: ROOK_ENABLE_DISCOVERY_DAEMON
+              value: 'false'
+            - name: ROOK_DISABLE_ADMISSION_CONTROLLER
+              value: 'false'
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          image: docker.io/rook/ceph:v1.9.11
+          imagePullPolicy: IfNotPresent
+          name: rook-ceph-operator
+          ports:
+            - containerPort: 9443
+              name: https-webhook
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 750m
+              memory: 512Mi
+          securityContext:
+            runAsGroup: 2016
+            runAsNonRoot: true
+            runAsUser: 2016
+          volumeMounts:
+            - mountPath: /var/lib/rook
+              name: rook-config
+            - mountPath: /etc/ceph
+              name: default-config-dir
+            - mountPath: /etc/webhook
+              name: webhook-cert
       nodeSelector:
         node-role.kubernetes.io/storage: ''
       serviceAccountName: rook-ceph-system
       tolerations:
-      - key: storagenode
-        operator: Exists
+        - key: storagenode
+          operator: Exists
       volumes:
-      - emptyDir: {}
-        name: rook-config
-      - emptyDir: {}
-        name: default-config-dir
-      - emptyDir: {}
-        name: webhook-cert
+        - emptyDir: {}
+          name: rook-config
+        - emptyDir: {}
+          name: default-config-dir
+        - emptyDir: {}
+          name: webhook-cert

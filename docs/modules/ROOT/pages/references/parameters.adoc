@@ -113,6 +113,7 @@ global:
   mon_osd_full_ratio: '0.85'
   mon_osd_backfillfull_ratio: '0.8'
   mon_osd_nearfull_ratio: '0.75'
+  mon_data_avail_warn: '15'
 ----
 
 Additional Ceph configurations which are rendered in _ini_ style format by the component.
@@ -140,6 +141,7 @@ The default value is translated into the following _ini_ style file:
 mon_osd_full_ratio = 0.85
 mon_osd_backfillfull_ratio = 0.8
 mon_osd_nearfull_ratio = 0.75
+mon_data_avail_warn = 15
 ----
 
 The resulting _ini_ style file is written to the ConfigMap `rook-config-override` in the Ceph cluster namespace.

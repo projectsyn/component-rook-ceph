@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -41,7 +41,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -74,7 +74,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -254,7 +254,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -310,7 +310,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -390,40 +390,6 @@ rules:
       - nodes
     verbs:
       - get
-      - list
-      - watch
-  - apiGroups:
-      - ''
-    resources:
-      - namespaces
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - ''
-    resources:
-      - persistentvolumes
-    verbs:
-      - get
-      - list
-      - watch
-      - update
-  - apiGroups:
-      - storage.k8s.io
-    resources:
-      - volumeattachments
-    verbs:
-      - get
-      - list
-      - watch
-      - update
-  - apiGroups:
-      - ''
-    resources:
-      - configmaps
-    verbs:
-      - get
-      - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -447,7 +413,6 @@ rules:
       - watch
       - create
       - delete
-      - update
       - patch
   - apiGroups:
       - ''
@@ -457,6 +422,7 @@ rules:
       - get
       - list
       - watch
+      - patch
       - update
   - apiGroups:
       - storage.k8s.io
@@ -484,7 +450,6 @@ rules:
       - get
       - list
       - watch
-      - update
       - patch
   - apiGroups:
       - storage.k8s.io
@@ -495,17 +460,8 @@ rules:
   - apiGroups:
       - ''
     resources:
-      - nodes
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - ''
-    resources:
       - persistentvolumeclaims/status
     verbs:
-      - update
       - patch
   - apiGroups:
       - snapshot.storage.k8s.io
@@ -514,21 +470,6 @@ rules:
     verbs:
       - get
       - list
-      - watch
-      - update
-      - patch
-  - apiGroups:
-      - snapshot.storage.k8s.io
-    resources:
-      - volumesnapshotcontents
-    verbs:
-      - create
-      - get
-      - list
-      - watch
-      - update
-      - delete
-      - patch
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
@@ -540,14 +481,17 @@ rules:
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
-      - volumesnapshotcontents/status
+      - volumesnapshotcontents
     verbs:
-      - update
+      - get
+      - list
+      - watch
       - patch
+      - update
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
-      - volumesnapshots/status
+      - volumesnapshotcontents/status
     verbs:
       - update
       - patch
@@ -559,7 +503,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.11
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin
@@ -574,27 +518,10 @@ rules:
   - apiGroups:
       - ''
     resources:
-      - nodes
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - ''
-    resources:
-      - namespaces
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - ''
-    resources:
       - persistentvolumes
     verbs:
       - get
       - list
-      - watch
-      - update
   - apiGroups:
       - storage.k8s.io
     resources:
@@ -602,15 +529,12 @@ rules:
     verbs:
       - get
       - list
-      - watch
-      - update
   - apiGroups:
       - ''
     resources:
       - configmaps
     verbs:
       - get
-      - list
   - apiGroups:
       - ''
     resources:
@@ -623,6 +547,12 @@ rules:
       - serviceaccounts/token
     verbs:
       - create
+  - apiGroups:
+      - ''
+    resources:
+      - nodes
+    verbs:
+      - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -647,7 +577,6 @@ rules:
       - watch
       - create
       - delete
-      - update
       - patch
   - apiGroups:
       - ''
@@ -658,30 +587,6 @@ rules:
       - list
       - watch
       - update
-  - apiGroups:
-      - storage.k8s.io
-    resources:
-      - volumeattachments
-    verbs:
-      - get
-      - list
-      - watch
-      - update
-      - patch
-  - apiGroups:
-      - storage.k8s.io
-    resources:
-      - volumeattachments/status
-    verbs:
-      - patch
-  - apiGroups:
-      - ''
-    resources:
-      - nodes
-    verbs:
-      - get
-      - list
-      - watch
   - apiGroups:
       - storage.k8s.io
     resources:
@@ -701,6 +606,43 @@ rules:
       - update
       - patch
   - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattachments
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattachments/status
+    verbs:
+      - patch
+  - apiGroups:
+      - ''
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - csinodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ''
+    resources:
+      - persistentvolumeclaims/status
+    verbs:
+      - patch
+  - apiGroups:
       - snapshot.storage.k8s.io
     resources:
       - volumesnapshots
@@ -708,20 +650,6 @@ rules:
       - get
       - list
       - watch
-      - update
-      - patch
-  - apiGroups:
-      - snapshot.storage.k8s.io
-    resources:
-      - volumesnapshotcontents
-    verbs:
-      - create
-      - get
-      - list
-      - watch
-      - update
-      - delete
-      - patch
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
@@ -733,21 +661,17 @@ rules:
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
-      - volumesnapshotcontents/status
+      - volumesnapshotcontents
     verbs:
-      - update
+      - get
+      - list
+      - watch
       - patch
+      - update
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
-      - volumesnapshots/status
-    verbs:
-      - update
-      - patch
-  - apiGroups:
-      - ''
-    resources:
-      - persistentvolumeclaims/status
+      - volumesnapshotcontents/status
     verbs:
       - update
       - patch
@@ -755,39 +679,6 @@ rules:
       - ''
     resources:
       - configmaps
-    verbs:
-      - get
-  - apiGroups:
-      - replication.storage.openshift.io
-    resources:
-      - volumereplications
-      - volumereplicationclasses
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - replication.storage.openshift.io
-    resources:
-      - volumereplications/finalizers
-    verbs:
-      - update
-  - apiGroups:
-      - replication.storage.openshift.io
-    resources:
-      - volumereplications/status
-    verbs:
-      - get
-      - patch
-      - update
-  - apiGroups:
-      - replication.storage.openshift.io
-    resources:
-      - volumereplicationclasses/status
     verbs:
       - get
   - apiGroups:
@@ -802,3 +693,19 @@ rules:
       - serviceaccounts/token
     verbs:
       - create
+  - apiGroups:
+      - ''
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch"
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - csinodes
+    verbs:
+      - get
+      - list
+      - watch

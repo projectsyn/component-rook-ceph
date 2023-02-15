@@ -37,24 +37,41 @@ spec:
                   - key: node-role.kubernetes.io/storage
                     operator: Exists
       containers:
-        - args:
-            - -m
-            - -c
-            - /usr/local/bin/toolbox.sh
-          command:
+        - command:
             - /bin/bash
+            - -c
+            - "# Replicate the script from toolbox.sh inline so the ceph image\n#\
+              \ can be run directly, instead of requiring the rook toolbox\nCEPH_CONFIG=\"\
+              /etc/ceph/ceph.conf\"\nMON_CONFIG=\"/etc/rook/mon-endpoints\"\nKEYRING_FILE=\"\
+              /etc/ceph/keyring\"\n\n# create a ceph config file in its default location\
+              \ so ceph/rados tools can be used\n# without specifying any arguments\n\
+              write_endpoints() {\n  endpoints=$(cat ${MON_CONFIG})\n\n  # filter\
+              \ out the mon names\n  # external cluster can have numbers or hyphens\
+              \ in mon names, handling them in regex\n  # shellcheck disable=SC2001\n\
+              \  mon_endpoints=$(echo \"${endpoints}\"| sed 's/[a-z0-9_-]\\+=//g')\n\
+              \n  DATE=$(date)\n  echo \"$DATE writing mon endpoints to ${CEPH_CONFIG}:\
+              \ ${endpoints}\"\n    cat <<EOF > ${CEPH_CONFIG}\n[global]\nmon_host\
+              \ = ${mon_endpoints}\n\n[client.admin]\nkeyring = ${KEYRING_FILE}\n\
+              EOF\n}\n\n# watch the endpoints config file and update if the mon endpoints\
+              \ ever change\nwatch_endpoints() {\n  # get the timestamp for the target\
+              \ of the soft link\n  real_path=$(realpath ${MON_CONFIG})\n  initial_time=$(stat\
+              \ -c %Z \"${real_path}\")\n  while true; do\n    real_path=$(realpath\
+              \ ${MON_CONFIG})\n    latest_time=$(stat -c %Z \"${real_path}\")\n\n\
+              \    if [[ \"${latest_time}\" != \"${initial_time}\" ]]; then\n    \
+              \  write_endpoints\n      initial_time=${latest_time}\n    fi\n\n  \
+              \  sleep 10\n  done\n}\n\n# read the secret from an env var (for backward\
+              \ compatibility), or from the secret file\nceph_secret=${ROOK_CEPH_SECRET}\n\
+              if [[ \"$ceph_secret\" == \"\" ]]; then\n  ceph_secret=$(cat /var/lib/rook-ceph-mon/secret.keyring)\n\
+              fi\n\n# create the keyring file\ncat <<EOF > ${KEYRING_FILE}\n[${ROOK_CEPH_USERNAME}]\n\
+              key = ${ceph_secret}\nEOF\n\n# write the initial config file\nwrite_endpoints\n\
+              \n# continuously update the mon endpoints if they fail over\nwatch_endpoints\n"
           env:
             - name: ROOK_CEPH_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: ceph-username
                   name: rook-ceph-mon
-            - name: ROOK_CEPH_SECRET
-              valueFrom:
-                secretKeyRef:
-                  key: ceph-secret
-                  name: rook-ceph-mon
-          image: docker.io/rook/ceph:v1.9.11
+          image: docker.io/rook/ceph:v1.10.11
           imagePullPolicy: IfNotPresent
           name: rook-ceph-tools
           securityContext:
@@ -67,11 +84,21 @@ spec:
               name: ceph-config
             - mountPath: /etc/rook
               name: mon-endpoint-volume
+            - mountPath: /var/lib/rook-ceph-mon
+              name: ceph-admin-secret
+              readOnly: true
       dnsPolicy: ClusterFirstWithHostNet
       tolerations:
         - key: storagenode
           operator: Exists
       volumes:
+        - name: ceph-admin-secret
+          secret:
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+            optional: false
+            secretName: rook-ceph-mon
         - configMap:
             items:
               - key: data

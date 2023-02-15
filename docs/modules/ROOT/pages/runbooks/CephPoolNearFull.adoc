@@ -11,6 +11,19 @@ To resolve this alert, unused data should be deleted or the cluster size must be
 
 == icon:bug[] Steps for debugging
 
-// Add detailed steps to debug and resolve the issue
-See the how-to on xref:how-tos/scale-cluster.adoc[scaling a PVC-based Ceph cluster] for instructions to resize the cluster.
+First, identify the affected pool(s) by looking at the `QUOTA BYTES` and `STORED` values in the output of `ceph df detail`:
 
+[source,console]
+----
+$ ceph_cluster_ns=syn-rook-ceph-cluster
+$ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph df detail
+----
+
+Increase the pool's quota, if a quota configured.
+You can use `ceph osd pool set quota <pool_name> max_bytes <bytes>` or a similar command.
+
+Additionally, check whether the balancer is active with `ceph balancer status`.
+If the balancer is off, check the cluster's configuration for any notes on why the balancer is off.
+If there's no documented reason for the balancer being off, turn it back on in automatic mode with `ceph balancer on`.
+
+If the Ceph cluster is running out of space, see the how-to on xref:how-tos/scale-cluster.adoc[scaling a PVC-based Ceph cluster] for instructions to resize the cluster.

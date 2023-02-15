@@ -4,8 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-The device health module has determined that the number of devices predicted to fail can not be remediated automatically, since it would take too many OSDs out of the cluster, impacting performance and potentially availability.
-You should add new OSDs to the cluster to allow data to be relocated to avoid the data integrity issues.
+The device health module has determined that devices predicted to fail can not be remediated automatically, since too many OSDs would be removed from the cluster to ensure performance and availabililty.
+Prevent data integrity issues by adding new OSDs so that data may be relocated.
 
 == icon:bug[] Steps for debugging
 

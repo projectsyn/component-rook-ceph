@@ -4,8 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-The minimum number of standby daemons determined by standby_count_wanted is less than the actual number of standby daemons.
-Adjust the standby count or increase the number of mds daemons within the filesystem.
+The minimum number of standby daemons required by `standby_count_wanted` is less than the current number of standby daemons.
+Adjust the standby count or increase the number of MDS daemons.
 
 
 == icon:bug[] Steps for debugging

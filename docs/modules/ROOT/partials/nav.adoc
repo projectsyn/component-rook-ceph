@@ -32,7 +32,7 @@
 ** xref:runbooks/CephPGNotDeepScrubbed.adoc[CephPGNotDeepScrubbed]
 ** xref:runbooks/CephPGNotScrubbed.adoc[CephPGNotScrubbed]
 ** xref:runbooks/CephPGRecoveryAtRisk.adoc[CephPGRecoveryAtRisk]
-** xref:runbooks/CephPGUnavilableBlockingIO.adoc[CephPGUnavilableBlockingIO]
+** xref:runbooks/CephPGUnavailableBlockingIO.adoc[CephPGUnavailableBlockingIO]
 ** xref:runbooks/CephPGsDamaged.adoc[CephPGsDamaged]
 ** xref:runbooks/CephPGsHighPerOSD.adoc[CephPGsHighPerOSD]
 ** xref:runbooks/CephPGsInactive.adoc[CephPGsInactive]

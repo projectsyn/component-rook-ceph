@@ -4,8 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-All metadata (MDS) daemons are unavailable.
-The filesystem is offline.
+All MDS ranks are unavailable.
+The MDS daemons managing metadata are down, rendering the filesystem offline.
 
 == icon:bug[] Steps for debugging
 

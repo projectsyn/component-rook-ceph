@@ -6,7 +6,11 @@ include::partial$runbooks/contribution_note.adoc[]
 
 The free space available to a monitor's store is critically low (<5% by default).
 You should increase the space available to the monitor(s).
-The default location for the store sits under /var/lib/rook/<MON_NAME>/data as a `hostPath` volume.
+The monitor's store can be found at `/var/lib/rook/<MON_NAME>/data` on the host.
+
+Look for old, rotated versions of `*.log` and `MANIFEST*`.
+IMPORTANT: Don't touch any `*.sst` files.
+Also check any other directories under `/var/lib/rook` and other directories on the same filesystem, often `/var/log` and `/var/tmp` are culprits.
 
 == icon:bug[] Steps for debugging
 

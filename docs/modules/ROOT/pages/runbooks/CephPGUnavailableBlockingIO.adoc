@@ -1,5 +1,4 @@
-// Yes there is a typo upstream
-= Alert rule: CephPGUnavilableBlockingIO
+= Alert rule: CephPGUnavailableBlockingIO
 
 include::partial$runbooks/contribution_note.adoc[]
 

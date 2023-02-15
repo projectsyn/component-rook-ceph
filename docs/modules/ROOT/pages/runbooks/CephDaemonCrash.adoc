@@ -4,9 +4,9 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-One or more daemons have crashed recently, and need to be acknowledged. This notification
-ensures that software crashes don't go unseen. To acknowledge a crash, use the
-'ceph crash archive <id>' command.
+One or more daemons have crashed recently, and need to be acknowledged.
+This notification ensures that software crashes don't go unseen.
+To acknowledge a crash, use the `ceph crash archive <id>` command.
 
 == icon:bug[] Steps for debugging
 

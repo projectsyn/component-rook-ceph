@@ -5,34 +5,34 @@ parameters:
         source: https://charts.rook.io/release
         chart_name: rook-ceph
         version: ${rook_ceph:charts:rook-ceph}
-        output_path: dependencies/rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
+        output_path: ${_base_directory}/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
       - type: https
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/csi/rbd/storageclass.yaml
-        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/rbd-storageclass.yaml
+        output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/rbd-storageclass.yaml
       - type: https
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/csi/rbd/snapshotclass.yaml
-        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/rbd-snapshotclass.yaml
+        output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/rbd-snapshotclass.yaml
       - type: https
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/csi/cephfs/storageclass.yaml
-        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/cephfs-storageclass.yaml
+        output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/cephfs-storageclass.yaml
       - type: https
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/csi/cephfs/snapshotclass.yaml
-        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/cephfs-snapshotclass.yaml
+        output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/cephfs-snapshotclass.yaml
       - type: https
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/monitoring/csi-metrics-service-monitor.yaml
-        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/csi-metrics-service-monitor.yaml
+        output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/csi-metrics-service-monitor.yaml
       - type: https
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/monitoring/localrules.yaml
-        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/prometheus-ceph-rules.yaml
+        output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/prometheus-ceph-rules.yaml
       - type: https
         # Only for SCCs. By reading the SCCs from the manifest, we
         # automatically get SCC definitions which match the deployed Rook
         # version.
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/operator-openshift.yaml
-        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/operator-openshift.yaml
+        output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/operator-openshift.yaml
       - type: https
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/toolbox.yaml
-        output_path: dependencies/rook-ceph/manifests/${rook_ceph:images:rook:tag}/toolbox.yaml
+        output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/toolbox.yaml
 
     compile:
       - input_paths:

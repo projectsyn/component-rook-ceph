@@ -5,7 +5,11 @@ local params = inv.parameters.rook_ceph;
 
 local load_manifest(name) =
   std.parseJson(kap.yaml_load_stream(
-    'rook-ceph/manifests/%s/%s.yaml' % [ params.images.rook.tag, name ]
+    '%s/manifests/%s/%s.yaml' % [
+      inv.parameters._base_directory,
+      params.images.rook.tag,
+      name,
+    ]
   ));
 
 local metrics_role(namespace) =

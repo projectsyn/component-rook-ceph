@@ -6,8 +6,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 The device health module has determined that one or more devices will fail soon, but the normal process of relocating the data on the device to other OSDs in the cluster is blocked.
 
-Check the the cluster has available freespace.
-It may be necessary to add more disks to the cluster to allow the data from the failing device to successfully migrate.
+Ensure that the cluster has available free space.
+It may be necessary to add capacity to the cluster to allow the data from the failing device to successfully migrate, or to enable the balancer.
 
 == icon:bug[] Steps for debugging
 

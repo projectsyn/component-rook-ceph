@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.9.11
+    helm.sh/chart: rook-ceph-v1.10.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -62,26 +62,6 @@ metadata:
   namespace: syn-rook-ceph-operator
 rules:
   - apiGroups:
-      - ''
-    resources:
-      - endpoints
-    verbs:
-      - get
-      - watch
-      - list
-      - delete
-      - update
-      - create
-  - apiGroups:
-      - ''
-    resources:
-      - configmaps
-    verbs:
-      - get
-      - list
-      - create
-      - delete
-  - apiGroups:
       - coordination.k8s.io
     resources:
       - leases
@@ -99,28 +79,6 @@ metadata:
   name: rbd-external-provisioner-cfg
   namespace: syn-rook-ceph-operator
 rules:
-  - apiGroups:
-      - ''
-    resources:
-      - endpoints
-    verbs:
-      - get
-      - watch
-      - list
-      - delete
-      - update
-      - create
-  - apiGroups:
-      - ''
-    resources:
-      - configmaps
-    verbs:
-      - get
-      - list
-      - watch
-      - create
-      - delete
-      - update
   - apiGroups:
       - coordination.k8s.io
     resources:

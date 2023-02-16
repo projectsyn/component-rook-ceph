@@ -4,7 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-Ceph in HEALTH_ERROR state for more than 5 minutes. Please check "ceph health detail" for more information.
+The cluster state has been HEALTH_ERROR for more than 5 minutes.
+Please check `ceph health detail` for more information.
 
 
 == icon:bug[] Steps for debugging

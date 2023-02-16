@@ -4,7 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-Ceph has been in HEALTH_WARN for more than 15 minutes. Please check "ceph health detail" for more information.
+The cluster state has been HEALTH_WARN for more than 15 minutes.
+Please check `ceph health detail` for more information.
 
 
 == icon:bug[] Steps for debugging

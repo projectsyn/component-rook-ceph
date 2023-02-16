@@ -4,7 +4,7 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-The filesystem has switched to READ ONLY due to an unexpected write error, when writing to the metadata pool.
+The filesystem has switched to READ ONLY due to an unexpected error when writing to the metadata pool.
 
 == icon:bug[] Steps for debugging
 

@@ -6,15 +6,36 @@ include::partial$runbooks/contribution_note.adoc[]
 
 The ceph monitors rely on a consistent time reference to maintain quorum and cluster consistency.
 This event indicates that at least one of your MONs isn't sync'd correctly.
+The Ceph monitors rely on closely synchronized time to maintain quorum and cluster consistency.
+This alert indicates that time on at least one mon has drifted too far from the lead mon.
+
 
 == icon:bug[] Steps for debugging
 
-=== Check which hosts time isn't synced
+=== Check which host's time isn't synced
 
 [source,console]
 ----
 $ ceph_cluster_ns=syn-rook-ceph-cluster
 $ kubectl -n ${ceph_cluster_ns} exec -it deploy/rook-ceph-tools -- ceph status
+----
+
+Check the time sync status on each monitor host with `ceph time-sync-status` and the state and peers of the `ntpd` or `chrony` daemon on the host.
+
+For `ntpd`, you can check the peers with
+
+[source,console]
+----
+$ ntpq -p
+----
+
+For `chrony`, you can check the state and peers with
+
+[source,console]
+----
+$ chronyc sources
+$ chronyc sourcestats
+$ chronyc tracking
 ----
 
 == icon:book[] Upstream documentation

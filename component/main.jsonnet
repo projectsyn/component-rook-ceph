@@ -53,6 +53,33 @@ local common_labels(name) = {
   'app.kubernetes.io/component': 'rook-ceph',
 };
 
+// This is required for Rook 1.10.0-1.10.11, cf.
+// https://github.com/rook/rook/pull/11697
+local cephfs_rbac_fix =
+  local cephfs_additional_role =
+    kube.ClusterRole('syn-rook-ceph-cephfs-provisioner-fix') {
+      rules: [
+        {
+          apiGroups: [ '' ],
+          resources: [ 'nodes' ],
+          verbs: [ 'get' ],
+        },
+      ],
+    };
+  [
+    cephfs_additional_role,
+    kube.ClusterRoleBinding('syn-rook-ceph-cephfs-provisioner-fix') {
+      subjects: [
+        {
+          kind: 'ServiceAccount',
+          name: 'rook-csi-cephfs-provisioner-sa',
+          namespace: params.namespace,
+        },
+      ],
+      roleRef_:: cephfs_additional_role,
+    },
+  ];
+
 local add_labels(manifests) = [
   manifest {
     metadata+: {
@@ -76,6 +103,7 @@ std.mapWithKey(
     '00_namespaces': namespaces,
     '01_aggregated_rbac': aggregated_rbac.cluster_roles,
     [if on_openshift then '02_openshift_sccs']: ocp_config.sccs,
+    '03_rbac_fixes': cephfs_rbac_fix,
     '10_cephcluster_rbac': cephcluster.rbac,
     '10_cephcluster_configoverride': cephcluster.configmap,
     '10_cephcluster_cluster': cephcluster.cluster,

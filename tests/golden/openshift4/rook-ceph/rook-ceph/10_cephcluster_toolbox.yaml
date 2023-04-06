@@ -40,31 +40,69 @@ spec:
         - command:
             - /bin/bash
             - -c
-            - "# Replicate the script from toolbox.sh inline so the ceph image\n#\
-              \ can be run directly, instead of requiring the rook toolbox\nCEPH_CONFIG=\"\
-              /etc/ceph/ceph.conf\"\nMON_CONFIG=\"/etc/rook/mon-endpoints\"\nKEYRING_FILE=\"\
-              /etc/ceph/keyring\"\n\n# create a ceph config file in its default location\
-              \ so ceph/rados tools can be used\n# without specifying any arguments\n\
-              write_endpoints() {\n  endpoints=$(cat ${MON_CONFIG})\n\n  # filter\
-              \ out the mon names\n  # external cluster can have numbers or hyphens\
-              \ in mon names, handling them in regex\n  # shellcheck disable=SC2001\n\
-              \  mon_endpoints=$(echo \"${endpoints}\"| sed 's/[a-z0-9_-]\\+=//g')\n\
-              \n  DATE=$(date)\n  echo \"$DATE writing mon endpoints to ${CEPH_CONFIG}:\
-              \ ${endpoints}\"\n    cat <<EOF > ${CEPH_CONFIG}\n[global]\nmon_host\
-              \ = ${mon_endpoints}\n\n[client.admin]\nkeyring = ${KEYRING_FILE}\n\
-              EOF\n}\n\n# watch the endpoints config file and update if the mon endpoints\
-              \ ever change\nwatch_endpoints() {\n  # get the timestamp for the target\
-              \ of the soft link\n  real_path=$(realpath ${MON_CONFIG})\n  initial_time=$(stat\
-              \ -c %Z \"${real_path}\")\n  while true; do\n    real_path=$(realpath\
-              \ ${MON_CONFIG})\n    latest_time=$(stat -c %Z \"${real_path}\")\n\n\
-              \    if [[ \"${latest_time}\" != \"${initial_time}\" ]]; then\n    \
-              \  write_endpoints\n      initial_time=${latest_time}\n    fi\n\n  \
-              \  sleep 10\n  done\n}\n\n# read the secret from an env var (for backward\
-              \ compatibility), or from the secret file\nceph_secret=${ROOK_CEPH_SECRET}\n\
-              if [[ \"$ceph_secret\" == \"\" ]]; then\n  ceph_secret=$(cat /var/lib/rook-ceph-mon/secret.keyring)\n\
-              fi\n\n# create the keyring file\ncat <<EOF > ${KEYRING_FILE}\n[${ROOK_CEPH_USERNAME}]\n\
-              key = ${ceph_secret}\nEOF\n\n# write the initial config file\nwrite_endpoints\n\
-              \n# continuously update the mon endpoints if they fail over\nwatch_endpoints\n"
+            - |
+              # Replicate the script from toolbox.sh inline so the ceph image
+              # can be run directly, instead of requiring the rook toolbox
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+              MON_CONFIG="/etc/rook/mon-endpoints"
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              # create a ceph config file in its default location so ceph/rados tools can be used
+              # without specifying any arguments
+              write_endpoints() {
+                endpoints=$(cat ${MON_CONFIG})
+
+                # filter out the mon names
+                # external cluster can have numbers or hyphens in mon names, handling them in regex
+                # shellcheck disable=SC2001
+                mon_endpoints=$(echo "${endpoints}"| sed 's/[a-z0-9_-]\+=//g')
+
+                DATE=$(date)
+                echo "$DATE writing mon endpoints to ${CEPH_CONFIG}: ${endpoints}"
+                  cat <<EOF > ${CEPH_CONFIG}
+              [global]
+              mon_host = ${mon_endpoints}
+
+              [client.admin]
+              keyring = ${KEYRING_FILE}
+              EOF
+              }
+
+              # watch the endpoints config file and update if the mon endpoints ever change
+              watch_endpoints() {
+                # get the timestamp for the target of the soft link
+                real_path=$(realpath ${MON_CONFIG})
+                initial_time=$(stat -c %Z "${real_path}")
+                while true; do
+                  real_path=$(realpath ${MON_CONFIG})
+                  latest_time=$(stat -c %Z "${real_path}")
+
+                  if [[ "${latest_time}" != "${initial_time}" ]]; then
+                    write_endpoints
+                    initial_time=${latest_time}
+                  fi
+
+                  sleep 10
+                done
+              }
+
+              # read the secret from an env var (for backward compatibility), or from the secret file
+              ceph_secret=${ROOK_CEPH_SECRET}
+              if [[ "$ceph_secret" == "" ]]; then
+                ceph_secret=$(cat /var/lib/rook-ceph-mon/secret.keyring)
+              fi
+
+              # create the keyring file
+              cat <<EOF > ${KEYRING_FILE}
+              [${ROOK_CEPH_USERNAME}]
+              key = ${ceph_secret}
+              EOF
+
+              # write the initial config file
+              write_endpoints
+
+              # continuously update the mon endpoints if they fail over
+              watch_endpoints
           env:
             - name: ROOK_CEPH_USERNAME
               valueFrom:

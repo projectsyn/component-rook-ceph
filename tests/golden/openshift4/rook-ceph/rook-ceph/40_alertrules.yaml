@@ -15,10 +15,8 @@ spec:
       rules:
         - alert: SYN_CephHealthError
           annotations:
-            description: 'The cluster state has been HEALTH_ERROR for more than 5
-              minutes. Please check "ceph health detail" for more information.
-
-              '
+            description: |
+              The cluster state has been HEALTH_ERROR for more than 5 minutes. Please check "ceph health detail" for more information.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephHealthError.html
             summary: Cluster is in the ERROR state
           expr: ceph_health_status == 2
@@ -31,10 +29,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephHealthWarning
           annotations:
-            description: 'The cluster state has been HEALTH_WARN for more than 15
-              minutes. Please check "ceph health detail" for more information.
-
-              '
+            description: |
+              The cluster state has been HEALTH_WARN for more than 15 minutes. Please check "ceph health detail" for more information.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephHealthWarning.html
             summary: Cluster is in the WARNING state
           expr: ceph_health_status == 1
@@ -48,13 +44,14 @@ spec:
       rules:
         - alert: SYN_CephMonDownQuorumAtRisk
           annotations:
-            description: "{{ $min := query \"floor(count(ceph_mon_metadata) / 2) +1\"\
-              \ | first | value }}Quorum requires a majority of monitors (x {{ $min\
-              \ }}) to be active\nWithout quorum the cluster will become inoperable,\
-              \ affecting all services and connected clients.\n\nThe following monitors\
-              \ are down:\n{{- range query \"(ceph_mon_quorum_status == 0) + on(ceph_daemon)\
-              \ group_left(hostname) (ceph_mon_metadata * 0)\" }}\n  - {{ .Labels.ceph_daemon\
-              \ }} on {{ .Labels.hostname }}\n{{- end }}\n"
+            description: |
+              {{ $min := query "floor(count(ceph_mon_metadata) / 2) +1" | first | value }}Quorum requires a majority of monitors (x {{ $min }}) to be active
+              Without quorum the cluster will become inoperable, affecting all services and connected clients.
+
+              The following monitors are down:
+              {{- range query "(ceph_mon_quorum_status == 0) + on(ceph_daemon) group_left(hostname) (ceph_mon_metadata * 0)" }}
+                - {{ .Labels.ceph_daemon }} on {{ .Labels.hostname }}
+              {{- end }}
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-down
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephMonDownQuorumAtRisk.html
             summary: Monitor quorum is at risk
@@ -69,14 +66,14 @@ spec:
             type: ceph_default
         - alert: SYN_CephMonDown
           annotations:
-            description: "{{ $down := query \"count(ceph_mon_quorum_status == 0)\"\
-              \ | first | value }}{{ $s := \"\" }}{{ if gt $down 1.0 }}{{ $s = \"\
-              s\" }}{{ end }}There are {{ $down }} monitor{{ $s }} down.\nQuorum is\
-              \ still intact, but the loss of an additional monitor will make your\
-              \ cluster inoperable.\n\nThe following monitors are down:\n{{- range\
-              \ query \"(ceph_mon_quorum_status == 0) + on(ceph_daemon) group_left(hostname)\
-              \ (ceph_mon_metadata * 0)\" }}\n  - {{ .Labels.ceph_daemon }} on {{\
-              \ .Labels.hostname }}\n{{- end }}\n"
+            description: |
+              {{ $down := query "count(ceph_mon_quorum_status == 0)" | first | value }}{{ $s := "" }}{{ if gt $down 1.0 }}{{ $s = "s" }}{{ end }}There are {{ $down }} monitor{{ $s }} down.
+              Quorum is still intact, but the loss of an additional monitor will make your cluster inoperable.
+
+              The following monitors are down:
+              {{- range query "(ceph_mon_quorum_status == 0) + on(ceph_daemon) group_left(hostname) (ceph_mon_metadata * 0)" }}
+                - {{ .Labels.ceph_daemon }} on {{ .Labels.hostname }}
+              {{- end }}
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-down
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephMonDown.html
             summary: One or more monitors down
@@ -90,22 +87,14 @@ spec:
             type: ceph_default
         - alert: SYN_CephMonClockSkew
           annotations:
-            description: 'Ceph monitors rely on closely synchronized time to maintain
-
-              quorum and cluster consistency. This event indicates that time on at
-              least
-
+            description: |
+              Ceph monitors rely on closely synchronized time to maintain
+              quorum and cluster consistency. This event indicates that time on at least
               one mon has drifted too far from the lead mon.
 
-
               Review cluster status with ceph -s. This will show which monitors
-
               are affected. Check the time sync status on each monitor host with
-
-              "ceph time-sync-status" and the state and peers of your ntpd or chrony
-              daemon.
-
-              '
+              "ceph time-sync-status" and the state and peers of your ntpd or chrony daemon.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-clock-skew
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephMonClockSkew.html
             summary: Clock skew detected among monitors
@@ -120,12 +109,13 @@ spec:
       rules:
         - alert: SYN_CephOSDDownHigh
           annotations:
-            description: "{{ $value | humanize }}% or {{ with query \"count(ceph_osd_up\
-              \ == 0)\" }}{{ . | first | value }}{{ end }} of {{ with query \"count(ceph_osd_up)\"\
-              \ }}{{ . | first | value }}{{ end }} OSDs are down (>= 10%).\n\nThe\
-              \ following OSDs are down:\n{{- range query \"(ceph_osd_up * on(ceph_daemon)\
-              \ group_left(hostname) ceph_osd_metadata) == 0\" }}\n  - {{ .Labels.ceph_daemon\
-              \ }} on {{ .Labels.hostname }}\n{{- end }}\n"
+            description: |
+              {{ $value | humanize }}% or {{ with query "count(ceph_osd_up == 0)" }}{{ . | first | value }}{{ end }} of {{ with query "count(ceph_osd_up)" }}{{ . | first | value }}{{ end }} OSDs are down (>= 10%).
+
+              The following OSDs are down:
+              {{- range query "(ceph_osd_up * on(ceph_daemon) group_left(hostname) ceph_osd_metadata) == 0" }}
+                - {{ .Labels.ceph_daemon }} on {{ .Labels.hostname }}
+              {{- end }}
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDDownHigh.html
             summary: More than 10% of OSDs are down
           expr: count(ceph_osd_up == 0) / count(ceph_osd_up) * 100 >= 10
@@ -137,16 +127,11 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDHostDown
           annotations:
-            description: 'The following OSDs are down:
-
-              {{- range query "(ceph_osd_up * on(ceph_daemon) group_left(hostname)
-              ceph_osd_metadata) == 0" }}
-
+            description: |
+              The following OSDs are down:
+              {{- range query "(ceph_osd_up * on(ceph_daemon) group_left(hostname) ceph_osd_metadata) == 0" }}
               - {{ .Labels.hostname }} : {{ .Labels.ceph_daemon }}
-
               {{- end }}
-
-              '
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDHostDown.html
             summary: An OSD host is offline
           expr: ceph_health_detail{name="OSD_HOST_DOWN"} == 1
@@ -159,13 +144,13 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDDown
           annotations:
-            description: "{{ $num := query \"count(ceph_osd_up == 0)\" | first | value\
-              \ }}{{ $s := \"\" }}{{ if gt $num 1.0 }}{{ $s = \"s\" }}{{ end }}{{\
-              \ $num }} OSD{{ $s }} down for over 5mins.\n\nThe following OSD{{ $s\
-              \ }} {{ if eq $s \"\" }}is{{ else }}are{{ end }} down:\n  {{- range\
-              \ query \"(ceph_osd_up * on(ceph_daemon) group_left(hostname) ceph_osd_metadata)\
-              \ == 0\"}}\n  - {{ .Labels.ceph_daemon }} on {{ .Labels.hostname }}\n\
-              \  {{- end }}\n"
+            description: |
+              {{ $num := query "count(ceph_osd_up == 0)" | first | value }}{{ $s := "" }}{{ if gt $num 1.0 }}{{ $s = "s" }}{{ end }}{{ $num }} OSD{{ $s }} down for over 5mins.
+
+              The following OSD{{ $s }} {{ if eq $s "" }}is{{ else }}are{{ end }} down:
+                {{- range query "(ceph_osd_up * on(ceph_daemon) group_left(hostname) ceph_osd_metadata) == 0"}}
+                - {{ .Labels.ceph_daemon }} on {{ .Labels.hostname }}
+                {{- end }}
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-down
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDDown.html
             summary: An OSD has been marked down
@@ -179,15 +164,11 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDNearFull
           annotations:
-            description: 'One or more OSDs have reached the NEARFULL threshold
+            description: |
+              One or more OSDs have reached the NEARFULL threshold
 
-
-              Use ''ceph health detail'' and ''ceph osd df'' to identify the problem.
-
-              To resolve, add capacity to the affected OSD''s failure domain, restore
-              down/out OSDs, or delete unwanted data.
-
-              '
+              Use 'ceph health detail' and 'ceph osd df' to identify the problem.
+              To resolve, add capacity to the affected OSD's failure domain, restore down/out OSDs, or delete unwanted data.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-nearfull
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDNearFull.html
             summary: OSD(s) running low on free space (NEARFULL)
@@ -201,18 +182,12 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDFull
           annotations:
-            description: 'An OSD has reached the FULL threshold. Writes to pools that
-              share the
-
+            description: |
+              An OSD has reached the FULL threshold. Writes to pools that share the
               affected OSD will be blocked.
 
-
-              Use ''ceph health detail'' and ''ceph osd df'' to identify the problem.
-
-              To resolve, add capacity to the affected OSD''s failure domain, restore
-              down/out OSDs, or delete unwanted data.
-
-              '
+              Use 'ceph health detail' and 'ceph osd df' to identify the problem.
+              To resolve, add capacity to the affected OSD's failure domain, restore down/out OSDs, or delete unwanted data.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-full
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDFull.html
             summary: OSD full, writes blocked
@@ -226,18 +201,12 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDBackfillFull
           annotations:
-            description: 'An OSD has reached the BACKFILL FULL threshold. This will
-              prevent rebalance operations
-
+            description: |
+              An OSD has reached the BACKFILL FULL threshold. This will prevent rebalance operations
               from completing.
+              Use 'ceph health detail' and 'ceph osd df' to identify the problem.
 
-              Use ''ceph health detail'' and ''ceph osd df'' to identify the problem.
-
-
-              To resolve, add capacity to the affected OSD''s failure domain, restore
-              down/out OSDs, or delete unwanted data.
-
-              '
+              To resolve, add capacity to the affected OSD's failure domain, restore down/out OSDs, or delete unwanted data.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-backfillfull
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDBackfillFull.html
             summary: OSD(s) too full for backfill operations
@@ -250,12 +219,9 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDTooManyRepairs
           annotations:
-            description: 'Reads from an OSD have used a secondary PG to return data
-              to the client, indicating
-
+            description: |
+              Reads from an OSD have used a secondary PG to return data to the client, indicating
               a potential failing disk.
-
-              '
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-too-many-repairs
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDTooManyRepairs.html
             summary: OSD reports a high number of read errors
@@ -268,13 +234,9 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDTimeoutsPublicNetwork
           annotations:
-            description: 'OSD heartbeats on the cluster''s ''public'' network (frontend)
-              are running slow. Investigate the network
-
-              for latency or loss issues. Use ''ceph health detail'' to show the affected
-              OSDs.
-
-              '
+            description: |
+              OSD heartbeats on the cluster's 'public' network (frontend) are running slow. Investigate the network
+              for latency or loss issues. Use 'ceph health detail' to show the affected OSDs.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDTimeoutsPublicNetwork.html
             summary: Network issues delaying OSD heartbeats (public network)
           expr: ceph_health_detail{name="OSD_SLOW_PING_TIME_FRONT"} == 1
@@ -286,13 +248,9 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDTimeoutsClusterNetwork
           annotations:
-            description: 'OSD heartbeats on the cluster''s ''cluster'' network (backend)
-              are running slow. Investigate the network
-
-              for latency or loss issues. Use ''ceph health detail'' to show the affected
-              OSDs.
-
-              '
+            description: |
+              OSD heartbeats on the cluster's 'cluster' network (backend) are running slow. Investigate the network
+              for latency or loss issues. Use 'ceph health detail' to show the affected OSDs.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDTimeoutsClusterNetwork.html
             summary: Network issues delaying OSD heartbeats (cluster network)
           expr: ceph_health_detail{name="OSD_SLOW_PING_TIME_BACK"} == 1
@@ -304,13 +262,9 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDInternalDiskSizeMismatch
           annotations:
-            description: 'One or more OSDs have an internal inconsistency between
-              metadata and the size of the device.
-
-              This could lead to the OSD(s) crashing in future. You should redeploy
-              the affected OSDs.
-
-              '
+            description: |
+              One or more OSDs have an internal inconsistency between metadata and the size of the device.
+              This could lead to the OSD(s) crashing in future. You should redeploy the affected OSDs.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#bluestore-disk-size-mismatch
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDInternalDiskSizeMismatch.html
             summary: OSD size inconsistency error
@@ -323,18 +277,16 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDFlapping
           annotations:
-            description: 'OSD {{ $labels.ceph_daemon }} on {{ $labels.hostname }}
-              was marked down and back up {{ $value | humanize }} times once a minute
-              for 5 minutes. This may indicate a network issue (latency, packet loss,
-              MTU mismatch) on the cluster network, or the public network if no cluster
-              network is deployed. Check network stats on the listed host(s).
-
-              '
+            description: |
+              OSD {{ $labels.ceph_daemon }} on {{ $labels.hostname }} was marked down and back up {{ $value | humanize }} times once a minute for 5 minutes. This may indicate a network issue (latency, packet loss, MTU mismatch) on the cluster network, or the public network if no cluster network is deployed. Check network stats on the listed host(s).
             documentation: https://docs.ceph.com/en/latest/rados/troubleshooting/troubleshooting-osd#flapping-osds
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDFlapping.html
             summary: Network issues are causing OSDs to flap (mark each other down)
-          expr: "(\n  rate(ceph_osd_up[5m])\n  * on(ceph_daemon) group_left(hostname)\
-            \ ceph_osd_metadata\n) * 60 > 1\n"
+          expr: |
+            (
+              rate(ceph_osd_up[5m])
+              * on(ceph_daemon) group_left(hostname) ceph_osd_metadata
+            ) * 60 > 1
           labels:
             oid: 1.3.6.1.4.1.50495.1.2.1.4.4
             severity: warning
@@ -343,11 +295,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephOSDReadErrors
           annotations:
-            description: 'An OSD has encountered read errors, but the OSD has recovered
-              by retrying the reads. This may indicate an issue with hardware or the
-              kernel.
-
-              '
+            description: |
+              An OSD has encountered read errors, but the OSD has recovered by retrying the reads. This may indicate an issue with hardware or the kernel.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#bluestore-spurious-read-errors
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDReadErrors.html
             summary: Device read errors detected
@@ -360,16 +309,16 @@ spec:
             type: ceph_default
         - alert: SYN_CephPGImbalance
           annotations:
-            description: 'OSD {{ $labels.ceph_daemon }} on {{ $labels.hostname }}
-              deviates by more than 30% from average PG count.
-
-              '
+            description: |
+              OSD {{ $labels.ceph_daemon }} on {{ $labels.hostname }} deviates by more than 30% from average PG count.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGImbalance.html
             summary: PGs are not balanced across OSDs
-          expr: "abs(\n  (\n    (ceph_osd_numpg > 0) - on (job) group_left avg(ceph_osd_numpg\
-            \ > 0) by (job)\n  ) / on (job) group_left avg(ceph_osd_numpg > 0) by\
-            \ (job)\n) * on (ceph_daemon) group_left(hostname) ceph_osd_metadata >\
-            \ 0.30\n"
+          expr: |
+            abs(
+              (
+                (ceph_osd_numpg > 0) - on (job) group_left avg(ceph_osd_numpg > 0) by (job)
+              ) / on (job) group_left avg(ceph_osd_numpg > 0) by (job)
+            ) * on (ceph_daemon) group_left(hostname) ceph_osd_metadata > 0.30
           for: 5m
           labels:
             oid: 1.3.6.1.4.1.50495.1.2.1.4.5
@@ -381,10 +330,8 @@ spec:
       rules:
         - alert: SYN_CephFilesystemDamaged
           annotations:
-            description: 'Filesystem metadata has been corrupted. Data may be inaccessible.
-              Analyze metrics from the MDS daemon admin socket, or escalate to support.
-
-              '
+            description: |
+              Filesystem metadata has been corrupted. Data may be inaccessible. Analyze metrics from the MDS daemon admin socket, or escalate to support.
             documentation: https://docs.ceph.com/en/latest/cephfs/health-messages#cephfs-health-messages
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemDamaged.html
             summary: CephFS filesystem is damaged.
@@ -398,10 +345,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephFilesystemOffline
           annotations:
-            description: 'All MDS ranks are unavailable. The MDS daemons managing
-              metadata are down, rendering the filesystem offline.
-
-              '
+            description: |
+              All MDS ranks are unavailable. The MDS daemons managing metadata are down, rendering the filesystem offline.
             documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-all-down
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemOffline.html
             summary: CephFS filesystem is offline
@@ -415,11 +360,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephFilesystemDegraded
           annotations:
-            description: 'One or more metadata daemons (MDS ranks) are failed or in
-              a damaged state. At best the filesystem is partially available, at worst
-              the filesystem is completely unusable.
-
-              '
+            description: |
+              One or more metadata daemons (MDS ranks) are failed or in a damaged state. At best the filesystem is partially available, at worst the filesystem is completely unusable.
             documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#fs-degraded
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemDegraded.html
             summary: CephFS filesystem is degraded
@@ -433,11 +375,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephFilesystemMDSRanksLow
           annotations:
-            description: 'The filesystem''s "max_mds" setting defines the number of
-              MDS ranks in the filesystem. The current number of active MDS daemons
-              is less than this value.
-
-              '
+            description: |
+              The filesystem's "max_mds" setting defines the number of MDS ranks in the filesystem. The current number of active MDS daemons is less than this value.
             documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-up-less-than-max
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemMDSRanksLow.html
             summary: MDS daemon count is lower than configured
@@ -450,11 +389,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephFilesystemInsufficientStandby
           annotations:
-            description: 'The minimum number of standby daemons required by standby_count_wanted
-              is less than the current number of standby daemons. Adjust the standby
-              count or increase the number of MDS daemons.
-
-              '
+            description: |
+              The minimum number of standby daemons required by standby_count_wanted is less than the current number of standby daemons. Adjust the standby count or increase the number of MDS daemons.
             documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-insufficient-standby
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemInsufficientStandby.html
             summary: Ceph filesystem standby daemons too few
@@ -467,11 +403,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephFilesystemFailureNoStandby
           annotations:
-            description: 'An MDS daemon has failed, leaving only one active rank and
-              no available standby. Investigate the cause of the failure or add a
-              standby MDS.
-
-              '
+            description: |
+              An MDS daemon has failed, leaving only one active rank and no available standby. Investigate the cause of the failure or add a standby MDS.
             documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#fs-with-failed-mds
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemFailureNoStandby.html
             summary: MDS daemon failed, no further standby available
@@ -485,13 +418,9 @@ spec:
             type: ceph_default
         - alert: SYN_CephFilesystemReadOnly
           annotations:
-            description: 'The filesystem has switched to READ ONLY due to an unexpected
-              error when writing to the metadata pool.
-
-              Analyze the output from the MDS daemon admin socket, or escalate to
-              support.
-
-              '
+            description: |
+              The filesystem has switched to READ ONLY due to an unexpected error when writing to the metadata pool.
+              Analyze the output from the MDS daemon admin socket, or escalate to support.
             documentation: https://docs.ceph.com/en/latest/cephfs/health-messages#cephfs-health-messages
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemReadOnly.html
             summary: CephFS filesystem in read only mode due to write error(s)
@@ -507,12 +436,8 @@ spec:
       rules:
         - alert: SYN_CephMgrModuleCrash
           annotations:
-            description: 'One or more mgr modules have crashed and have yet to be
-              acknowledged by an administrator. A crashed module may impact functionality
-              within the cluster. Use the ''ceph crash'' command to determine which
-              module has failed, and archive it to acknowledge the failure.
-
-              '
+            description: |
+              One or more mgr modules have crashed and have yet to be acknowledged by an administrator. A crashed module may impact functionality within the cluster. Use the 'ceph crash' command to determine which module has failed, and archive it to acknowledge the failure.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#recent-mgr-module-crash
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephMgrModuleCrash.html
             summary: A manager module has recently crashed
@@ -526,18 +451,9 @@ spec:
             type: ceph_default
         - alert: SYN_CephMgrPrometheusModuleInactive
           annotations:
-            description: 'The mgr/prometheus module at {{ $labels.instance }} is unreachable.
-              This could mean that the module has been disabled or the mgr daemon
-              itself is down.
-
-              Without the mgr/prometheus module metrics and alerts will no longer
-              function. Open a shell to an admin node or toolbox pod and use ''ceph
-              -s'' to to determine whether the mgr is active. If the mgr is not active,
-              restart it, otherwise you can determine the mgr/prometheus module status
-              with ''ceph mgr module ls''. If it is not listed as enabled, enable
-              it with ''ceph mgr module enable prometheus''.
-
-              '
+            description: |
+              The mgr/prometheus module at {{ $labels.instance }} is unreachable. This could mean that the module has been disabled or the mgr daemon itself is down.
+              Without the mgr/prometheus module metrics and alerts will no longer function. Open a shell to an admin node or toolbox pod and use 'ceph -s' to to determine whether the mgr is active. If the mgr is not active, restart it, otherwise you can determine the mgr/prometheus module status with 'ceph mgr module ls'. If it is not listed as enabled, enable it with 'ceph mgr module enable prometheus'.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephMgrPrometheusModuleInactive.html
             summary: The mgr/prometheus module is not available
           expr: up{job="ceph"} == 0
@@ -552,11 +468,8 @@ spec:
       rules:
         - alert: SYN_CephPGsInactive
           annotations:
-            description: '{{ $value }} PGs have been inactive for more than 5 minutes
-              in pool {{ $labels.name }}. Inactive placement groups are not able to
-              serve read/write requests.
-
-              '
+            description: |
+              {{ $value }} PGs have been inactive for more than 5 minutes in pool {{ $labels.name }}. Inactive placement groups are not able to serve read/write requests.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGsInactive.html
             summary: One or more placement groups are inactive
           expr: ceph_pool_metadata * on(pool_id,instance) group_left() (ceph_pg_total
@@ -570,11 +483,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephPGsUnclean
           annotations:
-            description: '{{ $value }} PGs have been unclean for more than 15 minutes
-              in pool {{ $labels.name }}. Unclean PGs have not recovered from a previous
-              failure.
-
-              '
+            description: |
+              {{ $value }} PGs have been unclean for more than 15 minutes in pool {{ $labels.name }}. Unclean PGs have not recovered from a previous failure.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGsUnclean.html
             summary: One or more placement groups are marked unclean
           expr: ceph_pool_metadata * on(pool_id,instance) group_left() (ceph_pg_total
@@ -588,14 +498,9 @@ spec:
             type: ceph_default
         - alert: SYN_CephPGsDamaged
           annotations:
-            description: 'Scrubs have flagged at least one PG as damaged or inconsistent.
-
-              Check to see which PG is affected, and attempt a manual repair if necessary.
-              To list problematic placement groups, use ''ceph health detail'' or
-              ''rados list-inconsistent-pg <pool>''. To repair PGs use the ''ceph
-              pg repair <pg_num>'' command.
-
-              '
+            description: |
+              Scrubs have flagged at least one PG as damaged or inconsistent.
+              Check to see which PG is affected, and attempt a manual repair if necessary. To list problematic placement groups, use 'ceph health detail' or 'rados list-inconsistent-pg <pool>'. To repair PGs use the 'ceph pg repair <pg_num>' command.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-damaged
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGsDamaged.html
             summary: Placement group damaged; manual intervention needed
@@ -609,11 +514,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephPGRecoveryAtRisk
           annotations:
-            description: 'Data redundancy is at risk since one or more OSDs are at
-              or above the ''full'' threshold. Add capacity to the cluster, restore
-              down/out OSDs, or delete unwanted data.
-
-              '
+            description: |
+              Data redundancy is at risk since one or more OSDs are at or above the 'full' threshold. Add capacity to the cluster, restore down/out OSDs, or delete unwanted data.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-recovery-full
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGRecoveryAtRisk.html
             summary: OSDs are too full for recovery
@@ -627,11 +529,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephPGUnavailableBlockingIO
           annotations:
-            description: 'Data availability is reduced, impacting the cluster''s ability
-              to service I/O. One or more placement groups (PGs) are in a state that
-              blocks I/O.
-
-              '
+            description: |
+              Data availability is reduced, impacting the cluster's ability to service I/O. One or more placement groups (PGs) are in a state that blocks I/O.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-availability
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGUnavailableBlockingIO.html
             summary: PG is unavailable, blocking I/O
@@ -646,11 +545,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephPGBackfillAtRisk
           annotations:
-            description: 'Data redundancy may be at risk due to lack of free space
-              within the cluster. One or more OSDs have breached their ''backfillfull''
-              threshold. Add more capacity, or delete unwanted data.
-
-              '
+            description: |
+              Data redundancy may be at risk due to lack of free space within the cluster. One or more OSDs have breached their 'backfillfull' threshold. Add more capacity, or delete unwanted data.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-backfill-full
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGBackfillAtRisk.html
             summary: Backfill operations are blocked due to lack of free space
@@ -664,23 +560,14 @@ spec:
             type: ceph_default
         - alert: SYN_CephPGNotScrubbed
           annotations:
-            description: 'One or more PGs have not been scrubbed recently. Scrubs
-              check metadata integrity,
-
+            description: |
+              One or more PGs have not been scrubbed recently. Scrubs check metadata integrity,
               protecting against bit-rot. They check that metadata
-
-              is consistent across data replicas. When PGs miss their scrub interval,
-              it may
-
-              indicate that the scrub window is too small, or PGs were not in a ''clean''
-              state during the
-
+              is consistent across data replicas. When PGs miss their scrub interval, it may
+              indicate that the scrub window is too small, or PGs were not in a 'clean' state during the
               scrub window.
 
-
               You can manually initiate a scrub with: ceph pg scrub <pgid>
-
-              '
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-not-scrubbed
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGNotScrubbed.html
             summary: Placement group(s) have not been scrubbed
@@ -693,24 +580,14 @@ spec:
             type: ceph_default
         - alert: SYN_CephPGsHighPerOSD
           annotations:
-            description: 'The number of placement groups per OSD is too high (exceeds
-              the mon_max_pg_per_osd setting).
+            description: |
+              The number of placement groups per OSD is too high (exceeds the mon_max_pg_per_osd setting).
 
-
-              Check that the pg_autoscaler has not been disabled for any pools with
-              ''ceph osd pool autoscale-status'',
-
-              and that the profile selected is appropriate. You may also adjust the
-              target_size_ratio of a pool to guide
-
+              Check that the pg_autoscaler has not been disabled for any pools with 'ceph osd pool autoscale-status',
+              and that the profile selected is appropriate. You may also adjust the target_size_ratio of a pool to guide
               the autoscaler based on the expected relative size of the pool
-
-              (''ceph osd pool set cephfs.cephfs.meta target_size_ratio .1'') or set
-              the pg_autoscaler
-
+              ('ceph osd pool set cephfs.cephfs.meta target_size_ratio .1') or set the pg_autoscaler
               mode to "warn" and adjust pg_num appropriately for one or more pools.
-
-              '
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks/#too-many-pgs
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGsHighPerOSD.html
             summary: Placement groups per OSD is too high
@@ -723,23 +600,14 @@ spec:
             type: ceph_default
         - alert: SYN_CephPGNotDeepScrubbed
           annotations:
-            description: 'One or more PGs have not been deep scrubbed recently. Deep
-              scrubs
-
+            description: |
+              One or more PGs have not been deep scrubbed recently. Deep scrubs
               protect against bit-rot. They compare data
-
-              replicas to ensure consistency. When PGs miss their deep scrub interval,
-              it may indicate
-
-              that the window is too small or PGs were not in a ''clean'' state during
-              the deep-scrub
-
+              replicas to ensure consistency. When PGs miss their deep scrub interval, it may indicate
+              that the window is too small or PGs were not in a 'clean' state during the deep-scrub
               window.
 
-
               You can manually initiate a deep scrub with: ceph pg deep-scrub <pgid>
-
-              '
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-not-deep-scrubbed
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGNotDeepScrubbed.html
             summary: Placement group(s) have not been deep scrubbed
@@ -754,10 +622,8 @@ spec:
       rules:
         - alert: SYN_CephNodeRootFilesystemFull
           annotations:
-            description: 'Root volume is dangerously full: {{ $value | humanize }}%
-              free.
-
-              '
+            description: |
+              Root volume is dangerously full: {{ $value | humanize }}% free.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephNodeRootFilesystemFull.html
             summary: Root filesystem is dangerously full
           expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}
@@ -771,19 +637,21 @@ spec:
             type: ceph_default
         - alert: SYN_CephNodeNetworkPacketDrops
           annotations:
-            description: 'Node {{ $labels.instance }} experiences packet drop > 0.01%
-              or > 10 packets/s on interface {{ $labels.device }}.
-
-              '
+            description: |
+              Node {{ $labels.instance }} experiences packet drop > 0.01% or > 10 packets/s on interface {{ $labels.device }}.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephNodeNetworkPacketDrops.html
             summary: One or more NICs reports packet drops
-          expr: "(\n  increase(node_network_receive_drop_total{device!=\"lo\"}[1m])\
-            \ +\n  increase(node_network_transmit_drop_total{device!=\"lo\"}[1m])\n\
-            ) / (\n  increase(node_network_receive_packets_total{device!=\"lo\"}[1m])\
-            \ +\n  increase(node_network_transmit_packets_total{device!=\"lo\"}[1m])\n\
-            ) >= 0.0001 or (\n  increase(node_network_receive_drop_total{device!=\"\
-            lo\"}[1m]) +\n  increase(node_network_transmit_drop_total{device!=\"lo\"\
-            }[1m])\n) >= 10\n"
+          expr: |
+            (
+              increase(node_network_receive_drop_total{device!="lo"}[1m]) +
+              increase(node_network_transmit_drop_total{device!="lo"}[1m])
+            ) / (
+              increase(node_network_receive_packets_total{device!="lo"}[1m]) +
+              increase(node_network_transmit_packets_total{device!="lo"}[1m])
+            ) >= 0.0001 or (
+              increase(node_network_receive_drop_total{device!="lo"}[1m]) +
+              increase(node_network_transmit_drop_total{device!="lo"}[1m])
+            ) >= 10
           labels:
             oid: 1.3.6.1.4.1.50495.1.2.1.8.2
             severity: warning
@@ -792,19 +660,21 @@ spec:
             type: ceph_default
         - alert: SYN_CephNodeNetworkPacketErrors
           annotations:
-            description: 'Node {{ $labels.instance }} experiences packet errors >
-              0.01% or > 10 packets/s on interface {{ $labels.device }}.
-
-              '
+            description: |
+              Node {{ $labels.instance }} experiences packet errors > 0.01% or > 10 packets/s on interface {{ $labels.device }}.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephNodeNetworkPacketErrors.html
             summary: One or more NICs reports packet errors
-          expr: "(\n  increase(node_network_receive_errs_total{device!=\"lo\"}[1m])\
-            \ +\n  increase(node_network_transmit_errs_total{device!=\"lo\"}[1m])\n\
-            ) / (\n  increase(node_network_receive_packets_total{device!=\"lo\"}[1m])\
-            \ +\n  increase(node_network_transmit_packets_total{device!=\"lo\"}[1m])\n\
-            ) >= 0.0001 or (\n  increase(node_network_receive_errs_total{device!=\"\
-            lo\"}[1m]) +\n  increase(node_network_transmit_errs_total{device!=\"lo\"\
-            }[1m])\n) >= 10\n"
+          expr: |
+            (
+              increase(node_network_receive_errs_total{device!="lo"}[1m]) +
+              increase(node_network_transmit_errs_total{device!="lo"}[1m])
+            ) / (
+              increase(node_network_receive_packets_total{device!="lo"}[1m]) +
+              increase(node_network_transmit_packets_total{device!="lo"}[1m])
+            ) >= 0.0001 or (
+              increase(node_network_receive_errs_total{device!="lo"}[1m]) +
+              increase(node_network_transmit_errs_total{device!="lo"}[1m])
+            ) >= 10
           labels:
             oid: 1.3.6.1.4.1.50495.1.2.1.8.3
             severity: warning
@@ -815,15 +685,13 @@ spec:
       rules:
         - alert: SYN_CephPoolGrowthWarning
           annotations:
-            description: 'Pool ''{{ $labels.name }}'' will be full in less than 5
-              days assuming the average fill-up rate of the past 48 hours.
-
-              '
+            description: |
+              Pool '{{ $labels.name }}' will be full in less than 5 days assuming the average fill-up rate of the past 48 hours.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPoolGrowthWarning.html
             summary: Pool growth rate may soon exceed capacity
-          expr: "(predict_linear((max(ceph_pool_percent_used) without (pod, instance))[2d:1h],\
-            \ 3600 * 24 * 5) * on(pool_id)\n    group_right ceph_pool_metadata) >=\
-            \ 95\n"
+          expr: |
+            (predict_linear((max(ceph_pool_percent_used) without (pod, instance))[2d:1h], 3600 * 24 * 5) * on(pool_id)
+                group_right ceph_pool_metadata) >= 95
           labels:
             oid: 1.3.6.1.4.1.50495.1.2.1.9.2
             severity: warning
@@ -832,10 +700,8 @@ spec:
             type: ceph_default
         - alert: SYN_CephPoolBackfillFull
           annotations:
-            description: 'A pool is approaching the near full threshold, which will
-              prevent recovery/backfill from completing. Consider adding more capacity.
-
-              '
+            description: |
+              A pool is approaching the near full threshold, which will prevent recovery/backfill from completing. Consider adding more capacity.
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPoolBackfillFull.html
             summary: Free space in a pool is too low for recovery/backfill
           expr: ceph_health_detail{name="POOL_BACKFILLFULL"} > 0
@@ -846,14 +712,16 @@ spec:
             type: ceph_default
         - alert: SYN_CephPoolFull
           annotations:
-            description: "A pool has reached its MAX quota, or OSDs supporting the\
-              \ pool\nhave reached the FULL threshold. Until this is resolved, writes\
-              \ to\nthe pool will be blocked.\nPool Breakdown (top 5)\n{{- range query\
-              \ \"topk(5, sort_desc(ceph_pool_percent_used * on(pool_id) group_right\
-              \ ceph_pool_metadata))\" }}\n  - {{ .Labels.name }} at {{ .Value }}%\n\
-              {{- end }}\nIncrease the pool's quota, or add capacity to the cluster\n\
-              then increase the pool's quota (e.g. ceph osd pool set quota <pool_name>\
-              \ max_bytes <bytes>)\n"
+            description: |
+              A pool has reached its MAX quota, or OSDs supporting the pool
+              have reached the FULL threshold. Until this is resolved, writes to
+              the pool will be blocked.
+              Pool Breakdown (top 5)
+              {{- range query "topk(5, sort_desc(ceph_pool_percent_used * on(pool_id) group_right ceph_pool_metadata))" }}
+                - {{ .Labels.name }} at {{ .Value }}%
+              {{- end }}
+              Increase the pool's quota, or add capacity to the cluster
+              then increase the pool's quota (e.g. ceph osd pool set quota <pool_name> max_bytes <bytes>)
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pool-full
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPoolFull.html
             summary: Pool is full - writes are blocked
@@ -867,27 +735,17 @@ spec:
             type: ceph_default
         - alert: SYN_CephPoolNearFull
           annotations:
-            description: 'A pool has exceeded the warning (percent full) threshold,
-              or OSDs
-
+            description: |
+              A pool has exceeded the warning (percent full) threshold, or OSDs
               supporting the pool have reached the NEARFULL threshold. Writes may
-
               continue, but you are at risk of the pool going read-only if more capacity
+              isn't made available.
 
-              isn''t made available.
-
-
-              Determine the affected pool with ''ceph df detail'', looking
-
-              at QUOTA BYTES and STORED. Increase the pool''s quota, or add
-
-              capacity to the cluster then increase the pool''s quota
-
+              Determine the affected pool with 'ceph df detail', looking
+              at QUOTA BYTES and STORED. Increase the pool's quota, or add
+              capacity to the cluster then increase the pool's quota
               (e.g. ceph osd pool set quota <pool_name> max_bytes <bytes>).
-
               Also ensure that the balancer is active.
-
-              '
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPoolNearFull.html
             summary: One or more Ceph pools are nearly full
           expr: ceph_health_detail{name="POOL_NEAR_FULL"} > 0
@@ -901,10 +759,8 @@ spec:
       rules:
         - alert: SYN_CephSlowOps
           annotations:
-            description: '{{ $value }} OSD requests are taking too long to process
-              (osd_op_complaint_time exceeded)
-
-              '
+            description: |
+              {{ $value }} OSD requests are taking too long to process (osd_op_complaint_time exceeded)
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#slow-ops
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephSlowOps.html
             summary: OSD operations are slow to complete
@@ -919,16 +775,10 @@ spec:
       rules:
         - alert: SYN_CephObjectMissing
           annotations:
-            description: 'The latest version of a RADOS object can not be found, even
-              though all OSDs are up. I/O
-
-              requests for this object from clients will block (hang). Resolving this
-              issue may
-
-              require the object to be rolled back to a prior version manually, and
-              manually verified.
-
-              '
+            description: |
+              The latest version of a RADOS object can not be found, even though all OSDs are up. I/O
+              requests for this object from clients will block (hang). Resolving this issue may
+              require the object to be rolled back to a prior version manually, and manually verified.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#object-unfound
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephObjectMissing.html
             summary: Object(s) marked UNFOUND
@@ -945,15 +795,10 @@ spec:
       rules:
         - alert: SYN_CephDaemonCrash
           annotations:
-            description: 'One or more daemons have crashed recently, and need to be
-              acknowledged. This notification
-
-              ensures that software crashes do not go unseen. To acknowledge a crash,
-              use the
-
-              ''ceph crash archive <id>'' command.
-
-              '
+            description: |
+              One or more daemons have crashed recently, and need to be acknowledged. This notification
+              ensures that software crashes do not go unseen. To acknowledge a crash, use the
+              'ceph crash archive <id>' command.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks/#recent-crash
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephDaemonCrash.html
             summary: One or more Ceph daemons have crashed, and are pending acknowledgement

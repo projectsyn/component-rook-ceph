@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.11
+    helm.sh/chart: rook-ceph-v1.10.13
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -41,7 +41,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.11
+    helm.sh/chart: rook-ceph-v1.10.13
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -74,7 +74,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.11
+    helm.sh/chart: rook-ceph-v1.10.13
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -254,7 +254,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.11
+    helm.sh/chart: rook-ceph-v1.10.13
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -310,7 +310,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.11
+    helm.sh/chart: rook-ceph-v1.10.13
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -403,6 +403,14 @@ rules:
     verbs:
       - get
       - list
+  - apiGroups:
+      - ''
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
   - apiGroups:
       - ''
     resources:
@@ -503,7 +511,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.11
+    helm.sh/chart: rook-ceph-v1.10.13
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin
@@ -700,7 +708,7 @@ rules:
     verbs:
       - get
       - list
-      - watch"
+      - watch
   - apiGroups:
       - storage.k8s.io
     resources:

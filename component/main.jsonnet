@@ -55,6 +55,9 @@ local common_labels(name) = {
 
 // This is required for Rook 1.10.0-1.10.11, cf.
 // https://github.com/rook/rook/pull/11697
+// NOTE(sg): We keep the workaround for now even though we default to Rook
+// 1.10.13 which fixes the permissions, to allow users to stay on lower 1.10
+// versions for the moment.
 local cephfs_rbac_fix =
   local cephfs_additional_role =
     kube.ClusterRole('syn-rook-ceph-cephfs-provisioner-fix') {

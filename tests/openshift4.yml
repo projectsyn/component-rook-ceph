@@ -18,8 +18,3 @@ parameters:
     defaultClass: ""
 
   rook_ceph: {}
-
-  openshift4_monitoring:
-    alerts:
-      ignoreNames: []
-      customAnnotations: {}

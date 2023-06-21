@@ -43,72 +43,37 @@ local ignore_alerts = std.set(
 local runbook(alertname) =
   'https://hub.syn.tools/rook-ceph/runbooks/%s.html' % alertname;
 
-/* FROM HERE: should be provided as library function by
- * rancher-/openshift4-monitoring */
-// We shouldn't be expected to care how rancher-/openshift4-monitoring
-// implement alert managmement and patching, instead we should be able to
-// reuse their functionality as a black box to make sure our alerts work
-// correctly in the environment into which we're deploying.
-
 local on_openshift =
   inv.parameters.facts.distribution == 'openshift4';
-
-local global_alert_params =
+local alertpatching =
   if on_openshift then
-    inv.parameters.openshift4_monitoring.alerts
+    import 'lib/alert-patching.libsonnet'
   else
-    inv.parameters.rancher_monitoring.alerts;
-
-local filter_patch_rules(g) =
-  // combine our set of alerts to ignore with the monitoring component's
-  // set of ignoreNames.
-  local ignore_set = std.set(global_alert_params.ignoreNames + ignore_alerts);
-  g {
-    rules: std.map(
-      // Patch rules to make sure they match the requirements.
-      function(rule)
-        local rulepatch = com.makeMergeable(
-          com.getValueOrDefault(
-            params.alerts.patchRules,
-            rule.alert,
-            {}
-          )
-        );
-        local runbook_url = runbook(rule.alert);
+    local patchRule(rule) =
+      if !std.objectHas(rule, 'alert') then
+        rule
+      else
         rule {
-          // Change alert names so we don't get multiple alerts with the same
-          // name, as the rook-ceph operator deploys its own copy of these
-          // rules.
           alert: 'SYN_%s' % super.alert,
-          // add customAnnotations configured for all alerts on cluster
-          annotations+: global_alert_params.customAnnotations {
-            runbook_url: runbook_url,
-          },
           labels+: {
-            // ensure the alerts are not silenced on OCP4
-            // TODO: figure out how to ensure we don't get duplicate alerts on
-            // not-OCP4
             syn: 'true',
-            // mark alert as belonging to rook-ceph
-            // can be used for inhibition rules
-            syn_component: 'rook-ceph',
+            syn_component: inv.parameters._instance,
           },
-        } + rulepatch,
-      std.filter(
-        // Filter out unwanted rules
-        function(rule)
-          // only create duplicates of alert rules, we can use the recording
-          // rules which are deployed anyway when we enable monitoring on the
-          // CephCluster resource.
-          std.objectHas(rule, 'alert') &&
-          // Drop rules which are in the ignore_set
-          !std.member(ignore_set, rule.alert),
-        super.rules
-      ),
-    ),
-  };
-
-/* TO HERE */
+        };
+    std.trace(
+      'Alert patching library not available on non-OCP4, alerts may be configured incorrectly',
+      {
+        patchRule: patchRule,
+        filterPatchRules(group, ignoreNames, patches):
+          group {
+            rules: [
+              patchRule(r)
+              for r in super.rules
+              if !std.member(ignoreNames, r.alert)
+            ],
+          },
+      }
+    );
 
 local alert_rules_raw = helpers.load_manifest('prometheus-ceph-rules');
 assert std.length(alert_rules_raw) >= 1;
@@ -131,24 +96,35 @@ local additional_rules = [
   {
     name: 'syn-rook-ceph-additional.alerts',
     rules: [
-      {
-        alert: 'SYN_RookCephOperatorScaledDown',
-        expr: 'kube_deployment_spec_replicas{deployment="rook-ceph-operator", namespace="%s"} == 0' % params.namespace,
-        annotations: global_alert_params.customAnnotations {
-          summary: 'rook-ceph operator scaled to 0 for more than 1 hour.',
-          description: 'TODO',
-          runbook_url: runbook('RookCephOperatorScaledDown'),
+      alertpatching.patchRule(
+        {
+          alert: 'RookCephOperatorScaledDown',
+          expr: 'kube_deployment_spec_replicas{deployment="rook-ceph-operator", namespace="%s"} == 0' % params.namespace,
+          annotations: {
+            summary: 'rook-ceph operator scaled to 0 for more than 1 hour.',
+            description: 'TODO',
+            runbook_url: runbook('RookCephOperatorScaledDown'),
+          },
+          labels: {
+            severity: 'warning',
+          },
+          'for': '1h',
         },
-        labels: {
-          severity: 'warning',
-          syn_component: 'rook-ceph',
-          syn: 'true',
-        },
-        'for': '1h',
-      },
+      ),
     ],
   },
 ];
+
+local add_runbook_url = {
+  rules: [
+    r {
+      annotations+: {
+        runbook_url: runbook(r.alert),
+      },
+    }
+    for r in super.rules
+  ],
+};
 
 local alert_rules = [
   local gs = std.filter(
@@ -164,7 +140,11 @@ local alert_rules = [
       groups: std.filter(
         function(it) it != null,
         [
-          local r = filter_patch_rules(g);
+          local r = alertpatching.filterPatchRules(
+            g + add_runbook_url,
+            ignore_alerts,
+            params.alerts.patchRules,
+          );
           if std.length(r.rules) > 0 then r
           for g in gs
         ]

@@ -9,6 +9,9 @@ parameters:
       - type: https
         source: https://raw.githubusercontent.com/projectsyn/component-storageclass/v1.0.0/lib/storageclass.libsonnet
         output_path: vendor/lib/storageclass.libsonnet
+      - type: https
+        source: https://raw.githubusercontent.com/appuio/component-openshift4-monitoring/v3.1.0/lib/openshift4-monitoring-alert-patching.libsonnet
+        output_path: vendor/lib/alert-patching.libsonnet
 
   storageclass:
     defaults: {}

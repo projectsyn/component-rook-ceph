@@ -133,6 +133,33 @@ parameters:
         - CephDeviceFailurePredicted
         - CephDeviceFailurePredictionTooHigh
         - CephDeviceFailureRelocationIncomplete
+        # Offline OSD host should be covered by cluster-level alerts
+        - CephOSDHostDown
+        # Clock skew should be covered by cluster-level alert
+        - CephMonClockSkew
+        # Network packet drops/errors should be covered by cluster-level
+        # alerts, we don't need to have duplicates for Ceph nodes
+        - CephNodeNetworkPacketDrops
+        - CephNodeNetworkPacketErrors
+        # All the following alerts should be covered by CephHealthWarning
+        - CephOSDInternalDiskSizeMismatch
+        - CephOSDInternalDiskSizeMismatch
+        - CephFilesystemInsufficientStandby
+        - CephFilesystemMDSRanksLow
+        - CephOSDTooManyRepairs
+        - CephOSDBackfillFull
+        - CephOSDReadErrors
+        - CephOSDNearFull
+        - CephPGNotDeepScrubbed
+        - CephPGNotScrubbed
+        - CephPGsHighPerOSD
+        - CephPoolBackfillFull
+        - CephPoolNearFull
+        # The following alerts are not valuable enough to have active by
+        # default
+        - CephPGImbalance
+        - CephPoolGrowthWarning
+        - CephSlowOps
 
       # Alert rule patches.
       # Provide partial objects for alert rules that need to be tuned compared to

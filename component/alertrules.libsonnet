@@ -35,6 +35,16 @@ local ignore_alerts = std.set(
     // covered by `CephMgrIsAbsent`.
     'CephMgrIsMissingReplicas',
   ] +
+  (
+    // Drop CephOSDDownHigh for installations with < 10 nodes, since the alert
+    // fires if more than 10% of OSDs are down (i.e. 1 node/OSD for small
+    // clusters). The assumption here is that for clusters with >= 10 nodes,
+    // the likelyhood of running >1 OSD per node is significant.
+    if params.ceph_cluster.node_count < 10 then
+      [ 'CephOSDDownHigh' ]
+    else
+      []
+  ) +
   // Add set of upstream alerts that should be ignored from processed value of
   // `params.alerts.ignoreNames`
   user_ignore_alerts

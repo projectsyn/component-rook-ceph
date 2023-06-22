@@ -225,10 +225,6 @@ local cephcluster =
         placement: {
           all: helpers.nodeAffinity,
         },
-        disruptionManagement: {
-          manageMachineDisruptionBudgets: on_openshift,
-          machineDisruptionBudgetNamespace: 'openshift-machine-api',
-        },
         storage+: {
           storageClassDeviceSets: std.filter(
             function(it) it != null,

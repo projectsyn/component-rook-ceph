@@ -126,34 +126,6 @@ spec:
             syn: 'true'
             syn_component: rook-ceph
             type: ceph_default
-        - alert: SYN_CephOSDTimeoutsPublicNetwork
-          annotations:
-            description: |
-              OSD heartbeats on the cluster's 'public' network (frontend) are running slow. Investigate the network
-              for latency or loss issues. Use 'ceph health detail' to show the affected OSDs.
-            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDTimeoutsPublicNetwork.html
-            summary: Network issues delaying OSD heartbeats (public network)
-          expr: ceph_health_detail{name="OSD_SLOW_PING_TIME_FRONT"} == 1
-          for: 1m
-          labels:
-            severity: warning
-            syn: 'true'
-            syn_component: rook-ceph
-            type: ceph_default
-        - alert: SYN_CephOSDTimeoutsClusterNetwork
-          annotations:
-            description: |
-              OSD heartbeats on the cluster's 'cluster' network (backend) are running slow. Investigate the network
-              for latency or loss issues. Use 'ceph health detail' to show the affected OSDs.
-            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDTimeoutsClusterNetwork.html
-            summary: Network issues delaying OSD heartbeats (cluster network)
-          expr: ceph_health_detail{name="OSD_SLOW_PING_TIME_BACK"} == 1
-          for: 1m
-          labels:
-            severity: warning
-            syn: 'true'
-            syn_component: rook-ceph
-            type: ceph_default
         - alert: SYN_CephOSDFlapping
           annotations:
             description: |
@@ -296,21 +268,6 @@ spec:
           labels:
             oid: 1.3.6.1.4.1.50495.1.2.1.7.1
             severity: critical
-            syn: 'true'
-            syn_component: rook-ceph
-            type: ceph_default
-        - alert: SYN_CephPGsUnclean
-          annotations:
-            description: |
-              {{ $value }} PGs have been unclean for more than 15 minutes in pool {{ $labels.name }}. Unclean PGs have not recovered from a previous failure.
-            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGsUnclean.html
-            summary: One or more placement groups are marked unclean
-          expr: ceph_pool_metadata * on(pool_id,instance) group_left() (ceph_pg_total
-            - ceph_pg_clean) > 0
-          for: 15m
-          labels:
-            oid: 1.3.6.1.4.1.50495.1.2.1.7.2
-            severity: warning
             syn: 'true'
             syn_component: rook-ceph
             type: ceph_default

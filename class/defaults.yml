@@ -137,10 +137,13 @@ parameters:
         - CephOSDHostDown
         # Clock skew should be covered by cluster-level alert
         - CephMonClockSkew
-        # Network packet drops/errors should be covered by cluster-level
-        # alerts, we don't need to have duplicates for Ceph nodes
+        # Network packet drops/errors and osd timeouts should be covered by
+        # cluster-level alerts, we don't need to have duplicates for Ceph
+        # nodes or OSDs
         - CephNodeNetworkPacketDrops
         - CephNodeNetworkPacketErrors
+        - CephOSDTimeoutsClusterNetwork
+        - CephOSDTimeoutsPublicNetwork
         # All the following alerts should be covered by CephHealthWarning
         - CephOSDInternalDiskSizeMismatch
         - CephOSDInternalDiskSizeMismatch
@@ -153,6 +156,7 @@ parameters:
         - CephPGNotDeepScrubbed
         - CephPGNotScrubbed
         - CephPGsHighPerOSD
+        - CephPGsUnclean
         - CephPoolBackfillFull
         - CephPoolNearFull
         # The following alerts are not valuable enough to have active by

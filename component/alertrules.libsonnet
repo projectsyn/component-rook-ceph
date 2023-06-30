@@ -55,16 +55,21 @@ local runbook(alertname) =
 
 local on_openshift =
   inv.parameters.facts.distribution == 'openshift4';
+
 local alertpatching =
   if on_openshift then
     import 'lib/alert-patching.libsonnet'
   else
-    local patchRule(rule) =
+    local patchRule(rule, patches={}, patch_name=true) =
       if !std.objectHas(rule, 'alert') then
         rule
       else
         rule {
-          alert: 'SYN_%s' % super.alert,
+          alert:
+            if patch_name then
+              'SYN_%s' % super.alert
+            else
+              super.alert,
           labels+: {
             syn: 'true',
             syn_component: inv.parameters._instance,
@@ -85,6 +90,37 @@ local alertpatching =
       }
     );
 
+local prom =
+  if on_openshift then
+    import 'lib/prom.libsonnet'
+  else
+    std.trace(
+      'Prometheus object helper library not available on non-OCP4, additional rules may be configured incorrectly',
+      {
+        generateRules(name, rules): {
+          spec: {
+            groups: [
+              {
+                name: group_name,
+                rules: [
+                  local keyparts = std.splitLimit(rulekey, ':', 1);
+                  alertpatching.patchRule(
+                    rules[group_name][rulekey] {
+                      [keyparts[0]]: keyparts[1],
+                    },
+                    patches={},
+                    patch_name=false,
+                  )
+                  for rulekey in std.objectFields(rules[group_name])
+                ],
+              }
+              for group_name in std.objectFields(rules)
+            ],
+          },
+        },
+      }
+    );
+
 local alert_rules_raw = helpers.load_manifest('prometheus-ceph-rules');
 assert std.length(alert_rules_raw) >= 1;
 local alert_rules_manifests = std.filter(
@@ -102,39 +138,36 @@ local ignore_groups = std.set([
   'ceph-node-alert.rules',
 ]);
 
-local additional_rules = [
-  {
-    name: 'syn-rook-ceph-additional.alerts',
-    rules: [
-      alertpatching.patchRule(
-        {
-          alert: 'RookCephOperatorScaledDown',
-          expr: 'kube_deployment_spec_replicas{deployment="rook-ceph-operator", namespace="%s"} == 0' % params.namespace,
-          annotations: {
-            summary: 'rook-ceph operator scaled to 0 for more than 1 hour.',
-            description: 'TODO',
-            runbook_url: runbook('RookCephOperatorScaledDown'),
-          },
-          labels: {
-            severity: 'warning',
-          },
-          'for': '1h',
-        },
-      ),
-    ],
-  },
-];
-
 local add_runbook_url = {
   rules: [
-    r {
-      annotations+: {
-        runbook_url: runbook(r.alert),
-      },
-    }
+    if std.objectHas(r, 'alert') then
+      r {
+        annotations+: {
+          [if !std.objectHas(r.annotations, 'runbook_url') then 'runbook_url']:
+            runbook(r.alert),
+        },
+      }
+    else
+      r
     for r in super.rules
   ],
 };
+
+local additional_rules =
+  prom.generateRules(
+    'additional-rules',
+    // Adjust input to match expected format of `generateRules`
+    {
+      'syn-rook-ceph-additional.rules': params.alerts.additionalRules,
+    }
+  ) {
+    spec+: {
+      groups: [
+        g + add_runbook_url
+        for g in super.groups
+      ],
+    },
+  };
 
 local alert_rules = [
   local gs = std.filter(
@@ -158,7 +191,7 @@ local alert_rules = [
           if std.length(r.rules) > 0 then r
           for g in gs
         ]
-      ) + additional_rules,
+      ) + additional_rules.spec.groups,
     },
   }
   for rule_manifest in alert_rules_manifests

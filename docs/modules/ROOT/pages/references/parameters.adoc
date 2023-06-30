@@ -410,6 +410,18 @@ The component expects valid partial Prometheus alert rule objects as values.
 
 IMPORTANT: The provided values aren't validated, they're applied to the corresponding upstream alert as-is.
 
+=== `additionalRules`
+
+[horizontal]
+type:: dict
+default:: https://github.com/projectsyn/component-rook-ceph/blob/master/class/defaults.yml[See `class/defaults.yml`]
+
+This parameter allows users to configure additional alerting and recording rules.
+All rules defined in this parameter will be added to rule group `syn-rook-ceph-additional.rules`.
+
+For alerting rules, a runbook URL is injected if annotation `runbook_url` is not already set on the rule.
+The injected runbook URL is derived from the alert name using pattern `pass:[https://hub.syn.tools/rook-ceph/runbooks/{alertname}.html]`.
+
 == `node_selector`
 
 [horizontal]

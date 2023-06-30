@@ -414,11 +414,10 @@ spec:
             syn: 'true'
             syn_component: rook-ceph
             type: ceph_default
-    - name: syn-rook-ceph-additional.alerts
+    - name: syn-rook-ceph-additional.rules
       rules:
-        - alert: SYN_RookCephOperatorScaledDown
+        - alert: RookCephOperatorScaledDown
           annotations:
-            description: TODO
             runbook_url: https://hub.syn.tools/rook-ceph/runbooks/RookCephOperatorScaledDown.html
             summary: rook-ceph operator scaled to 0 for more than 1 hour.
           expr: kube_deployment_spec_replicas{deployment="rook-ceph-operator", namespace="syn-rook-ceph-operator"}

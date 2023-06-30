@@ -175,6 +175,17 @@ parameters:
         CephOSDDiskNotResponding:
           for: 5m
 
+      # Supports configuring recording/alerting rules by using the
+      # "record:" and "alert:" prefixes.
+      additionalRules:
+        "alert:RookCephOperatorScaledDown":
+          expr: kube_deployment_spec_replicas{deployment="rook-ceph-operator", namespace="${rook_ceph:namespace}"} == 0
+          for: 1h
+          annotations:
+            summary: rook-ceph operator scaled to 0 for more than 1 hour.
+          labels:
+            severity: warning
+
     node_selector:
       node-role.kubernetes.io/storage: ''
 

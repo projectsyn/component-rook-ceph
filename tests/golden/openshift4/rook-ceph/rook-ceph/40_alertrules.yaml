@@ -427,3 +427,33 @@ spec:
             severity: warning
             syn: 'true'
             syn_component: rook-ceph
+        - expr: sum(ceph_mon_num_sessions{})
+          record: ceph_mon_num_sessions:sum
+        - expr: count(ceph_mon_quorum_status{})
+          record: ceph_mon_quorum_status:count
+        - expr: avg(ceph_osd_apply_latency_ms{})
+          record: ceph_osd_apply_latency_ms:avg
+        - expr: avg(ceph_osd_commit_latency_ms{})
+          record: ceph_osd_commit_latency_ms:avg
+        - expr: sum(ceph_osd_numpg{})
+          record: ceph_osd_numpg:sum
+        - expr: sum(irate(ceph_osd_op_r{}[5m]))
+          record: ceph_osd_op_r:irate5m
+        - expr: avg(rate(ceph_osd_op_r_latency_sum{}[5m]) / rate(ceph_osd_op_r_latency_count{}[5m])
+            >= 0)
+          record: ceph_osd_op_r_latency:avg5m
+        - expr: sum(irate(ceph_osd_op_r_out_bytes{}[5m]))
+          record: ceph_osd_op_r_out_bytes:irate5m
+        - expr: sum(ceph_osd_op_r_out_bytes{})
+          record: ceph_osd_op_r_out_bytes:sum
+        - expr: sum(irate(ceph_osd_op_w{}[5m]))
+          record: ceph_osd_op_w:irate5m
+        - expr: sum(irate(ceph_osd_op_w_in_bytes{}[5m]))
+          record: ceph_osd_op_w_in_bytes:irate5m
+        - expr: sum(ceph_osd_op_w_in_bytes{})
+          record: ceph_osd_op_w_in_bytes:sum
+        - expr: avg(rate(ceph_osd_op_w_latency_sum{}[5m]) / rate(ceph_osd_op_w_latency_count{}[5m])
+            >= 0)
+          record: ceph_osd_op_w_latency:avg5m
+        - expr: sum(ceph_pool_objects{})
+          record: ceph_pool_objects:sum

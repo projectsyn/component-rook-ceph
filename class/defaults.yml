@@ -185,10 +185,10 @@ parameters:
             summary: rook-ceph operator scaled to 0 for more than 1 hour.
           labels:
             severity: warning
-        "record:ceph_osd_op_w_in_bytes:irate5m":
-          expr: sum(irate(ceph_osd_op_w_in_bytes{}[5m]))
-        "record:ceph_osd_op_r_out_bytes:irate5m":
-          expr: sum(irate(ceph_osd_op_r_out_bytes{}[5m]))
+        "record:ceph_osd_op_w_in_bytes:rate5m":
+          expr: sum(rate(ceph_osd_op_w_in_bytes{}[5m]))
+        "record:ceph_osd_op_r_out_bytes:rate5m":
+          expr: sum(rate(ceph_osd_op_r_out_bytes{}[5m]))
         "record:ceph_pool_objects:sum":
           expr: sum(ceph_pool_objects{})
         "record:ceph_mon_num_sessions:sum":
@@ -209,10 +209,10 @@ parameters:
           expr: avg(rate(ceph_osd_op_w_latency_sum{}[5m]) / rate(ceph_osd_op_w_latency_count{}[5m]) >= 0)
         "record:ceph_osd_op_r_latency:avg5m":
           expr: avg(rate(ceph_osd_op_r_latency_sum{}[5m]) / rate(ceph_osd_op_r_latency_count{}[5m]) >= 0)
-        "record:ceph_osd_op_w:irate5m":
-          expr: sum(irate(ceph_osd_op_w{}[5m]))
-        "record:ceph_osd_op_r:irate5m":
-          expr: sum(irate(ceph_osd_op_r{}[5m]))
+        "record:ceph_osd_op_w:rate5m":
+          expr: sum(rate(ceph_osd_op_w{}[5m]))
+        "record:ceph_osd_op_r:rate5m":
+          expr: sum(rate(ceph_osd_op_r{}[5m]))
 
     node_selector:
       node-role.kubernetes.io/storage: ''

@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.63.0
-	sigs.k8s.io/yaml v1.3.0
+	sigs.k8s.io/yaml v1.4.0
 )
 
 require (

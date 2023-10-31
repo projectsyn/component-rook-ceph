@@ -4,9 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-Node has a different MTU size than the median value on device.
+Node {{ $labels.instance }} has a different MTU size ({{ $value }}) than the median of devices named {{ $labels.device }}.
 
 == icon:bug[] Steps for debugging
 
 // Add detailed steps to debug and resolve the issue
-

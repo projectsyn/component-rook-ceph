@@ -4,10 +4,9 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-This alert is triggered when the disk space used by a Storage Node will be full in less than 5 days assuming the average fill-up rate of the past 48 hours.
-You should increase the space available to the node.
-The default location for the store sits under /var/lib/rook/ as a `hostPath` volume.
+Mountpoint {{ $labels.mountpoint }} on {{ $labels.nodename }} will be full in less than 5 days based on the 48 hour trailing fill rate.
 
 == icon:bug[] Steps for debugging
 
-include::partial$runbooks/check_mon_low_disk.adoc[]
+// Add detailed steps to debug and resolve the issue
+

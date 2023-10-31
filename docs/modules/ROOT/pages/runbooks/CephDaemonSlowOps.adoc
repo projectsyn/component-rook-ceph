@@ -1,0 +1,15 @@
+= Alert rule: CephDaemonSlowOps
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+{{ $labels.ceph_daemon }} operations are taking too long to process (complaint time exceeded)
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#slow-ops

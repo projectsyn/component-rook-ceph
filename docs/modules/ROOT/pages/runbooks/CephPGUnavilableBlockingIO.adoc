@@ -1,0 +1,15 @@
+= Alert rule: CephPGUnavilableBlockingIO
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+Data availability is reduced, impacting the cluster's ability to service I/O. One or more placement groups (PGs) are in a state that blocks I/O.
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-availability

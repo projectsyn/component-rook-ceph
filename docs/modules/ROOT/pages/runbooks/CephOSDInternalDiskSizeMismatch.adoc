@@ -4,9 +4,9 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-One or more OSDs have an internal inconsistency between the size of the physical device and it's metadata.
+One or more OSDs have an internal inconsistency between metadata and the size of the device.
 This could lead to the OSD(s) crashing in future.
-You should redeploy the effected OSDs.
+You should redeploy the affected OSDs.
 
 == icon:bug[] Steps for debugging
 

@@ -6,11 +6,11 @@ include::partial$runbooks/contribution_note.adoc[]
 
 The space available to a monitor's store is approaching full (>70% is the default).
 You should increase the space available to the monitor(s).
-The monitor's store can be found at `/var/lib/rook/<MON_NAME>/data` on the host.
-
+The default directory is `/var/lib/ceph/mon-*/data/store.db` on traditional deployments, and `/var/lib/rook/mon-*/data/store.db` on the mon pod's worker node for rook.
 Look for old, rotated versions of `*.log` and `MANIFEST*`.
 IMPORTANT: Don't touch any `*.sst` files.
 Also check any other directories under `/var/lib/rook` and other directories on the same filesystem, often `/var/log` and `/var/tmp` are culprits.
+Your monitor hosts are; {{- range query "ceph_mon_metadata"}} - {{ .Labels.hostname }} {{- end }}
 
 == icon:bug[] Steps for debugging
 

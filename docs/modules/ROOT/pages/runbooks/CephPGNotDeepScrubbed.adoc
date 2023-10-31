@@ -5,9 +5,9 @@ include::partial$runbooks/contribution_note.adoc[]
 == icon:glasses[] Overview
 
 One or more PGs haven't been deep scrubbed recently.
-Deep scrub is a data integrity feature, protecting against bit-rot.
-It compares the contents of objects and their replicas for inconsistency.
-When PGs miss their deep scrub window, it may indicate that the window is too small or PGs weren't in a 'clean' state during the deep-scrub window.
+Deep scrubs protect against bit-rot.
+They compare data replicas to ensure consistency.
+When PGs miss their deep scrub interval, it may indicate that the window is too small or PGs weren't in a `clean` state during the deep-scrub window.
 
 == icon:bug[] Steps for debugging
 

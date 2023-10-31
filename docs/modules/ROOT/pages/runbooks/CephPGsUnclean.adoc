@@ -4,8 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-PGs haven't been clean for more than 15 minutes in pool.
-Unclean PGs haven't been able to completely recover from a previous failure.
+{{ $value }} PGs have been unclean for more than 15 minutes in pool {{ $labels.name }}.
+Unclean PGs haven't recovered from a previous failure.
 
 == icon:bug[] Steps for debugging
 

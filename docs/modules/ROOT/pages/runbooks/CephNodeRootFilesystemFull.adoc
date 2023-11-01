@@ -4,7 +4,7 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-Root volume (OSD and MON store) is dangerously full: {{ $value | humanize }}% free.
+Root volume (OSD and MON store) is dangerously full.
 You should increase the space available to the node.
 The default location for the store sits under /var/lib/rook/ as a `hostPath` volume.
 

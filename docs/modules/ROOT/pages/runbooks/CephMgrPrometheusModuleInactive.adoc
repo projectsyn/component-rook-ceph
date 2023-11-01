@@ -4,9 +4,9 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-The mgr/prometheus module at {{ $labels.instance }} is unreachable.
-This could mean that the module has been disabled or the mgr daemon itself is down.
-Without the mgr/prometheus module metrics and alerts will no longer function.
+The MGR/Prometheus module is unreachable.
+This could mean that the module has been disabled or the MGR itself is down.
+Without the MGR/Prometheus module metrics and alerts will no longer function.
 
 == icon:bug[] Steps for debugging
 

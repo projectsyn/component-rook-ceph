@@ -4,9 +4,11 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-The following OSDs are down: {{- range query "(ceph_osd_up * on(ceph_daemon) group_left(hostname) ceph_osd_metadata) == 0" }} - {{ .Labels.hostname }} : {{ .Labels.ceph_daemon }} {{- end }}
+This alert fires if an OSD isn't running.
+This alert can be caused because a storage node is unavailable.
 
 == icon:bug[] Steps for debugging
 
-// Add detailed steps to debug and resolve the issue
+:component: OSD
 
+include::partial$runbooks/check_component_pod_status.adoc[]

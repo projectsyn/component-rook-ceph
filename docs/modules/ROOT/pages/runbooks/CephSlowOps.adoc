@@ -4,7 +4,7 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-{{ $value }} OSD requests are taking too long to process (osd_op_complaint_time exceeded).
+This alert fires if some Ceph OSD requests take too long to process.
 Slow OSD requests may be the cause of PVCs taking a long time to become bound to a PV.
 
 Most likely, slow requests will be caused by heavy load on the Ceph cluster.

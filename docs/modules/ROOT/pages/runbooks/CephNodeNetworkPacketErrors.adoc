@@ -4,7 +4,7 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-Node {{ $labels.instance }} experiences packet errors > 0.01% or > 10 packets/s on interface {{ $labels.device }}.
+Node experiences packet errors > 0.01% or > 10 packets/s on given interface.
 
 == icon:bug[] Steps for debugging
 

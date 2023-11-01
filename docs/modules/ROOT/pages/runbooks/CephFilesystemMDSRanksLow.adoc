@@ -4,7 +4,7 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-The filesystem's "max_mds" setting defined the number of MDS ranks in the filesystem.
+The filesystem's `max_mds` setting defined the number of MDS ranks in the filesystem.
 The current number of active MDS daemons is less than this setting.
 
 == icon:bug[] Steps for debugging

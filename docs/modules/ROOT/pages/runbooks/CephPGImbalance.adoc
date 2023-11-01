@@ -4,7 +4,7 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-OSD {{ $labels.ceph_daemon }} on {{ $labels.hostname }} deviates by more than 30% from average PG count.
+An alert is fired if an OSD deviates by more than 30% from average PG count.
 
 == icon:bug[] Steps for debugging
 

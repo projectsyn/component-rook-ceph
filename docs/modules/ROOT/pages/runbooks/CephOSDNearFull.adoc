@@ -5,6 +5,7 @@ include::partial$runbooks/contribution_note.adoc[]
 == icon:glasses[] Overview
 
 This alert fires when utilization of a Ceph storage device (disk) is higher than 75% of the device's capacity.
+
 This alert may indicate that the cluster utilization will soon reach problematic levels.
 If this alert is caused by high cluster utilization, unused data should be deleted or the cluster size must be increased.
 
@@ -12,7 +13,6 @@ Otherwise, investigate why this particular device has higher utilization than th
 
 == icon:bug[] Steps for debugging
 
-// Add detailed steps to debug and resolve the issue
 See the how-to on xref:how-tos/scale-cluster.adoc[scaling a PVC-based Ceph cluster] for instructions to resize the cluster.
 
 == icon:book[] Upstream documentation

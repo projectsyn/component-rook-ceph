@@ -225,7 +225,7 @@ parameters:
       rook:
         registry: docker.io
         image: rook/ceph
-        tag: v1.10.13
+        tag: v1.11.11
       ceph:
         registry: quay.io
         image: ceph/ceph
@@ -233,15 +233,15 @@ parameters:
       cephcsi:
         registry: quay.io
         image: cephcsi/cephcsi
-        tag: v3.7.2
+        tag: v3.8.1
       kubectl:
         registry: docker.io
         image: bitnami/kubectl
-        tag: '1.25.5@sha256:19dff0248157ae4cd320097ace1b5e0ffbb8bc7c7ea7fa3f13f73993fc6d7ee2'
+        tag: '1.26.10@sha256:056c0c09241d5c6ae97ff782ebee9e1cc73363583ff93067679702c72e11c77a'
 
     charts:
       # We do not support helm chart versions older than v1.7.0
-      rook-ceph: v1.10.13
+      rook-ceph: v1.11.11
 
     operator_helm_values:
       image:

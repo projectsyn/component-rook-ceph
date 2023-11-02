@@ -4,8 +4,9 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-One or more mgr modules have crashed and are yet to be acknowledged.
+One or more mgr modules have crashed and have yet to be acknowledged.
 A crashed module may impact functionality within the cluster.
+Use the `ceph crash` command to determine which module has failed, and archive it to acknowledge the failure.
 
 == icon:bug[] Steps for debugging
 

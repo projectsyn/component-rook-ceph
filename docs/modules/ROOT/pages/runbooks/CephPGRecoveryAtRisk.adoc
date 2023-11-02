@@ -4,8 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-Data redundancy may be reduced, or is at risk, since one or more OSDs are at or above their 'full' threshold.
-Add more capacity to the cluster, or delete unwanted data.
+Data redundancy is at risk since one or more OSDs are at or above the `full` threshold.
+Add more capacity to the cluster, restore down/out OSDs, or delete unwanted data.
 
 == icon:bug[] Steps for debugging
 

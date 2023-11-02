@@ -5,7 +5,7 @@ include::partial$runbooks/contribution_note.adoc[]
 == icon:glasses[] Overview
 
 An OSD has encountered read errors, but the OSD has recovered by retrying the reads.
-This may indicate an issue with the Hardware or Kernel.
+This may indicate an issue with hardware or the kernel.
 
 == icon:bug[] Steps for debugging
 

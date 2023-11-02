@@ -5,11 +5,13 @@ include::partial$runbooks/contribution_note.adoc[]
 == icon:glasses[] Overview
 
 One or more PGs haven't been scrubbed recently.
-The scrub process is a data integrity feature, protectng against bit-rot.
-It checks that objects and their metadata (size and attributes) match across object replicas.
-When PGs miss their scrub window, it may indicate the scrub window is too small, or PGs weren't in a 'clean' state during the scrub window.
+Scrubs check metadata integrity, protecting against bit-rot.
+They check that metadata is consistent across data replicas.
+When PGs miss their scrub interval, it may indicate that the scrub window is too small, or PGs weren't in a `clean` state during the scrub window.
 
 == icon:bug[] Steps for debugging
+
+=== Initiate a scrub
 
 [source,console]
 ----

@@ -4,10 +4,10 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-An OSD has reached it's BACKFILL FULL threshold.
-This will prevent rebalance operations completing for some pools. Check the current capacity utilisation with 'ceph df'
-
-To resolve, either add capacity to the cluster, or delete unwanted data
+An OSD has reached the BACKFILL FULL threshold.
+This will prevent rebalance operations from completing.
+Use `ceph health detail` and `ceph osd df` to identify the problem.
+To resolve, add capacity to the affected OSD's failure domain, restore down/out OSDs, or delete unwanted data.
 
 == icon:bug[] Steps for debugging
 

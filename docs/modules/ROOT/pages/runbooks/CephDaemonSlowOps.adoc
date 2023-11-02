@@ -1,0 +1,16 @@
+= Alert rule: CephDaemonSlowOps
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+One or more OSD requests or monitor requests are taking a long time to process.
+This alert might be an indication of extreme load, a slow storage device, or a software bug.
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
+
+== icon:book[] Upstream documentation
+
+https://docs.ceph.com/en/latest/rados/operations/health-checks#slow-ops

@@ -15,8 +15,6 @@ spec:
     image: quay.io/ceph/ceph:v17.2.6
   dataDirHostPath: /var/lib/rook
   disruptionManagement:
-    machineDisruptionBudgetNamespace: openshift-machine-api
-    manageMachineDisruptionBudgets: false
     managePodBudgets: true
     osdMaintenanceTimeout: 30
   mon:

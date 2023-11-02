@@ -4,8 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-OSD heartbeats on the cluster's 'public' network (frontend) are running slow.
-Investigate the network for any latency issues on this subnet.
+OSD heartbeats on the cluster's `public` network (frontend) are running slow.
+Investigate the network for latency or loss issues.
 
 == icon:bug[] Steps for debugging
 

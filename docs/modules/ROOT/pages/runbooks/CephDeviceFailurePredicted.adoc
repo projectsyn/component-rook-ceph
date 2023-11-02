@@ -5,6 +5,9 @@ include::partial$runbooks/contribution_note.adoc[]
 == icon:glasses[] Overview
 
 The device health module has determined that one or more devices will fail soon.
+To review device status use `ceph device ls`. To show a specific device use `ceph device info <dev id>`.
+Mark the OSD out so that data may migrate to other OSDs.
+Once the OSD has drained, destroy the OSD, replace the device, and redeploy the OSD.
 
 == icon:bug[] Steps for debugging
 

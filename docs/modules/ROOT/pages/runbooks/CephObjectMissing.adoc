@@ -4,7 +4,7 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-A version of a RADOS object can not be found, even though all OSDs are up.
+The latest version of a RADOS object can not be found, even though all OSDs are up.
 I/O requests for this object from clients will block (hang).
 Resolving this issue may require the object to be rolled back to a prior version manually, and manually verified.
 

@@ -5,7 +5,7 @@ include::partial$runbooks/contribution_note.adoc[]
 == icon:glasses[] Overview
 
 Data redundancy may be at risk due to lack of free space within the cluster.
-One or more OSDs have breached their 'backfillfull' threshold.
+One or more OSDs have reached the `backfillfull` threshold.
 Add more capacity, or delete unwanted data.
 
 == icon:bug[] Steps for debugging

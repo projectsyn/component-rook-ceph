@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.13
+    helm.sh/chart: rook-ceph-v1.11.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -41,7 +41,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.13
+    helm.sh/chart: rook-ceph-v1.11.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -74,7 +74,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.13
+    helm.sh/chart: rook-ceph-v1.11.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -127,6 +127,7 @@ rules:
       - create
       - update
       - delete
+      - deletecollection
   - apiGroups:
       - ceph.rook.io
     resources:
@@ -210,6 +211,12 @@ rules:
       - delete
       - deletecollection
   - apiGroups:
+      - apps
+    resources:
+      - deployments/finalizers
+    verbs:
+      - update
+  - apiGroups:
       - healthchecking.openshift.io
     resources:
       - machinedisruptionbudgets
@@ -254,7 +261,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.13
+    helm.sh/chart: rook-ceph-v1.11.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -310,7 +317,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.13
+    helm.sh/chart: rook-ceph-v1.11.11
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -511,7 +518,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.10.13
+    helm.sh/chart: rook-ceph-v1.11.11
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin

@@ -9,4 +9,3 @@ An alert is fired if an OSD deviates by more than 30% from average PG count.
 == icon:bug[] Steps for debugging
 
 // Add detailed steps to debug and resolve the issue
-

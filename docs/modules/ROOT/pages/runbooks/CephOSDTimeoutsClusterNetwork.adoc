@@ -4,8 +4,8 @@ include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-OSD heartbeats on the cluster's 'cluster' network are running slow.
-Investigate the network for any latency issues on this subnet.
+OSD heartbeats on the cluster's `cluster` network (backend) are slow.
+Investigate the network for latency issues on this subnet.
 
 == icon:bug[] Steps for debugging
 

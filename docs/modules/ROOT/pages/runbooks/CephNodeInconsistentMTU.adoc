@@ -9,4 +9,3 @@ Node has a different MTU size than the median value on device.
 == icon:bug[] Steps for debugging
 
 // Add detailed steps to debug and resolve the issue
-

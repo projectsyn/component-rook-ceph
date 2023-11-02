@@ -109,10 +109,13 @@ spec:
                 secretKeyRef:
                   key: ceph-username
                   name: rook-ceph-mon
-          image: docker.io/rook/ceph:v1.11.11
+          image: docker.io/rook/ceph:v1.12.7
           imagePullPolicy: IfNotPresent
           name: rook-ceph-tools
           securityContext:
+            capabilities:
+              drop:
+                - ALL
             runAsGroup: 2016
             runAsNonRoot: true
             runAsUser: 2016

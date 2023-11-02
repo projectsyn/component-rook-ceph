@@ -19,7 +19,8 @@ metadata:
   name: rook-ceph
 priority: null
 readOnlyRootFilesystem: false
-requiredDropCapabilities: []
+requiredDropCapabilities:
+  - All
 runAsUser:
   type: RunAsAny
 seLinuxContext:

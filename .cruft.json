@@ -1,13 +1,13 @@
 {
   "template": "https://github.com/projectsyn/commodore-component-template.git",
-  "commit": "d8afca0d957d69b362c2cb45e3f6faa13662dfe2",
+  "commit": "6559a10aa1b226aa978e2ce593e115c3db984a6c",
   "checkout": "main",
   "context": {
     "cookiecutter": {
       "name": "Rook Ceph",
       "slug": "rook-ceph",
       "parameter_key": "rook_ceph",
-      "test_cases": "defaults openshift4",
+      "test_cases": "defaults openshift4 cephfs",
       "add_lib": "n",
       "add_pp": "y",
       "add_golden": "y",

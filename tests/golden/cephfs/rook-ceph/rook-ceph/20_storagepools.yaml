@@ -1,0 +1,69 @@
+apiVersion: ceph.rook.io/v1
+kind: CephFilesystem
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: fspool
+    name: fspool
+  name: fspool
+  namespace: syn-rook-ceph-cluster
+spec:
+  dataPools:
+    - failureDomain: host
+      parameters:
+        compression_mode: none
+        target_size_ratio: '0.8'
+      replicated:
+        requireSafeReplicaSize: true
+        size: 3
+  metadataPool:
+    parameters:
+      compression_mode: none
+      target_size_ratio: '0.2'
+    replicated:
+      requireSafeReplicaSize: true
+      size: 3
+  metadataServer:
+    activeCount: 1
+    activeStandby: true
+    placement:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/storage
+                  operator: Exists
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - rook-ceph-mds
+              topologyKey: topology.kubernetes.io/zone
+            weight: 100
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - rook-ceph-mds
+            topologyKey: kubernetes.io/hostname
+      tolerations:
+        - key: storagenode
+          operator: Exists
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: '1'
+        memory: 4Gi
+  mirroring:
+    enabled: false
+  preserveFilesystemOnDelete: true

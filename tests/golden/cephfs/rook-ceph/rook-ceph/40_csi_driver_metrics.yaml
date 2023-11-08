@@ -1,0 +1,24 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: csi-metrics
+    team: rook
+  name: csi-metrics
+  namespace: syn-rook-ceph-operator
+spec:
+  endpoints:
+    - interval: 5s
+      path: /metrics
+      port: csi-http-metrics
+    - interval: 5s
+      path: /metrics
+      port: csi-grpc-metrics
+  namespaceSelector:
+    matchNames:
+      - syn-rook-ceph-operator
+  selector:
+    matchLabels:
+      app: csi-metrics

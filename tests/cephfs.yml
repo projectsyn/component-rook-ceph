@@ -1,0 +1,23 @@
+applications:
+  - rancher-monitoring
+
+parameters:
+  kapitan:
+    dependencies:
+      - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-storageclass/v1.0.0/lib/storageclass.libsonnet
+        output_path: vendor/lib/storageclass.libsonnet
+
+  storageclass:
+    defaults: {}
+    defaultClass: ""
+
+  rook_ceph:
+    ceph_cluster:
+      rbd_enabled: false
+      cephfs_enabled: true
+
+  rancher_monitoring:
+    alerts:
+      ignoreNames: []
+      customAnnotations: {}

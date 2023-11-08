@@ -9,8 +9,7 @@ metadata:
     app.kubernetes.io/name: cephfs-fspool-cluster
     name: cephfs-fspool-cluster
   name: cephfs-fspool-cluster
-mountOptions:
-  - discard
+mountOptions: []
 parameters:
   clusterID: syn-rook-ceph-cluster
   csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner

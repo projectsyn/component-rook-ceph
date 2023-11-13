@@ -323,8 +323,7 @@ fspool:
       # extended here
     mirroring:
       enabled: false
-  mount_options:
-    discard: true
+  mount_options: {}
   storage_class_config:
     allowVolumeExpansion: true
 ----
@@ -334,8 +333,10 @@ This configuration creates
 * One `CephFilesystem` resource named `fspool`.
 This CephFS instance is configured to have 3 replicas both for the metadata pool and its single data pool.
 By default, the CephFS instance is configured to assume that metadata will consume roughly 20% and data roughly 80% of the storage cluster.
-* A storage class which creates PVs on the CephFS instance, supports volume expansion and configures PVs to be mounted with `-o discard`.
+* A storage class which creates PVs on the CephFS instance and  supports volume expansion.
 * A `VolumeSnapshotClass` associated with the storage class
+
+NOTE: CephFS doesn't require mount option `discard`, and ceph-csi v3.9.0+ will fail to mount any CephFS volumes if the storage class is configured with mount option `discard`.
 
 The key `data_pools` is provided to avoid having to manage a list of data pools directly in the hierarchy.
 The values of each key in `data_pools` are placed in the resulting CephFS resource's field `.spec.dataPools`

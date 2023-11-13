@@ -112,8 +112,7 @@ parameters:
                 # extended here
               mirroring:
                 enabled: false
-            mount_options:
-              discard: true
+            mount_options: {}
             storage_class_config:
               allowVolumeExpansion: true
 
@@ -225,7 +224,7 @@ parameters:
       rook:
         registry: docker.io
         image: rook/ceph
-        tag: v1.11.11
+        tag: v1.12.7
       ceph:
         registry: quay.io
         image: ceph/ceph
@@ -241,7 +240,7 @@ parameters:
 
     charts:
       # We do not support helm chart versions older than v1.7.0
-      rook-ceph: v1.11.11
+      rook-ceph: v1.12.7
 
     operator_helm_values:
       image:

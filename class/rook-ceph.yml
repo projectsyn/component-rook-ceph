@@ -35,6 +35,10 @@ parameters:
         output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/toolbox.yaml
 
     compile:
+      - input_type: remove
+        input_paths:
+          - rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}/templates/securityContextConstraints.yaml
+        output_path: .
       - input_paths:
           - rook-ceph/component/app.jsonnet
         input_type: jsonnet

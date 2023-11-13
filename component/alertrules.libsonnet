@@ -141,10 +141,15 @@ local ignore_groups = std.set([
 local add_runbook_url = {
   rules: [
     if std.objectHas(r, 'alert') then
-      r {
+      local a =
+        if r.alert == 'CephPGUnavilableBlockingIO' then
+          r { alert: 'CephPGUnavailableBlockingIO' }
+        else
+          r;
+      a {
         annotations+: {
           [if !std.objectHas(r.annotations, 'runbook_url') then 'runbook_url']:
-            runbook(r.alert),
+            runbook(a.alert),
         },
       }
     else

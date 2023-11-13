@@ -306,13 +306,13 @@ spec:
             syn: 'true'
             syn_component: rook-ceph
             type: ceph_default
-        - alert: SYN_CephPGUnavilableBlockingIO
+        - alert: SYN_CephPGUnavailableBlockingIO
           annotations:
             description: Data availability is reduced, impacting the cluster's ability
               to service I/O. One or more placement groups (PGs) are in a state that
               blocks I/O.
             documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-availability
-            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGUnavilableBlockingIO.html
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGUnavailableBlockingIO.html
             summary: PG is unavailable, blocking I/O
           expr: ((ceph_health_detail{name="PG_AVAILABILITY"} == 1) - scalar(ceph_health_detail{name="OSD_DOWN"}))
             == 1

@@ -1,10 +1,11 @@
 = Alert rule: CephPGUnavailableBlockingIO
+:page-aliases: runbooks/CephPGUnavilableBlockingIO.adoc
 
 include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-Data availability is reduced impacting the clusters ability to service I/O to some data.
+Data availability is reduced impacting the clusters ability to service I/O.
 One or more placement groups (PGs) are in a state that blocks IO.
 
 == icon:bug[] Steps for debugging

@@ -24,6 +24,7 @@
 ** xref:runbooks/CephHealthWarning.adoc[CephHealthWarning]
 ** xref:runbooks/CephNodeDiskspaceWarning.adoc[CephNodeDiskspaceWarning]
 ** xref:runbooks/CephNodeInconsistentMTU.adoc[CephNodeInconsistentMTU]
+** xref:runbooks/CephNodeNetworkBondDegraded.adoc[CephNodeNetworkBondDegraded]
 ** xref:runbooks/CephNodeNetworkPacketDrops.adoc[CephNodeNetworkPacketDrops]
 ** xref:runbooks/CephNodeNetworkPacketErrors.adoc[CephNodeNetworkPacketErrors]
 ** xref:runbooks/CephNodeRootFilesystemFull.adoc[CephNodeRootFilesystemFull]

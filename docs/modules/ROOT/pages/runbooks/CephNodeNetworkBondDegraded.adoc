@@ -1,11 +1,12 @@
-= Alert rule: CephNodeInconsistentMTU
+= Alert rule: CephNodeNetworkBondDegraded
 
 include::partial$runbooks/contribution_note.adoc[]
 
 == icon:glasses[] Overview
 
-At least one network device on the node has a different MTU size than the median value for that device across all storage nodes.
+A bonded network device is degraded on the node.
 
 == icon:bug[] Steps for debugging
 
 // Add detailed steps to debug and resolve the issue
+

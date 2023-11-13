@@ -3,7 +3,7 @@ module github.com/projectsyn/component-rook-ceph/tools/runbooks-from-upstream
 go 1.19
 
 require (
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.69.0
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.69.1
 	sigs.k8s.io/yaml v1.4.0
 )
 

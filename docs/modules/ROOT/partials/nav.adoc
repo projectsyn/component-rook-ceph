@@ -10,6 +10,7 @@
 * xref:how-tos/setup-cluster.adoc[Setup a PVC-based Ceph cluster]
 * xref:how-tos/scale-cluster.adoc[Scale a PVC-based Ceph cluster]
 * xref:how-tos/configure-ceph.adoc[Configuring and tuning Ceph]
+* xref:how-tos/upgrade-ceph-csi-v3.9.adoc[]
 
 .Alert runbooks
 

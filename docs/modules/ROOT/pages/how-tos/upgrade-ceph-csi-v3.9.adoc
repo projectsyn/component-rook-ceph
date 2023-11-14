@@ -1,0 +1,78 @@
+= Upgrading to Ceph-CSI v3.9.0
+
+Starting from component version v6.0.0, the component deploys Ceph-CSI v3.9.0 by default.
+
+Ceph-CSI has been updated to pass any mount options configured for CephFS volumes to the `NodeStageVolume` calls which create bind mounts for existing volumes.
+
+We previously configured mount option `discard` for CephFS, which isn't a supported option for bind mounts.
+However, the option is unnecessary for CephFS anyway, so we remove it completely from the generated CephFS storage class in component version v6.0.0.
+
+This how-to is intended for users which are upgrading an existing Rook-Ceph setup to component version v6.0.0 from a previous component version.
+
+== Prerequisites
+
+* `cluster-admin` access to the cluster
+* Access to Project Syn configuration for the cluster, including a method to compile the catalog
+* `kubectl`
+* `jq`
+
+
+== Steps
+
+. Check mount options for all CephFS volumes.
+If this command shows custom mount options for any volumes, you'll want to handle those volumes separately.
++
+[source,bash]
+----
+kubectl get pv -ojson | \
+  jq -r '.items[] | select(.spec.storageClassName=="cephfs-fspool-cluster") | "\(.metadata.name) \(.spec.mountOptions)" '
+----
+
+. Remove mount option `discard` from all existing CephFS volumes.
++
+[source,bash]
+----
+for pv in $(kubectl get pv -ojson |\
+  jq -r '.items[] | select(.spec.storageClassName=="cephfs-fspool-cluster" and (.spec.mountOptions//[]) == ["discard"]) | .metadata.name');
+do
+  kubectl patch --as=cluster-admin pv $pv --type=json \
+    -p '[{"op": "replace", "path": "/spec/mountOptions", "value": [] }]'
+done
+----
+
+. Upgrade component to v6.0.0
+
+. Check for any CephFS volumes which got provisioned between step 2 and the upgrade and remove mount option `discard` for those volumes.
++
+[source,bash]
+----
+kubectl get pv -ojson | \
+  jq -r '.items[] | select(.spec.storageClassName=="cephfs-fspool-cluster" and (.spec.mountOptions//[]) == ["discard"]) | "\(.metadata.name) \(.spec.mountOptions)" '
+----
+
+. Finally, you should make sure you replace the existing CSI driver `holder` pods (if they're present on your cluster) with updated pods to ensure you're not getting any spurious DaemonSetRolloutStuck alerts.
++
+IMPORTANT: This needs to be done for each node after a node drain to ensure no Ceph-CSI mounts are active on the node
++
+[source,bash]
+----
+node_selector="node-role.kubernetes.io/worker" <1>
+timeout=300s <2>
+for node in $(kubectl get node -o name -l $node_selector); do
+  echo "Draining $node"
+  if !kubectl drain --ignore-daemonsets --delete-emptydir-data --timeout=$timeout $node
+  then
+    echo "Drain of $node failed... exiting"
+    break
+  fi
+  echo "Deleting holder pods for $node"
+  kubectl -n syn-rook-ceph-operator delete pods \
+    --field-selector spec.nodeName=${node//node\/} -l app=csi-cephfsplugin-holder
+  kubectl -n syn-rook-ceph-operator delete pods \
+    --field-selector spec.nodeName=${node//node\/} -l app=csi-rbdplugin-holder
+  echo "Uncordoning $node"
+  kubectl uncordon $node
+done
+----
+<1> Adjust the node selector to the set of nodes you want to drain
+<2> Adjust if you expect node drains to be slower or faster than 5 minutes

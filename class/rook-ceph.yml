@@ -35,10 +35,6 @@ parameters:
         output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/toolbox.yaml
 
     compile:
-      - input_type: remove
-        input_paths:
-          - rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}/templates/securityContextConstraints.yaml
-        output_path: .
       - input_paths:
           - rook-ceph/component/app.jsonnet
         input_type: jsonnet
@@ -59,6 +55,9 @@ parameters:
   commodore:
     postprocess:
       filters:
+        - type: jsonnet
+          path: rook-ceph/01_rook_ceph_helmchart/rook-ceph/templates/
+          filter: postprocess/delete_helm_scc.jsonnet
         - type: jsonnet
           path: rook-ceph/01_rook_ceph_helmchart/rook-ceph/templates/
           filter: postprocess/patch_operator_deployment.jsonnet

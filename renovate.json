@@ -18,6 +18,7 @@
   "labels": [
     "dependency"
   ],
+  "separateMinorPatch": true,
   "packageRules": [
     {
       "matchPackageNames": ["rook-ceph", "docker.io/rook/ceph"],

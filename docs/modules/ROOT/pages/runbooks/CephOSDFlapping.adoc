@@ -32,33 +32,6 @@ In particular, check whether section `State` for container `osd` has a note that
 
 include::partial$runbooks/check_cephcluster_status.adoc[]
 
-==== Check Ceph crash logs
-
-[source,console]
-----
-$ ceph_cluster_ns=syn-rook-ceph-cluster
-$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- ceph crash ls <1>
-[ ... list of crash logs ... ]
-$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- \
-      ceph crash info <CRASH_ID> <2>
-[ ... detailed crash info ... ]
-----
-<1> List currently not archived crash logs
-<2> Show detailed information of crash log with id `<CRASH_ID>`
-
-==== Archive Ceph crash logs
-
-[source,console]
-----
-$ ceph_cluster_ns=syn-rook-ceph-cluster
-$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- \
-      ceph crash archive-all <1>
-$ kubectl -n "${ceph_cluster_ns}" exec -it deploy/rook-ceph-tools -- \
-      ceph crash archive <CRASH_ID> <2>
-----
-<1> Archive all currently not archived crash logs
-<2> Archive crash log with id `<CRASH_ID>`
-
 == icon:book[] Upstream documentation
 
 https://docs.ceph.com/en/latest/rados/troubleshooting/troubleshooting-osd#flapping-osds

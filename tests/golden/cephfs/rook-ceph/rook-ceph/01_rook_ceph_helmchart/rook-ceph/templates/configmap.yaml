@@ -240,3 +240,4 @@ data:
 kind: ConfigMap
 metadata:
   name: rook-ceph-operator-config
+  namespace: syn-rook-ceph-operator

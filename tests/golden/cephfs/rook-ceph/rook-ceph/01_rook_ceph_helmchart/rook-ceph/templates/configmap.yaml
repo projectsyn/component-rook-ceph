@@ -227,7 +227,7 @@ data:
   ROOK_CEPH_ALLOW_LOOP_DEVICES: 'false'
   ROOK_CEPH_COMMANDS_TIMEOUT_SECONDS: '15'
   ROOK_CSIADDONS_IMAGE: quay.io/csiaddons/k8s-sidecar:v0.7.0
-  ROOK_CSI_CEPH_IMAGE: quay.io/cephcsi/cephcsi:v3.9.0
+  ROOK_CSI_CEPH_IMAGE: quay.io/cephcsi/cephcsi:v3.10.2
   ROOK_CSI_ENABLE_CEPHFS: 'true'
   ROOK_CSI_ENABLE_GRPC_METRICS: 'true'
   ROOK_CSI_ENABLE_NFS: 'false'

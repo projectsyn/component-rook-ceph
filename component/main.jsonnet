@@ -92,6 +92,7 @@ local add_labels(manifests) = [
   for manifest in manifests
 ];
 
+
 std.mapWithKey(
   function(field, value)
     if std.isArray(value) then
@@ -126,6 +127,7 @@ std.mapWithKey(
       csi_metrics.servicemonitor,
     [if params.ceph_cluster.monitoring_enabled then '40_alertrules']:
       alert_rules.rules,
+    '50_restart_holder_ds': (import 'restart-holder-ds.libsonnet'),
     '99_cleanup': (import 'cleanup.libsonnet'),
   }
 )

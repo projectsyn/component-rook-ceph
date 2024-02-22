@@ -1,0 +1,164 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: holder-updater
+    name: holder-updater
+  name: holder-updater
+  namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: holder-updater-admin
+    name: holder-updater-admin
+  name: holder-updater-admin
+  namespace: syn-rook-ceph-operator
+roleRef:
+  kind: ClusterRole
+  name: admin
+subjects:
+  - kind: ServiceAccount
+    name: holder-updater
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: syn:rook-ceph:holder-updater-cluster-reader
+    name: syn-rook-ceph-holder-updater-cluster-reader
+  name: syn:rook-ceph:holder-updater-cluster-reader
+roleRef:
+  kind: ClusterRole
+  name: cluster-reader
+subjects:
+  - kind: ServiceAccount
+    name: holder-updater
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: v1
+data:
+  wait-and-delete-holder-pods.sh: |
+    #!/bin/sh
+    trap : TERM INT
+    sleep infinity &
+
+    while true; do
+      # assumption: holder plugin daemonset is called
+      # `csi-cephfsplugin-holder-${cephcluster:name}`
+      cephfs_holder_wanted_gen=$(kubectl get ds csi-cephfsplugin-holder-cluster -ojsonpath='{.metadata.generation}')
+      rbd_holder_wanted_gen=$(kubectl get ds csi-rbdplugin-holder-cluster -ojsonpath='{.metadata.generation}')
+      needs_update=$( (\
+        kubectl get pods -l app=csi-cephfsplugin-holder --field-selector spec.nodeName=${NODE_NAME} -ojson |\
+          jq --arg wanted_gen ${cephfs_holder_wanted_gen} \
+            -r '.items[] | select(.metadata.labels."pod-template-generation" != $wanted_gen) | .metadata.name'
+        kubectl get pods -l app=csi-rbdplugin-holder --field-selector spec.nodeName=${NODE_NAME} -ojson |\
+          jq --arg wanted_gen ${rbd_holder_wanted_gen} \
+            -r '.items[] | select(.metadata.labels."pod-template-generation" != $wanted_gen) | .metadata.name'
+      ) | wc -l)
+      if [ $needs_update -eq 0 ]; then
+        echo "No holder pods with outdated pod generation, nothing to do"
+        break
+      fi
+      non_ds_pods=$(kubectl get pods -A --field-selector spec.nodeName=${NODE_NAME} -ojson | \
+        jq -r '.items[] | select(.metadata.ownerReferences[0].kind!="DaemonSet") | .metadata.name' | wc -l)
+      if [ $non_ds_pods -eq 0 ]; then
+        echo "node ${NODE_NAME} drained, deleting Ceph CSI holder pods"
+        kubectl delete pods -l app=csi-cephfsplugin-holder --field-selector=spec.nodeName=${NODE_NAME}
+        kubectl delete pods -l app=csi-rbdplugin-holder --field-selector=spec.nodeName=${NODE_NAME}
+        break
+      else
+        echo "${non_ds_pods} non-daemonset pods still on node ${NODE_NAME}, sleeping for 5s"
+      fi
+      sleep 5
+    done
+    echo "script completed, sleeping"
+    wait
+kind: ConfigMap
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: holder-restart-script
+    name: holder-restart-script
+  name: holder-restart-script
+  namespace: syn-rook-ceph-operator
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    syn.tools/description: DaemonSet which waits for node to be drained (by waiting
+      until no non-daemonset pods are running on the node) and then deletes any outdated
+      csi holder pods. Outdated holder pods are identified by comparing the DaemonSet
+      generation with the pod generation.
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: syn-holder-updater
+    name: syn-holder-updater
+  name: syn-holder-updater
+  namespace: syn-rook-ceph-operator
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: rook-ceph
+      app.kubernetes.io/managed-by: commodore
+      app.kubernetes.io/name: syn-holder-updater
+      name: syn-holder-updater
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/component: rook-ceph
+        app.kubernetes.io/managed-by: commodore
+        app.kubernetes.io/name: syn-holder-updater
+        name: syn-holder-updater
+    spec:
+      containers:
+        - args: []
+          command:
+            - /scripts/wait-and-delete-holder-pods.sh
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          image: docker.io/bitnami/kubectl:1.28.4@sha256:6485a923f6f4ff3d42d871ce5bd45ee8f25a303c44972a4ad31ddd895082fc22
+          imagePullPolicy: IfNotPresent
+          name: update
+          ports: []
+          resources:
+            requests:
+              cpu: 5m
+              memory: 20Mi
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /scripts
+              name: scripts
+      imagePullSecrets: []
+      initContainers: []
+      serviceAccountName: holder-updater
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 504
+            name: holder-restart-script
+          name: scripts
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate

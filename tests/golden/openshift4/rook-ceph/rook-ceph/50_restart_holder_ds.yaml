@@ -36,7 +36,7 @@ metadata:
   labels:
     app.kubernetes.io/component: rook-ceph
     app.kubernetes.io/managed-by: commodore
-    app.kubernetes.io/name: syn:rook-ceph:holder-updater-cluster-reader
+    app.kubernetes.io/name: syn-rook-ceph-holder-updater-cluster-reader
     name: syn-rook-ceph-holder-updater-cluster-reader
   name: syn:rook-ceph:holder-updater-cluster-reader
 roleRef:

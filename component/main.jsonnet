@@ -48,7 +48,7 @@ local namespaces =
   else [];
 
 local common_labels(name) = {
-  'app.kubernetes.io/name': name,
+  'app.kubernetes.io/name': std.strReplace(name, ':', '-'),
   'app.kubernetes.io/managed-by': 'commodore',
   'app.kubernetes.io/component': 'rook-ceph',
 };

@@ -39,8 +39,11 @@ local script = |||
   while true; do
     # assumption: holder plugin daemonset is called
     # `csi-cephfsplugin-holder-${cephcluster:name}`
-    cephfs_holder_wanted_gen=$(kubectl get ds csi-cephfsplugin-holder-%(cephcluster_name)s -ojsonpath='{.metadata.generation}')
-    rbd_holder_wanted_gen=$(kubectl get ds csi-rbdplugin-holder-%(cephcluster_name)s -ojsonpath='{.metadata.generation}')
+    # note: we don't care about the value of the variable if the daemonset
+    # isn't there, since we'll check for pods in a K8s `List` which will
+    # simply be empty if the plugin isn't enabled.
+    cephfs_holder_wanted_gen=$(kubectl get ds csi-cephfsplugin-holder-%(cephcluster_name)s -ojsonpath='{.metadata.generation}' 2>/dev/null)
+    rbd_holder_wanted_gen=$(kubectl get ds csi-rbdplugin-holder-%(cephcluster_name)s -ojsonpath='{.metadata.generation}' 2>/dev/null)
     needs_update=$( (\
       kubectl get pods -l app=csi-cephfsplugin-holder --field-selector spec.nodeName=${NODE_NAME} -ojson |\
         jq --arg wanted_gen ${cephfs_holder_wanted_gen} \
@@ -86,11 +89,19 @@ local daemonset = kube.DaemonSet('syn-holder-updater') {
         'non-daemonset pods are running on the node) and then deletes any ' +
         'outdated csi holder pods. Outdated holder pods are identified by ' +
         'comparing the DaemonSet generation with the pod generation.',
+      // set sync wave 10 for the daemonset to ensure that the ConfigMap is
+      // updated first.
+      'argocd.argoproj.io/sync-wave': '10',
     },
     namespace: params.namespace,
   },
   spec+: {
     template+: {
+      metadata+: {
+        annotations+: {
+          'script-checksum': std.md5(script),
+        },
+      },
       spec+: {
         serviceAccountName: serviceaccount.metadata.name,
         containers_: {

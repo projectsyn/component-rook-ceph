@@ -103,6 +103,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   annotations:
+    argocd.argoproj.io/sync-wave: '10'
     syn.tools/description: DaemonSet which waits for node to be drained (by waiting
       until no non-daemonset pods are running on the node) and then deletes any outdated
       csi holder pods. Outdated holder pods are identified by comparing the DaemonSet
@@ -123,7 +124,8 @@ spec:
       name: syn-holder-updater
   template:
     metadata:
-      annotations: {}
+      annotations:
+        script-checksum: 488da91788ef6e501cece9d3d67ff8b0
       labels:
         app.kubernetes.io/component: rook-ceph
         app.kubernetes.io/managed-by: commodore

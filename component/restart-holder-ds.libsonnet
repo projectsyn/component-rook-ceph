@@ -89,11 +89,19 @@ local daemonset = kube.DaemonSet('syn-holder-updater') {
         'non-daemonset pods are running on the node) and then deletes any ' +
         'outdated csi holder pods. Outdated holder pods are identified by ' +
         'comparing the DaemonSet generation with the pod generation.',
+      // set sync wave 10 for the daemonset to ensure that the ConfigMap is
+      // updated first.
+      'argocd.argoproj.io/sync-wave': '10',
     },
     namespace: params.namespace,
   },
   spec+: {
     template+: {
+      metadata+: {
+        annotations+: {
+          'script-checksum': std.md5(script),
+        },
+      },
       spec+: {
         serviceAccountName: serviceaccount.metadata.name,
         containers_: {

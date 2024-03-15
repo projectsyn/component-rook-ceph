@@ -141,7 +141,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-          image: docker.io/bitnami/kubectl:1.28.4@sha256:6485a923f6f4ff3d42d871ce5bd45ee8f25a303c44972a4ad31ddd895082fc22
+          image: docker.io/bitnami/kubectl:1.28.8@sha256:3a99c05bb324f817599ee2508c156253abcefa521c4ce072ef167c4b5c5d69be
           imagePullPolicy: IfNotPresent
           name: update
           ports: []

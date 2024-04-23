@@ -17,6 +17,18 @@ metadata:
   labels:
     app.kubernetes.io/component: rook-ceph
     app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: rook-ceph-default
+    name: rook-ceph-default
+  name: rook-ceph-default
+  namespace: syn-rook-ceph-cluster
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/name: rook-ceph-mgr
     name: rook-ceph-mgr
   name: rook-ceph-mgr

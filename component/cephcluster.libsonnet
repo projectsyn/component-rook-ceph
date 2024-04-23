@@ -15,7 +15,7 @@ local serviceaccounts =
         namespace: params.ceph_cluster.namespace,
       },
     }
-    for suffix in [ 'osd', 'mgr', 'cmd-reporter' ]
+    for suffix in [ 'default', 'osd', 'mgr', 'cmd-reporter' ]
   }
   else {};
 

@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.12.7
+    helm.sh/chart: rook-ceph-v1.14.2
     operator: rook
     storage-backend: ceph
   name: rook-ceph-osd
@@ -18,7 +18,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.12.7
+    helm.sh/chart: rook-ceph-v1.14.2
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr
@@ -31,7 +31,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.12.7
+    helm.sh/chart: rook-ceph-v1.14.2
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cmd-reporter
@@ -50,10 +50,19 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.12.7
+    helm.sh/chart: rook-ceph-v1.14.2
     operator: rook
     storage-backend: ceph
   name: rook-ceph-rgw
+  namespace: syn-rook-ceph-operator
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    operator: rook
+    storage-backend: ceph
+  name: rook-ceph-default
   namespace: syn-rook-ceph-operator
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -117,19 +126,6 @@ rules:
       - create
       - update
       - delete
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: rook-ceph-rgw
-  namespace: syn-rook-ceph-operator
-rules:
-  - apiGroups:
-      - ''
-    resources:
-      - configmaps
-    verbs:
-      - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -286,20 +282,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: rook-ceph-osd
-    namespace: syn-rook-ceph-operator
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: rook-ceph-rgw
-  namespace: syn-rook-ceph-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: rook-ceph-rgw
-subjects:
-  - kind: ServiceAccount
-    name: rook-ceph-rgw
     namespace: syn-rook-ceph-operator
 ---
 apiVersion: rbac.authorization.k8s.io/v1

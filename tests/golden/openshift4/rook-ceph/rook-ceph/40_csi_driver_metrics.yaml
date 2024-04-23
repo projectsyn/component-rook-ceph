@@ -56,9 +56,6 @@ spec:
     - interval: 5s
       path: /metrics
       port: csi-http-metrics
-    - interval: 5s
-      path: /metrics
-      port: csi-grpc-metrics
   namespaceSelector:
     matchNames:
       - syn-rook-ceph-operator

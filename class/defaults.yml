@@ -275,6 +275,12 @@ parameters:
         image: ${rook_ceph:images:ceph:registry}/${rook_ceph:images:ceph:image}:${rook_ceph:images:ceph:tag}
         allowUnsupported: false
       dataDirHostPath: /var/lib/rook
+      healthCheck:
+        daemonHealth:
+          mon:
+            disabled: false
+            interval: 45s
+            timeout: 600s
       monitoring:
         enabled: ${rook_ceph:ceph_cluster:monitoring_enabled}
       mon:

@@ -257,7 +257,7 @@ parameters:
       tolerations: ${rook_ceph:tolerations}
       csi:
         provisionerTolerations: ${rook_ceph:tolerations}
-        enableCSIHostNetwork: false
+        enableCSIHostNetwork: true
         enableRbdDriver: ${rook_ceph:ceph_cluster:rbd_enabled}
         enableCephfsDriver: ${rook_ceph:ceph_cluster:cephfs_enabled}
         enableGrpcMetrics: true

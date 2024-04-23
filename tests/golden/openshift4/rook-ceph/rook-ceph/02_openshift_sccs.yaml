@@ -30,6 +30,7 @@ supplementalGroups:
 users:
   - system:serviceaccount:syn-rook-ceph-operator:rook-ceph-system
   - system:serviceaccount:syn-rook-ceph-cluster:default
+  - system:serviceaccount:syn-rook-ceph-cluster:rook-ceph-default
   - system:serviceaccount:syn-rook-ceph-cluster:rook-ceph-mgr
   - system:serviceaccount:syn-rook-ceph-cluster:rook-ceph-osd
 volumes:

@@ -33,6 +33,7 @@ local patches = {
       ] +
       sccServiceAccountList([
         'default',
+        'rook-ceph-default',
         'rook-ceph-mgr',
         'rook-ceph-osd',
       ], params.ceph_cluster.namespace),

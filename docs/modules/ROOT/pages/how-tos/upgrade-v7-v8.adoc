@@ -2,7 +2,7 @@
 
 The component was updated to use `HostNetwork` for the Ceph-CSI driver pods and to disable holder pods.
 
-Using `HostNetwork` for the Ceph-CSI driver pods fixes broken mounts after the Ceph-CSI driver is updated.
+Using `HostNetwork` for the Ceph-CSI driver pods avoids running into issues with existing mounts after the Ceph-CSI driver pods are restarted.
 Holder pods will be deprecated in one of the next Rook-Ceph releases.
 
 This how-to is intended for users which are upgrading an existing Rook-Ceph setup to component version v8.0.0 from a previous component version.

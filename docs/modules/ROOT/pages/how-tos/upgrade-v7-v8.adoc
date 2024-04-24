@@ -40,19 +40,18 @@ kubectl --as=cluster-admin -n syn-rook-ceph-operator delete pod -l app=csi-cephf
 kubectl --as=cluster-admin -n syn-rook-ceph-operator delete pod -l app=csi-rbdplugin
 ----
 
+. Drain each node in the cluster to ensure no volume mounts still rely on the holder pods
++
+Refer to the relevant documentation for your Kubernetes distribution for commands to safely drain each node in your cluster.
+See the https://kb.vshn.ch/oc4/how-tos/force-reboot.html[APPUiO Managed OpenShift 4 documentation] for a possible approach to take for draining all nodes of an OpenShift 4 cluster.
+
 . Delete holder pods
-
-[WARNING]
++
+[IMPORTANT]
 ====
-Running pods will still use the holder pods.
-You should evict the pods by draining each node to remount the volumes.
-
-[source,bash]
-----
-kubectl --as=cluster-admin drain <node-name> --ignore-daemonsets --delete-local-data
-----
+Make sure that all pods that mount volumes have been restarted before deleting the holder daemonsets.
 ====
-
++
 [source,bash]
 ----
 kubectl --as=cluster-admin delete -n syn-rook-ceph-operator daemonsets.apps csi-cephfsplugin-holder-cluster

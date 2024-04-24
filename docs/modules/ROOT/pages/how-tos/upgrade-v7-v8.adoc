@@ -1,0 +1,64 @@
+= Upgrading to Component Version v8.0.0
+
+The component was updated to use `HostNetwork` for the Ceph-CSI driver pods and to disable holder pods.
+
+Using `HostNetwork` for the Ceph-CSI driver pods avoids running into issues with existing mounts after the Ceph-CSI driver pods are restarted.
+Holder pods will be deprecated in one of the next Rook-Ceph releases.
+
+This how-to is intended for users which are upgrading an existing Rook-Ceph setup to component version v8.0.0 from a previous component version.
+
+== Prerequisites
+
+* `cluster-admin` access to the cluster
+* `kubectl`
+* `jq`
+
+== Steps
+
+. Upgrade the component to version v8.0.0 and wait for the upgrade to finish.
+Ensure the ArgoCD application is synced, in a healthy state, and the OSDs were restarted.
+
+. Delete the Ceph-CSI driver configmap:
++
+[source,bash]
+----
+kubectl --as=cluster-admin delete cm -n syn-rook-ceph-operator rook-ceph-csi-config
+----
+
+. Restart the Rook-Ceph operator:
++
+[source,bash]
+----
+kubectl --as=cluster-admin delete pod -n syn-rook-ceph-operator -l app=rook-ceph-operator
+----
+
+. Delete the Ceph-CSI driver pods:
++
+[source,bash]
+----
+kubectl --as=cluster-admin -n syn-rook-ceph-operator delete pod -l app=csi-cephfsplugin
+kubectl --as=cluster-admin -n syn-rook-ceph-operator delete pod -l app=csi-rbdplugin
+----
+
+. Drain each node in the cluster to ensure no volume mounts still rely on the holder pods
++
+Refer to the relevant documentation for your Kubernetes distribution for commands to safely drain each node in your cluster.
+See the https://kb.vshn.ch/oc4/how-tos/force-reboot.html[APPUiO Managed OpenShift 4 documentation] for a possible approach to take for draining all nodes of an OpenShift 4 cluster.
+
+. Delete holder pods
++
+[IMPORTANT]
+====
+Make sure that all pods that mount volumes have been restarted before deleting the holder daemonsets.
+====
++
+[source,bash]
+----
+kubectl --as=cluster-admin delete -n syn-rook-ceph-operator daemonsets.apps csi-cephfsplugin-holder-cluster
+kubectl --as=cluster-admin delete -n syn-rook-ceph-operator daemonsets.apps csi-rbdplugin-holder-cluster
+----
+
+== Sources
+
+* https://github.com/rook/rook/issues/12254[rook/rook#12254 Unable to revert back to host network from multus]
+* https://rook.io/docs/rook/v1.14/CRDs/Cluster/network-providers/#disabling-holder-pods[Holder Pod Deprecation]

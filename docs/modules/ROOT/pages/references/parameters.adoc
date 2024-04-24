@@ -490,7 +490,7 @@ The Helm values to use when rendering the rook-ceph operator Helm chart.
 
 A few Helm values are configured based on other component parameters by default:
 
-* The data in parameter `images` is used to set the `image.repository`, `image.tag`, and `csi.cephcsi.image` Helm values
+* The data in parameter `images` is used to set the `image.repository`, `image.tag`, `csi.cephcsi.repository`, and `csi.cephcsi.tag` Helm values
 * The value of `node_selector` is used to set Helm value `nodeSelector`
 * The value of `tolerations` is used to set Helm value `tolerations`
 * The component ensures that `hostpathRequiresPrivileged` is enabled on OpenShift 4 regardless of the contents of the Helm value.

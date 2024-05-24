@@ -21,6 +21,16 @@
   "separateMinorPatch": true,
   "packageRules": [
     {
+      "matchUpdateTypes": ["patch"],
+      "matchCurrentVersion": "!/^v?0\\./",
+      "automerge": true,
+      "platformAutomerge": false,
+      "labels": [
+        "dependency",
+        "automerge"
+      ]
+    },
+    {
       "matchPackageNames": ["rook-ceph", "docker.io/rook/ceph"],
       "groupName": "dependency Rook"
     }

@@ -3711,6 +3711,7 @@ spec:
                             type: boolean
                           name:
                             description: Name is a unique identifier for the set
+                            maxLength: 40
                             type: string
                           placement:
                             nullable: true
@@ -5380,6 +5381,12 @@ spec:
                 storage:
                   description: CephStorage represents flavors of Ceph Cluster Storage
                   properties:
+                    deprecatedOSDs:
+                      additionalProperties:
+                        items:
+                          type: integer
+                        type: array
+                      type: object
                     deviceClasses:
                       items:
                         description: DeviceClasses represents device classes of a

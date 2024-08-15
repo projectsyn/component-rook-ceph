@@ -236,7 +236,7 @@ parameters:
       kubectl:
         registry: docker.io
         image: bitnami/kubectl
-        tag: '1.28.12@sha256:e9d32369b107d0ceeee228c4dc19eff372c26009f29a2fc8f22327508f608542'
+        tag: '1.28.13@sha256:b4c5ede7592ee89ab4e3ef417a7cd92004e0b34442c55f743c954c9af0474707'
 
     charts:
       # We do not support helm chart versions older than v1.7.0

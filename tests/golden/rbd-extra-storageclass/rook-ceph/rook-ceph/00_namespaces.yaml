@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/node-selector: ''
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: syn-rook-ceph-operator
+    name: syn-rook-ceph-operator
+    openshift.io/cluster-monitoring: 'true'
+  name: syn-rook-ceph-operator
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/node-selector: ''
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: syn-rook-ceph-cluster
+    name: syn-rook-ceph-cluster
+    openshift.io/cluster-monitoring: 'true'
+  name: syn-rook-ceph-cluster

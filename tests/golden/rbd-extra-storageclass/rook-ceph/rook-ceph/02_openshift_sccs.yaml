@@ -1,0 +1,81 @@
+allowHostDirVolumePlugin: true
+allowHostIPC: true
+allowHostNetwork: true
+allowHostPID: false
+allowHostPorts: true
+allowPrivilegedContainer: true
+allowedCapabilities:
+  - MKNOD
+apiVersion: security.openshift.io/v1
+defaultAddCapabilities: []
+fsGroup:
+  type: MustRunAs
+kind: SecurityContextConstraints
+metadata:
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: rook-ceph
+  name: rook-ceph
+priority: null
+readOnlyRootFilesystem: false
+requiredDropCapabilities:
+  - All
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+users:
+  - system:serviceaccount:syn-rook-ceph-operator:rook-ceph-system
+  - system:serviceaccount:syn-rook-ceph-cluster:default
+  - system:serviceaccount:syn-rook-ceph-cluster:rook-ceph-default
+  - system:serviceaccount:syn-rook-ceph-cluster:rook-ceph-mgr
+  - system:serviceaccount:syn-rook-ceph-cluster:rook-ceph-osd
+volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - hostPath
+  - persistentVolumeClaim
+  - projected
+  - secret
+---
+allowHostDirVolumePlugin: true
+allowHostIPC: true
+allowHostNetwork: true
+allowHostPID: true
+allowHostPorts: true
+allowPrivilegedContainer: true
+allowedCapabilities:
+  - SYS_ADMIN
+apiVersion: security.openshift.io/v1
+fsGroup:
+  type: RunAsAny
+kind: SecurityContextConstraints
+metadata:
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: rook-ceph-csi
+  name: rook-ceph-csi
+priority: null
+readOnlyRootFilesystem: false
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+users:
+  - system:serviceaccount:syn-rook-ceph-operator:rook-csi-rbd-plugin-sa
+  - system:serviceaccount:syn-rook-ceph-operator:rook-csi-rbd-provisioner-sa
+  - system:serviceaccount:syn-rook-ceph-operator:rook-csi-cephfs-plugin-sa
+  - system:serviceaccount:syn-rook-ceph-operator:rook-csi-cephfs-provisioner-sa
+  - system:serviceaccount:syn-rook-ceph-operator:default
+volumes:
+  - configMap
+  - emptyDir
+  - hostPath
+  - projected

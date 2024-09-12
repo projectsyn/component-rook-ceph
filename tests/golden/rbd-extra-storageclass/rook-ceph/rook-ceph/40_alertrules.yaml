@@ -1,0 +1,875 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: syn-prometheus-ceph-rules
+    prometheus: rook-prometheus
+    role: alert-rules
+  name: syn-prometheus-ceph-rules
+  namespace: syn-rook-ceph-cluster
+spec:
+  groups:
+    - name: cluster health
+      rules:
+        - alert: SYN_CephHealthError
+          annotations:
+            description: The cluster state has been HEALTH_ERROR for more than 5 minutes.
+              Please check 'ceph health detail' for more information.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephHealthError.html
+            summary: Ceph is in the ERROR state
+          expr: ceph_health_status == 2
+          for: 5m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.2.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephHealthWarning
+          annotations:
+            description: The cluster state has been HEALTH_WARN for more than 15 minutes.
+              Please check 'ceph health detail' for more information.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephHealthWarning.html
+            summary: Ceph is in the WARNING state
+          expr: ceph_health_status == 1
+          for: 15m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: mon
+      rules:
+        - alert: SYN_CephMonDownQuorumAtRisk
+          annotations:
+            description: '{{ $min := query "floor(count(ceph_mon_metadata) / 2) +
+              1" | first | value }}Quorum requires a majority of monitors (x {{ $min
+              }}) to be active. Without quorum the cluster will become inoperable,
+              affecting all services and connected clients. The following monitors
+              are down: {{- range query "(ceph_mon_quorum_status == 0) + on(ceph_daemon)
+              group_left(hostname) (ceph_mon_metadata * 0)" }} - {{ .Labels.ceph_daemon
+              }} on {{ .Labels.hostname }} {{- end }}'
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-down
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephMonDownQuorumAtRisk.html
+            summary: Monitor quorum is at risk
+          expr: |
+            (
+              (ceph_health_detail{name="MON_DOWN"} == 1) * on() (
+                count(ceph_mon_quorum_status == 1) == bool (floor(count(ceph_mon_metadata) / 2) + 1)
+              )
+            ) == 1
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.3.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephMonDown
+          annotations:
+            description: |
+              {{ $down := query "count(ceph_mon_quorum_status == 0)" | first | value }}{{ $s := "" }}{{ if gt $down 1.0 }}{{ $s = "s" }}{{ end }}You have {{ $down }} monitor{{ $s }} down. Quorum is still intact, but the loss of an additional monitor will make your cluster inoperable.  The following monitors are down: {{- range query "(ceph_mon_quorum_status == 0) + on(ceph_daemon) group_left(hostname) (ceph_mon_metadata * 0)" }}   - {{ .Labels.ceph_daemon }} on {{ .Labels.hostname }} {{- end }}
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#mon-down
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephMonDown.html
+            summary: One or more monitors down
+          expr: |
+            count(ceph_mon_quorum_status == 0) <= (count(ceph_mon_metadata) - floor(count(ceph_mon_metadata) / 2) + 1)
+          for: 30s
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: osd
+      rules:
+        - alert: SYN_CephOSDDown
+          annotations:
+            description: |
+              {{ $num := query "count(ceph_osd_up == 0)" | first | value }}{{ $s := "" }}{{ if gt $num 1.0 }}{{ $s = "s" }}{{ end }}{{ $num }} OSD{{ $s }} down for over 5mins. The following OSD{{ $s }} {{ if eq $s "" }}is{{ else }}are{{ end }} down: {{- range query "(ceph_osd_up * on(ceph_daemon) group_left(hostname) ceph_osd_metadata) == 0"}} - {{ .Labels.ceph_daemon }} on {{ .Labels.hostname }} {{- end }}
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-down
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDDown.html
+            summary: An OSD has been marked down
+          expr: ceph_health_detail{name="OSD_DOWN"} == 1
+          for: 5m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.4.2
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephOSDFull
+          annotations:
+            description: An OSD has reached the FULL threshold. Writes to pools that
+              share the affected OSD will be blocked. Use 'ceph health detail' and
+              'ceph osd df' to identify the problem. To resolve, add capacity to the
+              affected OSD's failure domain, restore down/out OSDs, or delete unwanted
+              data.
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#osd-full
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDFull.html
+            summary: OSD full, writes blocked
+          expr: ceph_health_detail{name="OSD_FULL"} > 0
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.4.6
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephOSDFlapping
+          annotations:
+            description: OSD {{ $labels.ceph_daemon }} on {{ $labels.hostname }} was
+              marked down and back up {{ $value | humanize }} times once a minute
+              for 5 minutes. This may indicate a network issue (latency, packet loss,
+              MTU mismatch) on the cluster network, or the public network if no cluster
+              network is deployed. Check the network stats on the listed host(s).
+            documentation: https://docs.ceph.com/en/latest/rados/troubleshooting/troubleshooting-osd#flapping-osds
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephOSDFlapping.html
+            summary: Network issues are causing OSDs to flap (mark each other down)
+          expr: (rate(ceph_osd_up[5m]) * on(ceph_daemon) group_left(hostname) ceph_osd_metadata)
+            * 60 > 1
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.4.4
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: mds
+      rules:
+        - alert: SYN_CephFilesystemDamaged
+          annotations:
+            description: Filesystem metadata has been corrupted. Data may be inaccessible.
+              Analyze metrics from the MDS daemon admin socket, or escalate to support.
+            documentation: https://docs.ceph.com/en/latest/cephfs/health-messages#cephfs-health-messages
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemDamaged.html
+            summary: CephFS filesystem is damaged.
+          expr: ceph_health_detail{name="MDS_DAMAGE"} > 0
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.5.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephFilesystemOffline
+          annotations:
+            description: All MDS ranks are unavailable. The MDS daemons managing metadata
+              are down, rendering the filesystem offline.
+            documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#mds-all-down
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemOffline.html
+            summary: CephFS filesystem is offline
+          expr: ceph_health_detail{name="MDS_ALL_DOWN"} > 0
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.5.3
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephFilesystemDegraded
+          annotations:
+            description: One or more metadata daemons (MDS ranks) are failed or in
+              a damaged state. At best the filesystem is partially available, at worst
+              the filesystem is completely unusable.
+            documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#fs-degraded
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemDegraded.html
+            summary: CephFS filesystem is degraded
+          expr: ceph_health_detail{name="FS_DEGRADED"} > 0
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.5.4
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephFilesystemFailureNoStandby
+          annotations:
+            description: An MDS daemon has failed, leaving only one active rank and
+              no available standby. Investigate the cause of the failure or add a
+              standby MDS.
+            documentation: https://docs.ceph.com/en/latest/cephfs/health-messages/#fs-with-failed-mds
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemFailureNoStandby.html
+            summary: MDS daemon failed, no further standby available
+          expr: ceph_health_detail{name="FS_WITH_FAILED_MDS"} > 0
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.5.5
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephFilesystemReadOnly
+          annotations:
+            description: The filesystem has switched to READ ONLY due to an unexpected
+              error when writing to the metadata pool. Either analyze the output from
+              the MDS daemon admin socket, or escalate to support.
+            documentation: https://docs.ceph.com/en/latest/cephfs/health-messages#cephfs-health-messages
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephFilesystemReadOnly.html
+            summary: CephFS filesystem in read only mode due to write error(s)
+          expr: ceph_health_detail{name="MDS_HEALTH_READ_ONLY"} > 0
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.5.2
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: mgr
+      rules:
+        - alert: SYN_CephMgrModuleCrash
+          annotations:
+            description: One or more mgr modules have crashed and have yet to be acknowledged
+              by an administrator. A crashed module may impact functionality within
+              the cluster. Use the 'ceph crash' command to determine which module
+              has failed, and archive it to acknowledge the failure.
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#recent-mgr-module-crash
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephMgrModuleCrash.html
+            summary: A manager module has recently crashed
+          expr: ceph_health_detail{name="RECENT_MGR_MODULE_CRASH"} == 1
+          for: 5m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.6.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephMgrPrometheusModuleInactive
+          annotations:
+            description: The mgr/prometheus module at {{ $labels.instance }} is unreachable.
+              This could mean that the module has been disabled or the mgr daemon
+              itself is down. Without the mgr/prometheus module metrics and alerts
+              will no longer function. Open a shell to an admin node or toolbox pod
+              and use 'ceph -s' to to determine whether the mgr is active. If the
+              mgr is not active, restart it, otherwise you can determine module status
+              with 'ceph mgr module ls'. If it is not listed as enabled, enable it
+              with 'ceph mgr module enable prometheus'.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephMgrPrometheusModuleInactive.html
+            summary: The mgr/prometheus module is not available
+          expr: up{job="ceph"} == 0
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.6.2
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: pgs
+      rules:
+        - alert: SYN_CephPGsInactive
+          annotations:
+            description: '{{ $value }} PGs have been inactive for more than 5 minutes
+              in pool {{ $labels.name }}. Inactive placement groups are not able to
+              serve read/write requests.'
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGsInactive.html
+            summary: One or more placement groups are inactive
+          expr: ceph_pool_metadata * on(pool_id,instance) group_left() (ceph_pg_total
+            - ceph_pg_active) > 0
+          for: 5m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.7.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephPGsDamaged
+          annotations:
+            description: During data consistency checks (scrub), at least one PG has
+              been flagged as being damaged or inconsistent. Check to see which PG
+              is affected, and attempt a manual repair if necessary. To list problematic
+              placement groups, use 'rados list-inconsistent-pg <pool>'. To repair
+              PGs use the 'ceph pg repair <pg_num>' command.
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-damaged
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGsDamaged.html
+            summary: Placement group damaged, manual intervention needed
+          expr: ceph_health_detail{name=~"PG_DAMAGED|OSD_SCRUB_ERRORS"} == 1
+          for: 5m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.7.4
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephPGRecoveryAtRisk
+          annotations:
+            description: Data redundancy is at risk since one or more OSDs are at
+              or above the 'full' threshold. Add more capacity to the cluster, restore
+              down/out OSDs, or delete unwanted data.
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-recovery-full
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGRecoveryAtRisk.html
+            summary: OSDs are too full for recovery
+          expr: ceph_health_detail{name="PG_RECOVERY_FULL"} == 1
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.7.5
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephPGUnavailableBlockingIO
+          annotations:
+            description: Data availability is reduced, impacting the cluster's ability
+              to service I/O. One or more placement groups (PGs) are in a state that
+              blocks I/O.
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-availability
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGUnavailableBlockingIO.html
+            summary: PG is unavailable, blocking I/O
+          expr: ((ceph_health_detail{name="PG_AVAILABILITY"} == 1) - scalar(ceph_health_detail{name="OSD_DOWN"}))
+            == 1
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.7.3
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephPGBackfillAtRisk
+          annotations:
+            description: Data redundancy may be at risk due to lack of free space
+              within the cluster. One or more OSDs have reached the 'backfillfull'
+              threshold. Add more capacity, or delete unwanted data.
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pg-backfill-full
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPGBackfillAtRisk.html
+            summary: Backfill operations are blocked due to lack of free space
+          expr: ceph_health_detail{name="PG_BACKFILL_FULL"} == 1
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.7.6
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: nodes
+      rules:
+        - alert: SYN_CephNodeRootFilesystemFull
+          annotations:
+            description: 'Root volume is dangerously full: {{ $value | humanize }}%
+              free.'
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephNodeRootFilesystemFull.html
+            summary: Root filesystem is dangerously full
+          expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}
+            * 100 < 5
+          for: 5m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.8.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephNodeNetworkBondDegraded
+          annotations:
+            description: Bond {{ $labels.master }} is degraded on Node {{ $labels.instance
+              }}.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephNodeNetworkBondDegraded.html
+            summary: Degraded Bond on Node {{ $labels.instance }}
+          expr: |
+            node_bonding_slaves - node_bonding_active != 0
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: pools
+      rules:
+        - alert: SYN_CephPoolFull
+          annotations:
+            description: A pool has reached its MAX quota, or OSDs supporting the
+              pool have reached the FULL threshold. Until this is resolved, writes
+              to the pool will be blocked. Pool Breakdown (top 5) {{- range query
+              "topk(5, sort_desc(ceph_pool_percent_used * on(pool_id) group_right
+              ceph_pool_metadata))" }} - {{ .Labels.name }} at {{ .Value }}% {{- end
+              }} Increase the pool's quota, or add capacity to the cluster first then
+              increase the pool's quota (e.g. ceph osd pool set quota <pool_name>
+              max_bytes <bytes>)
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#pool-full
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephPoolFull.html
+            summary: Pool is full - writes are blocked
+          expr: ceph_health_detail{name="POOL_FULL"} > 0
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.9.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: healthchecks
+      rules:
+        - alert: SYN_CephDaemonSlowOps
+          annotations:
+            description: '{{ $labels.ceph_daemon }} operations are taking too long
+              to process (complaint time exceeded)'
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#slow-ops
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephDaemonSlowOps.html
+            summary: '{{ $labels.ceph_daemon }} operations are slow to complete'
+          expr: ceph_daemon_health_metrics{type="SLOW_OPS"} > 0
+          for: 30s
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: hardware
+      rules:
+        - alert: SYN_HardwareStorageError
+          annotations:
+            description: Some storage devices are in error. Check `ceph health detail`.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/HardwareStorageError.html
+            summary: Storage devices error(s) detected
+          expr: ceph_health_detail{name="HARDWARE_STORAGE"} > 0
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.13.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_HardwareMemoryError
+          annotations:
+            description: DIMM error(s) detected. Check `ceph health detail`.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/HardwareMemoryError.html
+            summary: DIMM error(s) detected
+          expr: ceph_health_detail{name="HARDWARE_MEMORY"} > 0
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.13.2
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_HardwareProcessorError
+          annotations:
+            description: Processor error(s) detected. Check `ceph health detail`.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/HardwareProcessorError.html
+            summary: Processor error(s) detected
+          expr: ceph_health_detail{name="HARDWARE_PROCESSOR"} > 0
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.13.3
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_HardwareNetworkError
+          annotations:
+            description: Network error(s) detected. Check `ceph health detail`.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/HardwareNetworkError.html
+            summary: Network error(s) detected
+          expr: ceph_health_detail{name="HARDWARE_NETWORK"} > 0
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.13.4
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_HardwarePowerError
+          annotations:
+            description: Power supply error(s) detected. Check `ceph health detail`.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/HardwarePowerError.html
+            summary: Power supply error(s) detected
+          expr: ceph_health_detail{name="HARDWARE_POWER"} > 0
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.13.5
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_HardwareFanError
+          annotations:
+            description: Fan error(s) detected. Check `ceph health detail`.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/HardwareFanError.html
+            summary: Fan error(s) detected
+          expr: ceph_health_detail{name="HARDWARE_FANS"} > 0
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.13.6
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: PrometheusServer
+      rules:
+        - alert: SYN_PrometheusJobMissing
+          annotations:
+            description: The prometheus job that scrapes from Ceph MGR is no longer
+              defined, this will effectively mean you'll have no metrics or alerts
+              for the cluster.  Please review the job definitions in the prometheus.yml
+              file of the prometheus instance.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/PrometheusJobMissing.html
+            summary: The scrape job for Ceph MGR is missing from Prometheus
+          expr: absent(up{job="rook-ceph-mgr"})
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.12.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_PrometheusJobExporterMissing
+          annotations:
+            description: The prometheus job that scrapes from Ceph Exporter is no
+              longer defined, this will effectively mean you'll have no metrics or
+              alerts for the cluster.  Please review the job definitions in the prometheus.yml
+              file of the prometheus instance.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/PrometheusJobExporterMissing.html
+            summary: The scrape job for Ceph Exporter is missing from Prometheus
+          expr: sum(absent(up{job="rook-ceph-exporter"})) and sum(ceph_osd_metadata{ceph_version=~"^ceph
+            version (1[89]|[2-9][0-9]).*"}) > 0
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.12.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: rados
+      rules:
+        - alert: SYN_CephObjectMissing
+          annotations:
+            description: The latest version of a RADOS object can not be found, even
+              though all OSDs are up. I/O requests for this object from clients will
+              block (hang). Resolving this issue may require the object to be rolled
+              back to a prior version manually, and manually verified.
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks#object-unfound
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephObjectMissing.html
+            summary: Object(s) marked UNFOUND
+          expr: (ceph_health_detail{name="OBJECT_UNFOUND"} == 1) * on() (count(ceph_osd_up
+            == 1) == bool count(ceph_osd_metadata)) == 1
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.10.1
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: generic
+      rules:
+        - alert: SYN_CephDaemonCrash
+          annotations:
+            description: One or more daemons have crashed recently, and need to be
+              acknowledged. This notification ensures that software crashes do not
+              go unseen. To acknowledge a crash, use the 'ceph crash archive <id>'
+              command.
+            documentation: https://docs.ceph.com/en/latest/rados/operations/health-checks/#recent-crash
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephDaemonCrash.html
+            summary: One or more Ceph daemons have crashed, and are pending acknowledgement
+          expr: ceph_health_detail{name="RECENT_CRASH"} == 1
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.1.2
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: rbdmirror
+      rules:
+        - alert: SYN_CephRBDMirrorImagesPerDaemonHigh
+          annotations:
+            description: Number of image replications per daemon is not supposed to
+              go beyond threshold 100
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephRBDMirrorImagesPerDaemonHigh.html
+            summary: Number of image replications are now above 100
+          expr: sum by (ceph_daemon, namespace) (ceph_rbd_mirror_snapshot_image_snapshots)
+            > 100
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.10.2
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephRBDMirrorImagesNotInSync
+          annotations:
+            description: Both local and remote RBD mirror images should be in sync.
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephRBDMirrorImagesNotInSync.html
+            summary: Some of the RBD mirror images are not in sync with the remote
+              counter parts.
+          expr: sum by (ceph_daemon, image, namespace, pool) (topk by (ceph_daemon,
+            image, namespace, pool) (1, ceph_rbd_mirror_snapshot_image_local_timestamp)
+            - topk by (ceph_daemon, image, namespace, pool) (1, ceph_rbd_mirror_snapshot_image_remote_timestamp))
+            != 0
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.10.3
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephRBDMirrorImagesNotInSyncVeryHigh
+          annotations:
+            description: More than 10% of the images have synchronization problems
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephRBDMirrorImagesNotInSyncVeryHigh.html
+            summary: Number of unsynchronized images are very high.
+          expr: count by (ceph_daemon) ((topk by (ceph_daemon, image, namespace, pool)
+            (1, ceph_rbd_mirror_snapshot_image_local_timestamp) - topk by (ceph_daemon,
+            image, namespace, pool) (1, ceph_rbd_mirror_snapshot_image_remote_timestamp))
+            != 0) > (sum by (ceph_daemon) (ceph_rbd_mirror_snapshot_snapshots)*.1)
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.10.4
+            severity: critical
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_CephRBDMirrorImageTransferBandwidthHigh
+          annotations:
+            description: Detected a heavy increase in bandwidth for rbd replications
+              (over 80%) in the last 30 min. This might not be a problem, but it is
+              good to review the number of images being replicated simultaneously
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/CephRBDMirrorImageTransferBandwidthHigh.html
+            summary: The replication network usage has been increased over 80% in
+              the last 30 minutes. Review the number of images being replicated. This
+              alert will be cleaned automatically after 30 minutes
+          expr: rate(ceph_rbd_mirror_journal_replay_bytes[30m]) > 0.80
+          for: 1m
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.10.5
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: nvmeof
+      rules:
+        - alert: SYN_NVMeoFSubsystemNamespaceLimit
+          annotations:
+            description: Subsystems have a max namespace limit defined at creation
+              time. This alert means that no more namespaces can be added to {{ $labels.nqn
+              }}
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFSubsystemNamespaceLimit.html
+            summary: '{{ $labels.nqn }} subsystem has reached its maximum number of
+              namespaces '
+          expr: (count by(nqn) (ceph_nvmeof_subsystem_namespace_metadata)) >= ceph_nvmeof_subsystem_namespace_limit
+          for: 1m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFTooManyGateways
+          annotations:
+            description: You may create many gateways, but 4 is the tested limit
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFTooManyGateways.html
+            summary: 'Max supported gateways exceeded '
+          expr: count(ceph_nvmeof_gateway_info) > 4.00
+          for: 1m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFMaxGatewayGroupSize
+          annotations:
+            description: You may create many gateways in a gateway group, but 2 is
+              the tested limit
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFMaxGatewayGroupSize.html
+            summary: 'Max gateways within a gateway group ({{ $labels.group }}) exceeded '
+          expr: count by(group) (ceph_nvmeof_gateway_info) > 2.00
+          for: 1m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFSingleGatewayGroup
+          annotations:
+            description: Although a single member gateway group is valid, it should
+              only be used for test purposes
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFSingleGatewayGroup.html
+            summary: 'The gateway group {{ $labels.group }} consists of a single gateway
+              - HA is not possible '
+          expr: count by(group) (ceph_nvmeof_gateway_info) == 1
+          for: 5m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFHighGatewayCPU
+          annotations:
+            description: Typically, high CPU may indicate degraded performance. Consider
+              increasing the number of reactor cores
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFHighGatewayCPU.html
+            summary: 'CPU used by {{ $labels.instance }} NVMe-oF Gateway is high '
+          expr: label_replace(avg by(instance) (rate(ceph_nvmeof_reactor_seconds_total{mode="busy"}[1m])),"instance","$1","instance","(.*):.*")
+            > 80.00
+          for: 10m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFGatewayOpenSecurity
+          annotations:
+            description: It is good practice to ensure subsystems use host security
+              to reduce the risk of unexpected data loss
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFGatewayOpenSecurity.html
+            summary: 'Subsystem {{ $labels.nqn }} has been defined without host level
+              security '
+          expr: ceph_nvmeof_subsystem_metadata{allow_any_host="yes"}
+          for: 5m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFTooManySubsystems
+          annotations:
+            description: Although you may continue to create subsystems in {{ $labels.gateway_host
+              }}, the configuration may not be supported
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFTooManySubsystems.html
+            summary: 'The number of subsystems defined to the gateway exceeds supported
+              values '
+          expr: count by(gateway_host) (label_replace(ceph_nvmeof_subsystem_metadata,"gateway_host","$1","instance","(.*):.*"))
+            > 16.00
+          for: 1m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFVersionMismatch
+          annotations:
+            description: This may indicate an issue with deployment. Check cephadm
+              logs
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFVersionMismatch.html
+            summary: 'The cluster has different NVMe-oF gateway releases active '
+          expr: count(count by(version) (ceph_nvmeof_gateway_info)) > 1
+          for: 1h
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFHighClientCount
+          annotations:
+            description: The supported limit for clients connecting to a subsystem
+              is 32
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFHighClientCount.html
+            summary: 'The number of clients connected to {{ $labels.nqn }} is too
+              high '
+          expr: ceph_nvmeof_subsystem_host_count > 32.00
+          for: 1m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFHighHostCPU
+          annotations:
+            description: High CPU on a gateway host can lead to CPU contention and
+              performance degradation
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFHighHostCPU.html
+            summary: 'The CPU is high ({{ $value }}%) on NVMeoF Gateway host ({{ $labels.host
+              }}) '
+          expr: 100-((100*(avg by(host) (label_replace(rate(node_cpu_seconds_total{mode="idle"}[5m]),"host","$1","instance","(.*):.*"))
+            * on(host) group_right label_replace(ceph_nvmeof_gateway_info,"host","$1","instance","(.*):.*"))))
+            >= 80.00
+          for: 10m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFInterfaceDown
+          annotations:
+            description: A NIC used by one or more subsystems is in a down state
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFInterfaceDown.html
+            summary: 'Network interface {{ $labels.device }} is down '
+          expr: ceph_nvmeof_subsystem_listener_iface_info{operstate="down"}
+          for: 30s
+          labels:
+            oid: 1.3.6.1.4.1.50495.1.2.1.14.1
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFInterfaceDuplex
+          annotations:
+            description: Until this is resolved, performance from the gateway will
+              be degraded
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFInterfaceDuplex.html
+            summary: 'Network interface {{ $labels.device }} is not running in full
+              duplex mode '
+          expr: ceph_nvmeof_subsystem_listener_iface_info{duplex!="full"}
+          for: 30s
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFHighReadLatency
+          annotations:
+            description: High latencies may indicate a constraint within the cluster
+              e.g. CPU, network. Please investigate
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFHighReadLatency.html
+            summary: The average read latency over the last 5 mins has reached 10
+              ms or more on {{ $labels.gateway }}
+          expr: label_replace((avg by(instance) ((rate(ceph_nvmeof_bdev_read_seconds_total[1m])
+            / rate(ceph_nvmeof_bdev_reads_completed_total[1m])))),"gateway","$1","instance","(.*):.*")
+            > 0.01
+          for: 5m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+        - alert: SYN_NVMeoFHighWriteLatency
+          annotations:
+            description: High latencies may indicate a constraint within the cluster
+              e.g. CPU, network. Please investigate
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/NVMeoFHighWriteLatency.html
+            summary: The average write latency over the last 5 mins has reached 20
+              ms or more on {{ $labels.gateway }}
+          expr: label_replace((avg by(instance) ((rate(ceph_nvmeof_bdev_write_seconds_total[5m])
+            / rate(ceph_nvmeof_bdev_writes_completed_total[5m])))),"gateway","$1","instance","(.*):.*")
+            > 0.02
+          for: 5m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+            type: ceph_default
+    - name: syn-rook-ceph-additional.rules
+      rules:
+        - alert: RookCephOperatorScaledDown
+          annotations:
+            runbook_url: https://hub.syn.tools/rook-ceph/runbooks/RookCephOperatorScaledDown.html
+            summary: rook-ceph operator scaled to 0 for more than 1 hour.
+          expr: kube_deployment_spec_replicas{deployment="rook-ceph-operator", namespace="syn-rook-ceph-operator"}
+            == 0
+          for: 1h
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: rook-ceph
+        - expr: sum(ceph_mon_num_sessions{})
+          record: ceph_mon_num_sessions:sum
+        - expr: count(ceph_mon_quorum_status{})
+          record: ceph_mon_quorum_status:count
+        - expr: avg(ceph_osd_apply_latency_ms{})
+          record: ceph_osd_apply_latency_ms:avg
+        - expr: avg(ceph_osd_commit_latency_ms{})
+          record: ceph_osd_commit_latency_ms:avg
+        - expr: sum(ceph_osd_numpg{})
+          record: ceph_osd_numpg:sum
+        - expr: sum(rate(ceph_osd_op_r{}[5m]))
+          record: ceph_osd_op_r:rate5m
+        - expr: avg(rate(ceph_osd_op_r_latency_sum{}[5m]) / rate(ceph_osd_op_r_latency_count{}[5m])
+            >= 0)
+          record: ceph_osd_op_r_latency:avg5m
+        - expr: sum(rate(ceph_osd_op_r_out_bytes{}[5m]))
+          record: ceph_osd_op_r_out_bytes:rate5m
+        - expr: sum(ceph_osd_op_r_out_bytes{})
+          record: ceph_osd_op_r_out_bytes:sum
+        - expr: sum(rate(ceph_osd_op_w{}[5m]))
+          record: ceph_osd_op_w:rate5m
+        - expr: sum(rate(ceph_osd_op_w_in_bytes{}[5m]))
+          record: ceph_osd_op_w_in_bytes:rate5m
+        - expr: sum(ceph_osd_op_w_in_bytes{})
+          record: ceph_osd_op_w_in_bytes:sum
+        - expr: avg(rate(ceph_osd_op_w_latency_sum{}[5m]) / rate(ceph_osd_op_w_latency_count{}[5m])
+            >= 0)
+          record: ceph_osd_op_w_latency:avg5m
+        - expr: sum(ceph_pool_objects{})
+          record: ceph_pool_objects:sum

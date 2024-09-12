@@ -1,0 +1,32 @@
+applications:
+  - openshift4-monitoring
+
+parameters:
+  facts:
+    distribution: openshift4
+  kapitan:
+    dependencies:
+      - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-storageclass/v1.0.0/lib/storageclass.libsonnet
+        output_path: vendor/lib/storageclass.libsonnet
+      - type: https
+        source: https://raw.githubusercontent.com/appuio/component-openshift4-monitoring/v3.5.0/lib/openshift4-monitoring-alert-patching.libsonnet
+        output_path: vendor/lib/alert-patching.libsonnet
+      - type: https
+        source: https://raw.githubusercontent.com/appuio/component-openshift4-monitoring/v3.5.0/lib/openshift4-monitoring-prom.libsonnet
+        output_path: vendor/lib/prom.libsonnet
+
+  storageclass:
+    defaults: {}
+    defaultClass: ""
+
+  rook_ceph:
+    ceph_cluster:
+      storage_pools:
+        rbd:
+          storagepool:
+            extra_storage_classes:
+              small-files:
+                parameters:
+                  csi.storage.k8s.io/fstype: ext4
+                  mkfsOptions: -m0 -Enodiscard,lazy_itable_init=1,lazy_journal_init=1 -i1024

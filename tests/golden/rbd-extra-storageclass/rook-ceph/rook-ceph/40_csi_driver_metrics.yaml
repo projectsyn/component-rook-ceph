@@ -1,0 +1,64 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: rook-ceph-metrics
+    name: rook-ceph-metrics
+  name: rook-ceph-metrics
+  namespace: syn-rook-ceph-operator
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - services
+      - endpoints
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: rook-ceph-metrics
+    name: rook-ceph-metrics
+  name: rook-ceph-metrics
+  namespace: syn-rook-ceph-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rook-ceph-metrics
+subjects:
+  - kind: ServiceAccount
+    name: prometheus-k8s
+    namespace: openshift-monitoring
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: csi-metrics
+    team: rook
+  name: csi-metrics
+  namespace: syn-rook-ceph-operator
+spec:
+  endpoints:
+    - interval: 5s
+      path: /metrics
+      port: csi-http-metrics
+  namespaceSelector:
+    matchNames:
+      - syn-rook-ceph-operator
+  selector:
+    matchLabels:
+      app: csi-metrics

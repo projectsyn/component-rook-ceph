@@ -20,11 +20,12 @@ local load_storageclass(type) =
   // return storageclass
   sc[0];
 
-local get_sc_config(type, pool) =
+local get_sc_config(type, pool, extra_class) =
   assert std.objectHas(params.ceph_cluster.storage_pools, type);
   assert std.objectHas(
     params.ceph_cluster.storage_pools[type], pool
   );
+  // we always use the pool-wide mount options
   local param_mount_options = com.getValueOrDefault(
     params.ceph_cluster.storage_pools[type][pool],
     'mount_options',
@@ -42,22 +43,44 @@ local get_sc_config(type, pool) =
       for opt in std.objectFields(param_mount_options)
     ]
   );
-  com.makeMergeable(com.getValueOrDefault(
-    params.ceph_cluster.storage_pools[type][pool],
-    'storage_class_config',
-    {}
-  )) +
-  {
+
+  // get default storage class config for pool
+  local sc_config =
+    com.makeMergeable(std.get(
+      params.ceph_cluster.storage_pools[type][pool],
+      'storage_class_config',
+      {}
+    ));
+
+  // get extra storage class config for additional storageclasses for pool
+  local sc_extra_config =
+    if extra_class != null then
+      com.makeMergeable(std.get(
+        std.get(
+          params.ceph_cluster.storage_pools[type][pool],
+          'extra_storage_classes',
+          {}
+        ),
+        extra_class
+      ))
+    else
+      {};
+
+  // all storage classes for the pool use the default sc config + potential
+  // extra config. This allows users to only specify the differences to the
+  // default class for extra classes.
+  sc_config + sc_extra_config + {
     mountOptions+: sc_mount_options,
   };
 
 // subpool used for CephFS
-local configure_sc(type, pool, subpool=null) =
+local configure_sc(type, pool, subpool=null, suffix=null) =
   local obj = load_storageclass(type);
-  local sc_config = get_sc_config(type, pool);
+  local sc_config = get_sc_config(type, pool, suffix);
   com.makeMergeable(obj) +
   sc.storageClass(
-    '%s-%s-%s' % [ type, pool, params.ceph_cluster.name ]
+    '%s-%s-%s' % [ type, pool, params.ceph_cluster.name ] +
+    if suffix != null then '-%s' % suffix else ''
   ) +
   sc_config +
   {

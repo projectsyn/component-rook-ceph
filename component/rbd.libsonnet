@@ -29,6 +29,12 @@ local rbd_blockpools = [
 local rbd_storageclasses = [
   sp.configure_storageclass('rbd', name)
   for name in std.objectFields(rbd_params)
+] + [
+  sp.configure_storageclass('rbd', name, suffix=suffix)
+  for name in std.objectFields(rbd_params)
+  for suffix in std.objectFields(
+    std.get(rbd_params[name], 'extra_storage_classes', {})
+  )
 ];
 
 local rbd_snapclass = [

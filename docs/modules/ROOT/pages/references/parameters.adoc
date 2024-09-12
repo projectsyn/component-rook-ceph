@@ -234,10 +234,12 @@ IMPORTANT: Storage class device sets added by `cephClusterSpec.storage.storageCl
 [horizontal]
 type:: dict
 keys:: Names of `CephBlockPool` resources
-values:: dicts with keys `config` and `mount_options`, and `storage_class_config`
+values:: dicts with keys `config` and `mount_options`, `storage_class_config`, and `extra_storage_classes`
 
 In this parameter `CephBlockPool` resources are configured.
-The component creates exactly one storageclass and volumesnapshotclass per block pool.
+The component creates one storageclass and volumesnapshotclass per block pool.
+
+NOTE: The component will create additional storage classes if field `extra_storage_classes` is provided.
 
 By default the parameter holds the following configuration:
 
@@ -263,7 +265,7 @@ This configuration results in
 * A storage class which creates PVs on this block pool, uses the `ext4` filesystem, supports volume expansion and configures PVs to be mounted with `-o discard`.
 * A `VolumeSnapshotClass` associated with the storage class
 
-See https://rook.io/docs/rook/v1.9/ceph-pool-crd.html[the Rook.io `CephBlockPool` CRD documentation] for all possible configurations in key `config`.
+See https://rook.github.io/docs/rook/v1.14/CRDs/Block-Storage/ceph-block-pool-crd/[the Rook.io `CephBlockPool` CRD documentation] for all possible configurations in key `config`.
 
 The values in key `storage_class_config` are merged into the `StorageClass` resource.
 
@@ -274,6 +276,35 @@ Providing a key with value `false` or `null` will result in the key not being ad
 
 See the filesystem documentation for the set of supported mount options.
 For example, see the list of supported mount options for `ext4` in the https://man7.org/linux/man-pages/man5/ext4.5.html#Mount_options_for_ext4[man page].
+
+==== `storage_pools.rbd.<poolname>.extra_storage_classes`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+
+.Example
+[source,yaml]
+----
+storagepool:
+  extra_storage_classes:
+    small-files:
+      parameters:
+        csi.storage.k8s.io/fstype: ext4 <1>
+        mkfsOptions: -m0 -Enodiscard,lazy_itable_init=1,lazy_journal_init=1 -i1024 <2>
+----
+<1> When providing `mkfsOptions` it makes sense to explicitly specify the fstype, since mismatched fstype and mkfsOptions will likely result in errors.
+Note that provinding `fstype` isn't strictly necessary, if the same fstype is set in `storage_pools.rbd.<poolname>.storage_class_config`.
+<2> `-m0 -Enodiscard,lazy_itable_init=1,lazy_journal_init=1` are the default `mkfsOptions` for ext4 in ceph-csi.
+
+This parameter allows users to configure additional storage classes for an RBD blockpool.
+The component will generate a storage class for each key-value pair in the parameter.
+
+The key will be used as a suffix for the storage class name.
+The resulting storage class name will have the form `rbd-<poolname>-<ceph cluster name>-<key>`.
+
+The component will use the configurations provided in `storage_pools.rbd.<poolname>.mount_options` and `storage_pools.rbd.<poolname>.storage_class_config` as the base for any storage classes defined here.
+The provided value will be merged into the base storage class definition.
 
 === `storage_pools.cephfs`
 

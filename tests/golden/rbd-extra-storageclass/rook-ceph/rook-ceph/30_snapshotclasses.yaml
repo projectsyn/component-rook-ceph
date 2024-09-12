@@ -1,0 +1,14 @@
+apiVersion: snapshot.storage.k8s.io/v1
+deletionPolicy: Delete
+driver: syn-rook-ceph-operator.rbd.csi.ceph.com
+kind: VolumeSnapshotClass
+metadata:
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: rook-ceph-rbd-cluster
+  name: rook-ceph-rbd-cluster
+parameters:
+  clusterID: syn-rook-ceph-cluster
+  csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/snapshotter-secret-namespace: syn-rook-ceph-cluster

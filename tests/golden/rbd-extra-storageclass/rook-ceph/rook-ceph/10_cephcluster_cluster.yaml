@@ -1,0 +1,84 @@
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: cluster
+    name: cluster
+  name: cluster
+  namespace: syn-rook-ceph-cluster
+spec:
+  cephVersion:
+    allowUnsupported: false
+    image: quay.io/ceph/ceph:v18.2.4
+  dataDirHostPath: /var/lib/rook
+  disruptionManagement:
+    managePodBudgets: true
+    osdMaintenanceTimeout: 30
+  healthCheck:
+    daemonHealth:
+      mon:
+        disabled: false
+        interval: 45s
+        timeout: 600s
+  mon:
+    allowMultiplePerNode: false
+    count: 3
+  monitoring:
+    enabled: true
+  network:
+    provider: host
+  placement:
+    all:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/storage
+                  operator: Exists
+      tolerations:
+        - key: storagenode
+          operator: Exists
+  resources:
+    mgr:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    mon:
+      limits:
+        cpu: 500m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 2Gi
+    osd:
+      limits:
+        cpu: '2'
+        memory: 5Gi
+      requests:
+        cpu: '2'
+        memory: 5Gi
+  storage:
+    storageClassDeviceSets:
+      - count: 3
+        encrypted: true
+        name: cluster
+        placement: {}
+        portable: false
+        tuneFastDeviceClass: false
+        volumeClaimTemplates:
+          - spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 1
+              storageClassName: localblock
+              volumeMode: Block
+    useAllDevices: false
+    useAllNodes: false

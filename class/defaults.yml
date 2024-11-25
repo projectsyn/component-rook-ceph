@@ -232,7 +232,7 @@ parameters:
       cephcsi:
         registry: quay.io
         image: cephcsi/cephcsi
-        tag: v3.12.2
+        tag: v3.12.3
       kubectl:
         registry: docker.io
         image: bitnami/kubectl

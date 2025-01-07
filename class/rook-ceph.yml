@@ -38,7 +38,7 @@ parameters:
       - input_paths:
           - rook-ceph/component/app.jsonnet
         input_type: jsonnet
-        output_path: apps/
+        output_path: .
       - input_paths:
           - rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
         input_type: helm

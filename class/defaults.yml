@@ -1,6 +1,7 @@
 parameters:
   rook_ceph:
-    =_metadata: {}
+    =_metadata:
+      multi_tenant: true
     namespace: syn-rook-ceph-operator
 
     ceph_cluster:

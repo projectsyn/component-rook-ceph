@@ -53,11 +53,8 @@ local ignore_alerts = std.set(
 local runbook(alertname) =
   'https://hub.syn.tools/rook-ceph/runbooks/%s.html' % alertname;
 
-local on_openshift =
-  inv.parameters.facts.distribution == 'openshift4';
-
 local alertpatching =
-  if on_openshift then
+  if helpers.on_openshift then
     import 'lib/alert-patching.libsonnet'
   else
     local patchRule(rule, patches={}, patch_name=true) =
@@ -91,7 +88,7 @@ local alertpatching =
     );
 
 local prom =
-  if on_openshift then
+  if helpers.on_openshift then
     import 'lib/prom.libsonnet'
   else
     std.trace(

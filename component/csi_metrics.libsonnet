@@ -5,12 +5,10 @@ local params = inv.parameters.rook_ceph;
 
 local helpers = import 'helpers.libsonnet';
 
-local on_openshift = inv.parameters.facts.distribution == 'openshift4';
-
 local ocp_role = helpers.metrics_role(params.namespace);
 
 local rbac =
-  if on_openshift then [
+  if helpers.on_openshift then [
     ocp_role,
     helpers.ocp_metrics_rolebinding(
       params.namespace,

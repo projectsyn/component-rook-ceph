@@ -6,8 +6,6 @@ local params = inv.parameters.rook_ceph;
 
 local helpers = import 'helpers.libsonnet';
 
-local on_openshift = inv.parameters.facts.distribution == 'openshift4';
-
 local serviceaccounts =
   if params.ceph_cluster.namespace != params.namespace then {
     [std.strReplace(suffix, '-', '_')]: kube.ServiceAccount('rook-ceph-%s' % suffix) {
@@ -26,7 +24,7 @@ local roles =
   if params.ceph_cluster.namespace != params.namespace then {
     // For OCP4 we need the metrics discovery role in the cluster
     // namespace, if it differs from the operator namespace.
-    [if on_openshift then 'metrics']:
+    [if helpers.on_openshift then 'metrics']:
       helpers.metrics_role(params.ceph_cluster.namespace),
     osd: kube.Role('rook-ceph-osd') {
       metadata+: {
@@ -100,7 +98,7 @@ local rolebindings =
   if params.ceph_cluster.namespace != params.namespace then
     (
       // For OCP4, we need the metrics discovery rolebinding
-      if on_openshift then [
+      if helpers.on_openshift then [
         helpers.ocp_metrics_rolebinding(
           params.ceph_cluster.namespace,
           roles.metrics,
@@ -284,7 +282,7 @@ local toolbox =
               super.containers[0] {
                 image: '%(registry)s/%(image)s:%(tag)s' % params.images.rook,
                 // Remove securityContext config on OCP4
-                [if on_openshift then 'securityContext']: {},
+                [if helpers.on_openshift then 'securityContext']: {},
               },
             ],
           tolerations: params.tolerations,

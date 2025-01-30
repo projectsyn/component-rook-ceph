@@ -2,10 +2,10 @@ parameters:
   kapitan:
     dependencies:
       - type: helm
-        source: https://charts.rook.io/release
+        source: ${rook_ceph:charts:rook-ceph:source}
         chart_name: rook-ceph
-        version: ${rook_ceph:charts:rook-ceph}
-        output_path: ${_base_directory}/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
+        version: ${rook_ceph:charts:rook-ceph:version}
+        output_path: ${_base_directory}/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph:version}
       - type: https
         source: https://raw.githubusercontent.com/rook/rook/${rook_ceph:images:rook:tag}/deploy/examples/csi/rbd/storageclass.yaml
         output_path: ${_base_directory}/manifests/${rook_ceph:images:rook:tag}/rbd-storageclass.yaml
@@ -40,7 +40,7 @@ parameters:
         input_type: jsonnet
         output_path: .
       - input_paths:
-          - rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph}
+          - rook-ceph/helmcharts/rook-ceph/${rook_ceph:charts:rook-ceph:version}
         input_type: helm
         output_type: yaml
         output_path: rook-ceph/01_rook_ceph_helmchart

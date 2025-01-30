@@ -55,9 +55,13 @@ local nodeAffinity = {
   },
 };
 
+local on_openshift =
+  std.member([ 'openshift4', 'oke' ], inv.parameters.facts.distribution);
+
 {
   load_manifest: load_manifest,
   metrics_role: metrics_role,
   ocp_metrics_rolebinding: ocp_metrics_rolebinding,
   nodeAffinity: nodeAffinity,
+  on_openshift: on_openshift,
 }

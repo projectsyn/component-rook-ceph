@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.14.10
+    helm.sh/chart: rook-ceph-v1.14.12
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -50,7 +50,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.14.10
+    helm.sh/chart: rook-ceph-v1.14.12
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -83,7 +83,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.14.10
+    helm.sh/chart: rook-ceph-v1.14.12
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -271,7 +271,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.14.10
+    helm.sh/chart: rook-ceph-v1.14.12
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -327,7 +327,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.14.10
+    helm.sh/chart: rook-ceph-v1.14.12
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -559,7 +559,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.14.10
+    helm.sh/chart: rook-ceph-v1.14.12
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin

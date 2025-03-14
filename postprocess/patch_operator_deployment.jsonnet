@@ -8,7 +8,7 @@ local params = inv.parameters.rook_ceph;
 // Respect user-provided configuration via `operator_helm_values` on
 // distributions other than OCP4.
 local hostpath_requires_privileged =
-  if inv.parameters.facts.distribution == 'openshift4' then
+  if std.member([ 'openshift4', 'oke' ], inv.parameters.facts.distribution) then
     true
   else
     com.getValueOrDefault(

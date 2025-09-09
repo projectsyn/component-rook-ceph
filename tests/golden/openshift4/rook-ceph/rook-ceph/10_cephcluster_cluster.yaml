@@ -12,7 +12,7 @@ metadata:
 spec:
   cephVersion:
     allowUnsupported: false
-    image: quay.io/ceph/ceph:v18.2.7
+    image: quay.io/ceph/ceph:v20.1.0
   dataDirHostPath: /var/lib/rook
   disruptionManagement:
     managePodBudgets: true

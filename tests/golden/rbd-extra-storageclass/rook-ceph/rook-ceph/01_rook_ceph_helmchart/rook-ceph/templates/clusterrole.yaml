@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.15.9
+    helm.sh/chart: rook-ceph-v1.16.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -94,7 +94,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.15.9
+    helm.sh/chart: rook-ceph-v1.16.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -127,7 +127,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.15.9
+    helm.sh/chart: rook-ceph-v1.16.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -315,7 +315,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.15.9
+    helm.sh/chart: rook-ceph-v1.16.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -371,7 +371,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.15.9
+    helm.sh/chart: rook-ceph-v1.16.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -579,9 +579,6 @@ rules:
       - get
       - list
       - watch
-      - update
-      - patch
-      - create
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
@@ -600,7 +597,6 @@ rules:
       - watch
       - patch
       - update
-      - create
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
@@ -653,7 +649,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.15.9
+    helm.sh/chart: rook-ceph-v1.16.9
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin
@@ -801,9 +797,6 @@ rules:
       - get
       - list
       - watch
-      - update
-      - patch
-      - create
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
@@ -822,7 +815,6 @@ rules:
       - watch
       - patch
       - update
-      - create
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:

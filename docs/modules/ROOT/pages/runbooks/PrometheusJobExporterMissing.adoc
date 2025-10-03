@@ -1,0 +1,13 @@
+= Alert rule: PrometheusJobExporterMissing
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+The prometheus job that scrapes from Ceph Exporter is no longer defined, this will effectively mean you'll have no metrics or alerts for the cluster.
+
+== icon:bug[] Steps for debugging
+
+. Check that the `prometheus-ceph-exporter` service monitor in the `syn-rook-ceph-cluster` namespace exists
+
+. On OpenShift, check that the namespace has the `openshift.io/cluster-monitoring=true` label

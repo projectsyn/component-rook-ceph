@@ -22,22 +22,22 @@ Ensure the ArgoCD application is synced, in a healthy state, and the OSDs were r
 +
 [source,bash]
 ----
-kubectl --as=cluster-admin delete cm -n syn-rook-ceph-operator rook-ceph-csi-config
+kubectl --as=system:admin delete cm -n syn-rook-ceph-operator rook-ceph-csi-config
 ----
 
 . Restart the Rook-Ceph operator:
 +
 [source,bash]
 ----
-kubectl --as=cluster-admin delete pod -n syn-rook-ceph-operator -l app=rook-ceph-operator
+kubectl --as=system:admin delete pod -n syn-rook-ceph-operator -l app=rook-ceph-operator
 ----
 
 . Delete the Ceph-CSI driver pods:
 +
 [source,bash]
 ----
-kubectl --as=cluster-admin -n syn-rook-ceph-operator delete pod -l app=csi-cephfsplugin
-kubectl --as=cluster-admin -n syn-rook-ceph-operator delete pod -l app=csi-rbdplugin
+kubectl --as=system:admin -n syn-rook-ceph-operator delete pod -l app=csi-cephfsplugin
+kubectl --as=system:admin -n syn-rook-ceph-operator delete pod -l app=csi-rbdplugin
 ----
 
 . Drain each node in the cluster to ensure no volume mounts still rely on the holder pods
@@ -54,8 +54,8 @@ Make sure that all pods that mount volumes have been restarted before deleting t
 +
 [source,bash]
 ----
-kubectl --as=cluster-admin delete -n syn-rook-ceph-operator daemonsets.apps csi-cephfsplugin-holder-cluster
-kubectl --as=cluster-admin delete -n syn-rook-ceph-operator daemonsets.apps csi-rbdplugin-holder-cluster
+kubectl --as=system:admin delete -n syn-rook-ceph-operator daemonsets.apps csi-cephfsplugin-holder-cluster
+kubectl --as=system:admin delete -n syn-rook-ceph-operator daemonsets.apps csi-rbdplugin-holder-cluster
 ----
 
 == Sources

@@ -35,7 +35,7 @@ kubectl get pv -ojson | \
 for pv in $(kubectl get pv -ojson |\
   jq -r '.items[] | select(.spec.storageClassName=="cephfs-fspool-cluster" and (.spec.mountOptions//[]) == ["discard"]) | .metadata.name');
 do
-  kubectl patch --as=cluster-admin pv $pv --type=json \
+  kubectl patch --as=system:admin pv $pv --type=json \
     -p '[{"op": "replace", "path": "/spec/mountOptions", "value": [] }]'
 done
 ----

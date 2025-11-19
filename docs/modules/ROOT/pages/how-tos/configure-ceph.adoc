@@ -107,9 +107,9 @@ At runtime, you can adjust the cluster's ratios with
 
 [source,bash]
 ----
-kubectl --as=cluster-admin exec -it deploy/rook-ceph-tools -- ceph osd set-full-ratio 0.9 <1>
-kubectl --as=cluster-admin exec -it deploy/rook-ceph-tools -- ceph osd set-nearfull-ratio 0.8 <2>
-kubectl --as=cluster-admin exec -it deploy/rook-ceph-tools -- ceph osd set-backfillfull-ratio 0.85 <3>
+kubectl --as=system:admin exec -it deploy/rook-ceph-tools -- ceph osd set-full-ratio 0.9 <1>
+kubectl --as=system:admin exec -it deploy/rook-ceph-tools -- ceph osd set-nearfull-ratio 0.8 <2>
+kubectl --as=system:admin exec -it deploy/rook-ceph-tools -- ceph osd set-backfillfull-ratio 0.85 <3>
 ----
 <1> Configure the cluster to become read-only (OSD status `full`) at 90% utilization.
 <2> Configure the threshold at which the OSD status becomes `nearfull`.

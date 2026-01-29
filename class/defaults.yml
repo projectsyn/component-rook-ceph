@@ -233,7 +233,7 @@ parameters:
       cephcsi:
         registry: quay.io
         image: cephcsi/cephcsi
-        tag: v3.14.2
+        tag: v3.16.0
 
     charts:
       # We do not support helm chart versions older than v1.7.0

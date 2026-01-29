@@ -73,6 +73,10 @@ users:
   - system:serviceaccount:syn-rook-ceph-operator:rook-csi-rbd-provisioner-sa
   - system:serviceaccount:syn-rook-ceph-operator:rook-csi-cephfs-plugin-sa
   - system:serviceaccount:syn-rook-ceph-operator:rook-csi-cephfs-provisioner-sa
+  - system:serviceaccount:syn-rook-ceph-operator:ceph-csi-cephfs-ctrlplugin-sa
+  - system:serviceaccount:syn-rook-ceph-operator:ceph-csi-cephfs-nodeplugin-sa
+  - system:serviceaccount:syn-rook-ceph-operator:ceph-csi-rbd-ctrlplugin-sa
+  - system:serviceaccount:syn-rook-ceph-operator:ceph-csi-rbd-nodeplugin-sa
   - system:serviceaccount:syn-rook-ceph-operator:default
 volumes:
   - configMap

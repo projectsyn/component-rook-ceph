@@ -48,7 +48,7 @@ local metadataServerPlacement = {
 
 // Users are responsible for providing working cephfs configs, we don't
 // verify them here
-local cephfs_pools = [
+local cephfs_pools = std.prune([
   kube._Object('ceph.rook.io/v1', 'CephFilesystem', pool)
   {
     metadata+: {
@@ -77,7 +77,7 @@ local cephfs_pools = [
     },
   }
   for pool in std.objectFields(cephfs_params)
-];
+]);
 
 // TODO: figure out if/how we want to create storageclasses for additional
 // pools configured on CephFS instances.

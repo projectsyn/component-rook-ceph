@@ -1,7 +1,6 @@
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
-  annotations: {}
   labels:
     app.kubernetes.io/component: rook-ceph
     app.kubernetes.io/managed-by: commodore

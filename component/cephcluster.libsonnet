@@ -212,7 +212,7 @@ local getDeviceset(name) =
       volumeClaimTemplates: std.objectValues(devicesets[name].volumeClaimTemplates),
     };
 
-local cephcluster =
+local cephcluster = std.prune(
   kube._Object('ceph.rook.io/v1', 'CephCluster', params.ceph_cluster.name)
   {
     metadata+: {
@@ -231,7 +231,8 @@ local cephcluster =
         },
       }
       + com.makeMergeable(params.cephClusterSpec),
-  };
+  }
+);
 
 local configmap =
   kube.ConfigMap('rook-config-override') {

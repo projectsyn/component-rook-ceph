@@ -46,6 +46,7 @@ spec:
               CEPH_CONFIG="/etc/ceph/ceph.conf"
               MON_CONFIG="/etc/rook/mon-endpoints"
               KEYRING_FILE="/etc/ceph/keyring"
+              CONFIG_OVERRIDE="/etc/rook-config-override/config"
 
               # create a ceph config file in its default location so ceph/rados tools can be used
               # without specifying any arguments
@@ -66,6 +67,13 @@ spec:
               [client.admin]
               keyring = ${KEYRING_FILE}
               EOF
+
+                # Merge the config override if it exists and is not empty
+                if [ -f "${CONFIG_OVERRIDE}" ] && [ -s "${CONFIG_OVERRIDE}" ]; then
+                  echo "$DATE merging config override from ${CONFIG_OVERRIDE}"
+                  echo "" >> ${CEPH_CONFIG}
+                  cat ${CONFIG_OVERRIDE} >> ${CEPH_CONFIG}
+                fi
               }
 
               # watch the endpoints config file and update if the mon endpoints ever change
@@ -109,7 +117,7 @@ spec:
                 secretKeyRef:
                   key: ceph-username
                   name: rook-ceph-mon
-          image: docker.io/rook/ceph:v1.17.9
+          image: docker.io/rook/ceph:v1.18.9
           imagePullPolicy: IfNotPresent
           name: rook-ceph-tools
           securityContext: {}
@@ -121,6 +129,9 @@ spec:
               name: mon-endpoint-volume
             - mountPath: /var/lib/rook-ceph-mon
               name: ceph-admin-secret
+              readOnly: true
+            - mountPath: /etc/rook-config-override
+              name: rook-config-override
               readOnly: true
       dnsPolicy: ClusterFirstWithHostNet
       serviceAccountName: rook-ceph-default
@@ -141,5 +152,9 @@ spec:
                 path: mon-endpoints
             name: rook-ceph-mon-endpoints
           name: mon-endpoint-volume
+        - configMap:
+            name: rook-config-override
+            optional: true
+          name: rook-config-override
         - emptyDir: {}
           name: ceph-config

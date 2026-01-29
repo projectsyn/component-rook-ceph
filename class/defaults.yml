@@ -234,6 +234,10 @@ parameters:
         registry: quay.io
         image: cephcsi/cephcsi
         tag: v3.15.0
+      oc:
+        registry: quay.io
+        repository: appuio/oc
+        tag: v4.20
 
     charts:
       # We do not support helm chart versions older than v1.7.0

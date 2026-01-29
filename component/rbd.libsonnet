@@ -10,7 +10,7 @@ local sp = import 'storagepool.libsonnet';
 
 local rbd_params = params.ceph_cluster.storage_pools.rbd;
 
-local rbd_blockpools = [
+local rbd_blockpools = std.prune([
   kube._Object('ceph.rook.io/v1', 'CephBlockPool', name) {
     metadata+: {
       namespace: params.ceph_cluster.namespace,
@@ -24,7 +24,7 @@ local rbd_blockpools = [
     ),
   }
   for name in std.objectFields(rbd_params)
-];
+]);
 
 local rbd_storageclasses = [
   sp.configure_storageclass('rbd', name)

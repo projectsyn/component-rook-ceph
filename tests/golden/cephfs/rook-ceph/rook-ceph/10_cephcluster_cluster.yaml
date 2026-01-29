@@ -1,7 +1,6 @@
 apiVersion: ceph.rook.io/v1
 kind: CephCluster
 metadata:
-  annotations: {}
   labels:
     app.kubernetes.io/component: rook-ceph
     app.kubernetes.io/managed-by: commodore
@@ -68,7 +67,6 @@ spec:
       - count: 3
         encrypted: true
         name: cluster
-        placement: {}
         portable: false
         tuneFastDeviceClass: false
         volumeClaimTemplates:

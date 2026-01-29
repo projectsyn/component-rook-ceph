@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.16.9
+    helm.sh/chart: rook-ceph-v1.17.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -94,7 +94,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.16.9
+    helm.sh/chart: rook-ceph-v1.17.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -127,7 +127,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.16.9
+    helm.sh/chart: rook-ceph-v1.17.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -146,12 +146,15 @@ rules:
       - watch
   - apiGroups:
       - ''
+      - discovery.k8s.io
     resources:
       - events
       - persistentvolumes
       - persistentvolumeclaims
       - endpoints
       - services
+      - endpointslices
+      - endpointslices/restricted
     verbs:
       - get
       - list
@@ -315,7 +318,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.16.9
+    helm.sh/chart: rook-ceph-v1.17.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -371,7 +374,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.16.9
+    helm.sh/chart: rook-ceph-v1.17.9
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -641,6 +644,12 @@ rules:
       - serviceaccounts/token
     verbs:
       - create
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -649,7 +658,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.16.9
+    helm.sh/chart: rook-ceph-v1.17.9
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin
@@ -699,6 +708,12 @@ rules:
       - nodes
     verbs:
       - get
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -873,6 +888,36 @@ rules:
       - get
       - list
       - watch
+  - apiGroups:
+      - gateway.networking.k8s.io
+    resources:
+      - referencegrants
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - replication.storage.openshift.io
+    resources:
+      - volumegroupreplicationcontents
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - replication.storage.openshift.io
+    resources:
+      - volumegroupreplicationclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

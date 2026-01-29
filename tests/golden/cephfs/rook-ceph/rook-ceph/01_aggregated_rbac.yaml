@@ -34,6 +34,18 @@ rules:
       - list
       - watch
   - apiGroups:
+      - csi.ceph.io
+    resources:
+      - cephconnections
+      - clientprofilemappings
+      - clientprofiles
+      - drivers
+      - operatorconfigs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
       - objectbucket.io
     resources:
       - objectbucketclaims

@@ -5,109 +5,38 @@ metadata:
   labels:
     app.kubernetes.io/component: rook-ceph
     app.kubernetes.io/managed-by: commodore
-    app.kubernetes.io/name: rook-ceph-view
-    name: rook-ceph-view
-    rbac.authorization.k8s.io/aggregate-to-admin: 'true'
-    rbac.authorization.k8s.io/aggregate-to-edit: 'true'
-    rbac.authorization.k8s.io/aggregate-to-view: 'true'
-  name: rook-ceph-view
-rules:
-  - apiGroups:
-      - ceph.rook.io
-    resources:
-      - cephblockpoolradosnamespaces
-      - cephblockpools
-      - cephbucketnotifications
-      - cephbuckettopics
-      - cephclients
-      - cephclusters
-      - cephfilesystemmirrors
-      - cephfilesystems
-      - cephfilesystemsubvolumegroups
-      - cephnfss
-      - cephobjectrealms
-      - cephobjectstores
-      - cephobjectstoreusers
-      - cephobjectzonegroups
-      - cephobjectzones
-      - cephrbdmirrors
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - objectbucket.io
-    resources:
-      - objectbucketclaims
-    verbs:
-      - get
-      - list
-      - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  annotations: {}
-  labels:
-    app.kubernetes.io/component: rook-ceph
-    app.kubernetes.io/managed-by: commodore
-    app.kubernetes.io/name: rook-ceph-edit
-    name: rook-ceph-edit
-    rbac.authorization.k8s.io/aggregate-to-admin: 'true'
-    rbac.authorization.k8s.io/aggregate-to-edit: 'true'
-  name: rook-ceph-edit
-rules:
-  - apiGroups:
-      - ceph.rook.io
-    resources:
-      - cephblockpoolradosnamespaces
-      - cephblockpools
-      - cephbucketnotifications
-      - cephbuckettopics
-      - cephclients
-      - cephclusters
-      - cephfilesystemmirrors
-      - cephfilesystems
-      - cephfilesystemsubvolumegroups
-      - cephnfss
-      - cephobjectrealms
-      - cephobjectstores
-      - cephobjectstoreusers
-      - cephobjectzonegroups
-      - cephobjectzones
-      - cephrbdmirrors
-    verbs:
-      - create
-      - delete
-      - deletecollection
-      - patch
-      - update
-  - apiGroups:
-      - objectbucket.io
-    resources:
-      - objectbucketclaims
-    verbs:
-      - create
-      - delete
-      - deletecollection
-      - patch
-      - update
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  annotations: {}
-  labels:
-    app.kubernetes.io/component: rook-ceph
-    app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/name: rook-ceph-cluster-reader
     name: rook-ceph-cluster-reader
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: 'true'
   name: rook-ceph-cluster-reader
 rules:
   - apiGroups:
+      - ceph.rook.io
+    resources:
+      - cephblockpoolradosnamespaces
+      - cephblockpools
+      - cephbucketnotifications
+      - cephbuckettopics
+      - cephclients
+      - cephclusters
+      - cephfilesystemmirrors
+      - cephfilesystems
+      - cephfilesystemsubvolumegroups
+      - cephnfss
+      - cephobjectrealms
+      - cephobjectstores
+      - cephobjectstoreusers
+      - cephobjectzonegroups
+      - cephobjectzones
+      - cephrbdmirrors
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
       - objectbucket.io
     resources:
+      - objectbucketclaims
       - objectbuckets
     verbs:
       - get

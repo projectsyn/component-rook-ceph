@@ -213,6 +213,16 @@ parameters:
           expr: sum(rate(ceph_osd_op_w{}[5m]))
         "record:ceph_osd_op_r:rate5m":
           expr: sum(rate(ceph_osd_op_r{}[5m]))
+        "record:rook_ceph_operator_images:count":
+          expr: count by (image) (kube_pod_container_info{namespace="${rook_ceph:namespace}"})
+        "record:ceph_mds_metadata:count":
+          expr: count by (ceph_version) (ceph_mon_metadata)
+        "record:ceph_mgr_metadata:count":
+          expr: count by (ceph_version) (ceph_mgr_metadata)
+        "record:ceph_mon_metadata:count":
+          expr: count by (ceph_version) (ceph_mon_metadata)
+        "record:ceph_osd_metadata:count":
+          expr: count by (ceph_version) (ceph_osd_metadata)
 
     node_selector:
       node-role.kubernetes.io/storage: ''

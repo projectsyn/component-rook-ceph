@@ -23,6 +23,16 @@ local custom_resources = [
     ],
   },
   {
+    apiGroups: [ 'csi.ceph.io' ],
+    resources: [
+      'cephconnections',
+      'clientprofilemappings',
+      'clientprofiles',
+      'drivers',
+      'operatorconfigs',
+    ],
+  },
+  {
     apiGroups: [ 'objectbucket.io' ],
     resources: [
       'objectbucketclaims',

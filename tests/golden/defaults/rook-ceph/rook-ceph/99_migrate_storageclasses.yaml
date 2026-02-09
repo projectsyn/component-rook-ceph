@@ -1,0 +1,116 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: migrate-rook-ceph-storageclasses
+    name: migrate-rook-ceph-storageclasses
+  name: migrate-rook-ceph-storageclasses
+  namespace: syn-rook-ceph-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: migrate-rook-ceph-storageclasses
+    name: migrate-rook-ceph-storageclasses
+  name: migrate-rook-ceph-storageclasses
+rules:
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+      - list
+      - watch
+      - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: migrate-rook-ceph-storageclasses
+    name: migrate-rook-ceph-storageclasses
+  name: migrate-rook-ceph-storageclasses
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: migrate-rook-ceph-storageclasses
+subjects:
+  - kind: ServiceAccount
+    name: migrate-rook-ceph-storageclasses
+    namespace: syn-rook-ceph-operator
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  labels:
+    app.kubernetes.io/component: rook-ceph
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: migrate-rook-ceph-storageclasses
+    name: migrate-rook-ceph-storageclasses
+  name: migrate-rook-ceph-storageclasses
+  namespace: syn-rook-ceph-operator
+spec:
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: rook-ceph
+        app.kubernetes.io/managed-by: commodore
+        app.kubernetes.io/name: migrate-rook-ceph-storageclasses
+        name: migrate-rook-ceph-storageclasses
+    spec:
+      containers:
+        - args:
+            - |
+              for sc in $(jq -nr --argjson sc "${STORAGECLASSES}" '$sc[]'); do
+                sc_has_new_field=$(kubectl get storageclass "$sc" -oyaml | \
+                  yq '.parameters|has("csi.storage.k8s.io/controller-publish-secret-name")')
+                if [ "$sc_has_new_field" == "false" ]; then
+                  kubectl delete storageclass "$sc" --ignore-not-found=true;
+                fi
+              done
+          command:
+            - bash
+            - -e
+            - -c
+          env:
+            - name: HOME
+              value: /home
+            - name: STORAGECLASSES
+              value: '["rbd-storagepool-cluster"]'
+          image: quay.io/appuio/oc:v4.20
+          imagePullPolicy: IfNotPresent
+          name: migrate-rook-ceph-storageclasses
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /home
+              name: home
+          workingDir: /home
+      imagePullSecrets: []
+      initContainers: []
+      restartPolicy: OnFailure
+      serviceAccountName: migrate-rook-ceph-storageclasses
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - emptyDir: {}
+          name: home

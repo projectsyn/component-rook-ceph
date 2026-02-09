@@ -125,5 +125,9 @@ std.mapWithKey(
       csi_metrics.servicemonitor,
     [if params.ceph_cluster.monitoring_enabled then '40_alertrules']:
       alert_rules.rules,
+    '99_migrate_storageclasses':
+      (import 'migrate-storageclasses.libsonnet').manifests(
+        rbd_config.storageclasses + cephfs_config.storageclasses
+      ),
   }
 )

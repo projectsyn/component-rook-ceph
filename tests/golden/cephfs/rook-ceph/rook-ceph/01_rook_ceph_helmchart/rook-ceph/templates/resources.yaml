@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephblockpoolradosnamespaces.ceph.rook.io
 spec:
@@ -62,6 +62,18 @@ spec:
                   type: string
                   x-kubernetes-validations:
                     - message: blockPoolName is immutable
+                      rule: self == oldSelf
+                clusterID:
+                  description: |-
+                    ClusterID to be used for this RadosNamespace in the CSI configuration.
+                    It must be unique among all Ceph clusters managed by Rook.
+                    If not specified, the clusterID will be generated and can be found in the CR status.
+                  maxLength: 36
+                  minLength: 1
+                  pattern: ^[a-zA-Z0-9_-]+$
+                  type: string
+                  x-kubernetes-validations:
+                    - message: ClusterID is immutable
                       rule: self == oldSelf
                 mirroring:
                   description: Mirroring configuration of CephBlockPoolRadosNamespace
@@ -382,7 +394,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephblockpools.ceph.rook.io
 spec:
@@ -478,6 +490,7 @@ spec:
                 enableCrushUpdates:
                   description: Allow rook operator to change the pool CRUSH tunables
                     once the pool is created
+                  nullable: true
                   type: boolean
                 enableRBDStats:
                   description: EnableRBDStats is used to enable gathering of statistics
@@ -666,6 +679,34 @@ spec:
               description: CephBlockPoolStatus represents the mirroring status of
                 Ceph Storage Pool
               properties:
+                cephx:
+                  description: PeerTokenCephxStatus represents the cephx key rotation
+                    status for peer tokens
+                  properties:
+                    peerToken:
+                      description: PeerToken shows the rotation status of the peer
+                        token associated with the `rbd-mirror-peer` user.
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                  type: object
                 conditions:
                   items:
                     description: Condition represents a status condition on any Rook-Ceph
@@ -943,7 +984,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephbucketnotifications.ceph.rook.io
 spec:
@@ -957,7 +998,14 @@ spec:
     singular: cephbucketnotification
   scope: Namespaced
   versions:
-    - name: v1
+    - additionalPrinterColumns:
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1
       schema:
         openAPIV3Schema:
           description: CephBucketNotification represents a Bucket Notifications
@@ -985,8 +1033,9 @@ spec:
                 events:
                   description: List of events that should trigger the notification
                   items:
-                    description: BucketNotificationSpec represent the event type of
-                      the bucket notification
+                    description: |-
+                      BucketNotificationSpec represent the event type of the bucket notification
+                      See: https://docs.ceph.com/en/latest/radosgw/s3-notification-compatibility/#event-types
                     enum:
                       - s3:ObjectCreated:*
                       - s3:ObjectCreated:Put
@@ -996,6 +1045,28 @@ spec:
                       - s3:ObjectRemoved:*
                       - s3:ObjectRemoved:Delete
                       - s3:ObjectRemoved:DeleteMarkerCreated
+                      - s3:ObjectLifecycle:Expiration:Current
+                      - s3:ObjectLifecycle:Expiration:NonCurrent
+                      - s3:ObjectLifecycle:Expiration:DeleteMarker
+                      - s3:ObjectLifecycle:Expiration:AbortMultipartUpload
+                      - s3:ObjectLifecycle:Transition:Current
+                      - s3:ObjectLifecycle:Transition:NonCurrent
+                      - s3:LifecycleExpiration:*
+                      - s3:LifecycleExpiration:Delete
+                      - s3:LifecycleExpiration:DeleteMarkerCreated
+                      - s3:LifecycleTransition
+                      - s3:ObjectSynced:*
+                      - s3:ObjectSynced:Create
+                      - s3:ObjectSynced:Delete
+                      - s3:ObjectSynced:DeletionMarkerCreated
+                      - s3:Replication:*
+                      - s3:Replication:Create
+                      - s3:Replication:Delete
+                      - s3:Replication:DeletionMarkerCreated
+                      - s3:ObjectRestore:*
+                      - s3:ObjectRestore:Post
+                      - s3:ObjectRestore:Completed
+                      - s3:ObjectRestore:Delete
                     type: string
                   type: array
                 filter:
@@ -1114,7 +1185,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephbuckettopics.ceph.rook.io
 spec:
@@ -1370,7 +1441,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephclients.ceph.rook.io
 spec:
@@ -1436,12 +1507,65 @@ spec:
                   x-kubernetes-validations:
                     - message: SecretName is immutable and cannot be changed
                       rule: self == oldSelf
+                security:
+                  description: Security represents security settings
+                  properties:
+                    cephx:
+                      description: 'CephX configures CephX key settings. More: https://docs.ceph.com/en/latest/dev/cephx/'
+                      properties:
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration specifies the desired CephX key generation. This is used when KeyRotationPolicy
+                            is KeyGeneration and ignored for other policies. If this is set to greater than the current
+                            key generation, relevant keys will be rotated, and the generation value will be updated to
+                            this new value (generation values are not necessarily incremental, though that is the
+                            intended use case). If this is set to less than or equal to the current key generation, keys
+                            are not rotated.
+                          format: int32
+                          maximum: 4294967295
+                          minimum: 0
+                          type: integer
+                          x-kubernetes-validations:
+                            - message: keyGeneration cannot be decreased
+                              rule: self >= oldSelf
+                        keyRotationPolicy:
+                          description: |-
+                            KeyRotationPolicy controls if and when CephX keys are rotated after initial creation.
+                            One of Disabled, or KeyGeneration. Default Disabled.
+                          enum:
+                            - ''
+                            - Disabled
+                            - KeyGeneration
+                          type: string
+                      type: object
+                  type: object
               required:
                 - caps
               type: object
             status:
               description: Status represents the status of a Ceph Client
               properties:
+                cephx:
+                  properties:
+                    keyCephVersion:
+                      description: |-
+                        KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                        same string format as reported by `CephCluster.status.version.version` to allow them to be
+                        compared. E.g., `20.2.0-0`.
+                        For all newly-created resources, this field set to the version of Ceph that created the key.
+                        The special value "Uninitialized" indicates that keys are being created for the first time.
+                        An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                      type: string
+                    keyGeneration:
+                      description: |-
+                        KeyGeneration represents the CephX key generation for the last successful reconcile.
+                        For all newly-created resources, this field is set to `1`.
+                        When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                        the configured policy generation.
+                        Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                      format: int32
+                      type: integer
+                  type: object
                 info:
                   additionalProperties:
                     type: string
@@ -1470,7 +1594,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephclusters.ceph.rook.io
 spec:
@@ -2202,6 +2326,11 @@ spec:
                       maximum: 5
                       minimum: 0
                       type: integer
+                    hostNetwork:
+                      description: Whether host networking is enabled for the Ceph
+                        Mgr. If not set, the network settings from CephCluster.spec.networking
+                        will be applied.
+                      type: boolean
                     modules:
                       description: Modules is the list of ceph manager modules to
                         enable/disable
@@ -3040,8 +3169,9 @@ spec:
                       description: ExternalMgrEndpoints points to an existing Ceph
                         prometheus exporter endpoint
                       items:
-                        description: EndpointAddress is a tuple that describes single
-                          IP address.
+                        description: |-
+                          EndpointAddress is a tuple that describes single IP address.
+                          Deprecated: This API is deprecated in v1.33+.
                         properties:
                           hostname:
                             description: The Hostname of this endpoint
@@ -3876,8 +4006,117 @@ spec:
                   description: Security represents security settings
                   nullable: true
                   properties:
+                    cephx:
+                      description: 'CephX configures CephX key settings. More: https://docs.ceph.com/en/latest/dev/cephx/'
+                      properties:
+                        csi:
+                          description: |-
+                            CSI configures CephX key rotation settings for the Ceph-CSI daemons in the current Kubernetes cluster.
+                            CSI key rotation can affect existing PV connections, so take care when exercising this option.
+                          properties:
+                            keepPriorKeyCountMax:
+                              description: |-
+                                KeepPriorKeyCountMax tells Rook how many prior keys to keep active.
+                                Generally, this would be set to 1 to allow for a migration period for applications.
+                                If desired, set this to 0 to delete prior keys after migration.
+                                This config only applies to prior keys that already exist.
+                                If PriorKeyCount is set to 2 while only a single key currently exists, only a single prior key will be kept,
+                                and the reported status will only indicate the actual number of prior keys,
+                                not necessarily a reflection of PriorKeyCount config here.
+                              maximum: 10
+                              minimum: 0
+                              type: integer
+                            keyGeneration:
+                              description: |-
+                                KeyGeneration specifies the desired CephX key generation. This is used when KeyRotationPolicy
+                                is KeyGeneration and ignored for other policies. If this is set to greater than the current
+                                key generation, relevant keys will be rotated, and the generation value will be updated to
+                                this new value (generation values are not necessarily incremental, though that is the
+                                intended use case). If this is set to less than or equal to the current key generation, keys
+                                are not rotated.
+                              format: int32
+                              maximum: 4294967295
+                              minimum: 0
+                              type: integer
+                              x-kubernetes-validations:
+                                - message: keyGeneration cannot be decreased
+                                  rule: self >= oldSelf
+                            keyRotationPolicy:
+                              description: |-
+                                KeyRotationPolicy controls if and when CephX keys are rotated after initial creation.
+                                One of Disabled, or KeyGeneration. Default Disabled.
+                              enum:
+                                - ''
+                                - Disabled
+                                - KeyGeneration
+                              type: string
+                          type: object
+                        daemon:
+                          description: |-
+                            Daemon configures CephX key settings for local Ceph daemons managed by Rook and part of the
+                            Ceph cluster. Daemon CephX keys can be rotated without affecting client connections.
+                          properties:
+                            keyGeneration:
+                              description: |-
+                                KeyGeneration specifies the desired CephX key generation. This is used when KeyRotationPolicy
+                                is KeyGeneration and ignored for other policies. If this is set to greater than the current
+                                key generation, relevant keys will be rotated, and the generation value will be updated to
+                                this new value (generation values are not necessarily incremental, though that is the
+                                intended use case). If this is set to less than or equal to the current key generation, keys
+                                are not rotated.
+                              format: int32
+                              maximum: 4294967295
+                              minimum: 0
+                              type: integer
+                              x-kubernetes-validations:
+                                - message: keyGeneration cannot be decreased
+                                  rule: self >= oldSelf
+                            keyRotationPolicy:
+                              description: |-
+                                KeyRotationPolicy controls if and when CephX keys are rotated after initial creation.
+                                One of Disabled, or KeyGeneration. Default Disabled.
+                              enum:
+                                - ''
+                                - Disabled
+                                - KeyGeneration
+                              type: string
+                          type: object
+                        rbdMirrorPeer:
+                          description: |-
+                            RBDMirrorPeer configures CephX key settings of the `rbd-mirror-peer` user that is used for creating
+                            bootstrap peer token used connect peer clusters. Rotating the `rbd-mirror-peer` user key will update
+                            the mirror peer token.
+                            Rotation will affect any existing peers connected to this cluster, so take care when exercising this option.
+                          properties:
+                            keyGeneration:
+                              description: |-
+                                KeyGeneration specifies the desired CephX key generation. This is used when KeyRotationPolicy
+                                is KeyGeneration and ignored for other policies. If this is set to greater than the current
+                                key generation, relevant keys will be rotated, and the generation value will be updated to
+                                this new value (generation values are not necessarily incremental, though that is the
+                                intended use case). If this is set to less than or equal to the current key generation, keys
+                                are not rotated.
+                              format: int32
+                              maximum: 4294967295
+                              minimum: 0
+                              type: integer
+                              x-kubernetes-validations:
+                                - message: keyGeneration cannot be decreased
+                                  rule: self >= oldSelf
+                            keyRotationPolicy:
+                              description: |-
+                                KeyRotationPolicy controls if and when CephX keys are rotated after initial creation.
+                                One of Disabled, or KeyGeneration. Default Disabled.
+                              enum:
+                                - ''
+                                - Disabled
+                                - KeyGeneration
+                              type: string
+                          type: object
+                      type: object
                     keyRotation:
-                      description: KeyRotation defines options for Key Rotation.
+                      description: KeyRotation defines options for rotation of OSD
+                        disk encryption keys.
                       nullable: true
                       properties:
                         enabled:
@@ -4350,6 +4589,11 @@ spec:
                       type: array
                     onlyApplyOSDPlacement:
                       type: boolean
+                    osdMaxUpdatesInParallel:
+                      description: The maximum number of OSDs to update in parallel.
+                      format: int32
+                      minimum: 1
+                      type: integer
                     scheduleAlways:
                       description: Whether to always schedule OSDs on a node even
                         if the node is not currently scheduleable or ready
@@ -6087,6 +6331,197 @@ spec:
                           type: object
                       type: object
                   type: object
+                cephx:
+                  description: ClusterCephxStatus defines the cephx key rotation status
+                    of various daemons on the cephCluster resource
+                  properties:
+                    admin:
+                      description: Admin shows the CephX key status for the client.admin
+                        key
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                    cephExporter:
+                      description: Ceph Exporter represents the cephx key rotation
+                        status of the ceph exporter daemon
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                    crashCollector:
+                      description: Crash Collector represents the cephx key rotation
+                        status of the crash collector daemon
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                    csi:
+                      description: CSI shows the CephX key status for Ceph-CSI components.
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                        priorKeyCount:
+                          description: PriorKeyCount reports the number of prior-generation
+                            CephX keys that remain active for the related component
+                          type: integer
+                      type: object
+                    mgr:
+                      description: Mgr represents the cephx key rotation status of
+                        the ceph manager daemon
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                    mon:
+                      description: Mon represents the CephX key status of the Monitor
+                        daemons
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                    osd:
+                      description: OSD shows the CephX key status of of OSDs
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                    rbdMirrorPeer:
+                      description: RBDMirrorPeer represents the cephx key rotation
+                        status of the `rbd-mirror-peer` user
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                  type: object
                 conditions:
                   items:
                     description: Condition represents a status condition on any Rook-Ceph
@@ -6182,7 +6617,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephcosidrivers.ceph.rook.io
 spec:
@@ -6818,7 +7253,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephfilesystemmirrors.ceph.rook.io
 spec:
@@ -7454,8 +7889,35 @@ spec:
                   type: object
               type: object
             status:
-              description: Status represents the status of an object
+              description: FileMirrorStatus represents the status of the FileSystem
+                mirror resource
               properties:
+                cephx:
+                  properties:
+                    daemon:
+                      description: Daemon shows the CephX key status for local Ceph
+                        daemons associated with this resources.
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                  type: object
                 conditions:
                   items:
                     description: Condition represents a status condition on any Rook-Ceph
@@ -7500,7 +7962,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephfilesystems.ceph.rook.io
 spec:
@@ -7586,6 +8048,7 @@ spec:
                       enableCrushUpdates:
                         description: Allow rook operator to change the pool CRUSH
                           tunables once the pool is created
+                        nullable: true
                         type: boolean
                       enableRBDStats:
                         description: EnableRBDStats is used to enable gathering of
@@ -7810,6 +8273,7 @@ spec:
                     enableCrushUpdates:
                       description: Allow rook operator to change the pool CRUSH tunables
                         once the pool is created
+                      nullable: true
                       type: boolean
                     enableRBDStats:
                       description: EnableRBDStats is used to enable gathering of statistics
@@ -8017,6 +8481,22 @@ spec:
                       nullable: true
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    cacheMemoryLimitFactor:
+                      description: |-
+                        CacheMemoryLimitFactor is the factor applied to the memory limit to determine the MDS cache memory limit.
+                        MDS cache memory limit should be set to 50-60% of RAM reserved for the MDS container.
+                        MDS uses approximately 125% of the value of mds_cache_memory_limit in RAM.
+                        This factor is applied when resources.limits.memory is set.
+                      maximum: 1
+                      minimum: 0
+                      type: number
+                    cacheMemoryRequestFactor:
+                      description: |-
+                        CacheMemoryRequestFactor is the factor applied to the memory request to determine the MDS cache memory limit.
+                        This factor is applied when resources.requests.memory is set and resources.limits.memory is not set.
+                      maximum: 1
+                      minimum: 0
+                      type: number
                     labels:
                       additionalProperties:
                         type: string
@@ -9007,6 +9487,32 @@ spec:
             status:
               description: CephFilesystemStatus represents the status of a Ceph Filesystem
               properties:
+                cephx:
+                  properties:
+                    daemon:
+                      description: Daemon shows the CephX key status for local Ceph
+                        daemons associated with this resources.
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                  type: object
                 conditions:
                   items:
                     description: Condition represents a status condition on any Rook-Ceph
@@ -9219,7 +9725,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephfilesystemsubvolumegroups.ceph.rook.io
 spec:
@@ -9278,6 +9784,18 @@ spec:
               description: Spec represents the specification of a Ceph Filesystem
                 SubVolumeGroup
               properties:
+                clusterID:
+                  description: |-
+                    ClusterID to be used for this subvolume group in the CSI configuration.
+                    It must be unique among all Ceph clusters managed by Rook.
+                    If not specified, the clusterID will be generated and can be found in the CR status.
+                  maxLength: 36
+                  minLength: 1
+                  pattern: ^[a-zA-Z0-9_-]+$
+                  type: string
+                  x-kubernetes-validations:
+                    - message: ClusterID is immutable
+                      rule: self == oldSelf
                 dataPoolName:
                   description: The data pool name for the Ceph Filesystem subvolume
                     group layout, if the default CephFS pool is not desired.
@@ -9368,7 +9886,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephnfses.ceph.rook.io
 spec:
@@ -9382,7 +9900,14 @@ spec:
     singular: cephnfs
   scope: Namespaced
   versions:
-    - name: v1
+    - additionalPrinterColumns:
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1
       schema:
         openAPIV3Schema:
           description: CephNFS represents a Ceph NFS
@@ -11325,8 +11850,34 @@ spec:
                 - server
               type: object
             status:
-              description: Status represents the status of an object
+              description: NFSStatus represents the status of Ceph NFS
               properties:
+                cephx:
+                  properties:
+                    daemon:
+                      description: Daemon shows the CephX key status for local Ceph
+                        daemons associated with this resources.
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                  type: object
                 conditions:
                   items:
                     description: Condition represents a status condition on any Rook-Ceph
@@ -11372,7 +11923,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephobjectrealms.ceph.rook.io
 spec:
@@ -11386,7 +11937,14 @@ spec:
     singular: cephobjectrealm
   scope: Namespaced
   versions:
-    - name: v1
+    - additionalPrinterColumns:
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1
       schema:
         openAPIV3Schema:
           description: CephObjectRealm represents a Ceph Object Store Gateway Realm
@@ -11472,7 +12030,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephobjectstores.ceph.rook.io
 spec:
@@ -11612,6 +12170,7 @@ spec:
                     enableCrushUpdates:
                       description: Allow rook operator to change the pool CRUSH tunables
                         once the pool is created
+                      nullable: true
                       type: boolean
                     enableRBDStats:
                       description: EnableRBDStats is used to enable gathering of statistics
@@ -13288,6 +13847,7 @@ spec:
                     enableCrushUpdates:
                       description: Allow rook operator to change the pool CRUSH tunables
                         once the pool is created
+                      nullable: true
                       type: boolean
                     enableRBDStats:
                       description: EnableRBDStats is used to enable gathering of statistics
@@ -13716,6 +14276,32 @@ spec:
               description: ObjectStoreStatus represents the status of a Ceph Object
                 Store resource
               properties:
+                cephx:
+                  properties:
+                    daemon:
+                      description: Daemon shows the CephX key status for local Ceph
+                        daemons associated with this resources.
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                  type: object
                 conditions:
                   items:
                     description: Condition represents a status condition on any Rook-Ceph
@@ -13782,7 +14368,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephobjectstoreusers.ceph.rook.io
 spec:
@@ -14134,7 +14720,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephobjectzonegroups.ceph.rook.io
 spec:
@@ -14235,7 +14821,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephobjectzones.ceph.rook.io
 spec:
@@ -14331,6 +14917,7 @@ spec:
                     enableCrushUpdates:
                       description: Allow rook operator to change the pool CRUSH tunables
                         once the pool is created
+                      nullable: true
                       type: boolean
                     enableRBDStats:
                       description: EnableRBDStats is used to enable gathering of statistics
@@ -14546,6 +15133,7 @@ spec:
                     enableCrushUpdates:
                       description: Allow rook operator to change the pool CRUSH tunables
                         once the pool is created
+                      nullable: true
                       type: boolean
                     enableRBDStats:
                       description: EnableRBDStats is used to enable gathering of statistics
@@ -14881,7 +15469,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   name: cephrbdmirrors.ceph.rook.io
 spec:
@@ -15540,8 +16128,35 @@ spec:
                 - count
               type: object
             status:
-              description: Status represents the status of an object
+              description: RBDMirrorStatus represents the status of the RBD mirror
+                resource
               properties:
+                cephx:
+                  properties:
+                    daemon:
+                      description: Daemon shows the CephX key status for local Ceph
+                        daemons associated with this resources.
+                      properties:
+                        keyCephVersion:
+                          description: |-
+                            KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+                            same string format as reported by `CephCluster.status.version.version` to allow them to be
+                            compared. E.g., `20.2.0-0`.
+                            For all newly-created resources, this field set to the version of Ceph that created the key.
+                            The special value "Uninitialized" indicates that keys are being created for the first time.
+                            An empty string indicates that the version is unknown, as expected in brownfield deployments.
+                          type: string
+                        keyGeneration:
+                          description: |-
+                            KeyGeneration represents the CephX key generation for the last successful reconcile.
+                            For all newly-created resources, this field is set to `1`.
+                            When keys are rotated due to any rotation policy, the generation is incremented or updated to
+                            the configured policy generation.
+                            Generation `0` indicates that keys existed prior to the implementation of key tracking.
+                          format: int32
+                          type: integer
+                      type: object
+                  type: object
                 conditions:
                   items:
                     description: Condition represents a status condition on any Rook-Ceph

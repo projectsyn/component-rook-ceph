@@ -45,6 +45,10 @@ local patches = {
         'rook-csi-rbd-provisioner-sa',
         'rook-csi-cephfs-plugin-sa',
         'rook-csi-cephfs-provisioner-sa',
+        'ceph-csi-cephfs-ctrlplugin-sa',
+        'ceph-csi-cephfs-nodeplugin-sa',
+        'ceph-csi-rbd-ctrlplugin-sa',
+        'ceph-csi-rbd-nodeplugin-sa',
         // Rook v1.9 adds "holder" DaemonSets for the CSI plugins which run
         // with the default serviceaccount, so we need to also allow the
         // default serviceaccount in the namespace access to the rook-ceph-csi

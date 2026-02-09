@@ -843,6 +843,12 @@ spec:
             severity: warning
             syn: 'true'
             syn_component: rook-ceph
+        - expr: count by (ceph_version) (ceph_mon_metadata)
+          record: ceph_mds_metadata:count
+        - expr: count by (ceph_version) (ceph_mgr_metadata)
+          record: ceph_mgr_metadata:count
+        - expr: count by (ceph_version) (ceph_mon_metadata)
+          record: ceph_mon_metadata:count
         - expr: sum(ceph_mon_num_sessions{})
           record: ceph_mon_num_sessions:sum
         - expr: count(ceph_mon_quorum_status{})
@@ -851,6 +857,8 @@ spec:
           record: ceph_osd_apply_latency_ms:avg
         - expr: avg(ceph_osd_commit_latency_ms{})
           record: ceph_osd_commit_latency_ms:avg
+        - expr: count by (ceph_version) (ceph_osd_metadata)
+          record: ceph_osd_metadata:count
         - expr: sum(ceph_osd_numpg{})
           record: ceph_osd_numpg:sum
         - expr: sum(rate(ceph_osd_op_r{}[5m]))
@@ -873,3 +881,5 @@ spec:
           record: ceph_osd_op_w_latency:avg5m
         - expr: sum(ceph_pool_objects{})
           record: ceph_pool_objects:sum
+        - expr: count by (image) (kube_pod_container_info{namespace="syn-rook-ceph-operator"})
+          record: rook_ceph_operator_images:count

@@ -243,7 +243,7 @@ parameters:
       cephcsi:
         registry: quay.io
         image: cephcsi/cephcsi
-        tag: v3.15.1
+        tag: v3.16.1
       oc:
         registry: quay.io
         repository: appuio/oc

@@ -92,12 +92,11 @@ local configure_sc(type, pool, subpool=null, suffix=null) =
           subpool
         else
           pool,
-      'csi.storage.k8s.io/provisioner-secret-namespace':
-        params.ceph_cluster.namespace,
-      'csi.storage.k8s.io/controller-expand-secret-namespace':
-        params.ceph_cluster.namespace,
-      'csi.storage.k8s.io/node-stage-secret-namespace':
-        params.ceph_cluster.namespace,
+    } + {
+      // Fixup secret-namespace parameters with actual Ceph cluster namespace
+      [k]: params.ceph_cluster.namespace
+      for k in std.objectFields(obj.parameters)
+      if std.length(std.findSubstr('secret-namespace', k)) > 0
     },
   };
 

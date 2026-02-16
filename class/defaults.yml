@@ -36,6 +36,10 @@ parameters:
           # Kubernetes imageGCHigh threshold, since we're using the node's
           # `/var` for the mon data store.
           mon_data_avail_warn: '15'
+        osd:
+          # Disable OSD bluestore `elastic_shared_blobs` for Ceph v19, since
+          # enabling that option can cause new OSDs to crash irrecoverably.
+          bluestore_elastic_shared_blobs: '0'
 
       # Whether to setup RBD CSI driver and pools
       rbd_enabled: true
@@ -239,7 +243,7 @@ parameters:
       ceph:
         registry: quay.io
         image: ceph/ceph
-        tag: v18.2.7
+        tag: v19.2.3
       cephcsi:
         registry: quay.io
         image: cephcsi/cephcsi

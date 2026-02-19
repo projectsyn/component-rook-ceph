@@ -220,7 +220,7 @@ parameters:
         "record:rook_ceph_operator_images:count":
           expr: count by (image) (kube_pod_container_info{namespace="${rook_ceph:namespace}"})
         "record:ceph_mds_metadata:count":
-          expr: count by (ceph_version) (ceph_mon_metadata)
+          expr: count by (ceph_version) (ceph_mds_metadata)
         "record:ceph_mgr_metadata:count":
           expr: count by (ceph_version) (ceph_mgr_metadata)
         "record:ceph_mon_metadata:count":

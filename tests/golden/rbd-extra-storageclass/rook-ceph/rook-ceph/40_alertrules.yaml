@@ -843,7 +843,7 @@ spec:
             severity: warning
             syn: 'true'
             syn_component: rook-ceph
-        - expr: count by (ceph_version) (ceph_mon_metadata)
+        - expr: count by (ceph_version) (ceph_mds_metadata)
           record: ceph_mds_metadata:count
         - expr: count by (ceph_version) (ceph_mgr_metadata)
           record: ceph_mgr_metadata:count

@@ -6,6 +6,8 @@ allowHostPorts: true
 allowPrivilegedContainer: true
 allowedCapabilities:
   - MKNOD
+  - SYS_ADMIN
+  - NET_RAW
 apiVersion: security.openshift.io/v1
 defaultAddCapabilities: []
 fsGroup:

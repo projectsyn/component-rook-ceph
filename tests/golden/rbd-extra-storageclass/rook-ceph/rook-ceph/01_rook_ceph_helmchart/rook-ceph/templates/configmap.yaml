@@ -202,18 +202,18 @@ data:
           memory: 256Mi
   ROOK_CEPH_ALLOW_LOOP_DEVICES: 'false'
   ROOK_CEPH_COMMANDS_TIMEOUT_SECONDS: '15'
-  ROOK_CSIADDONS_IMAGE: quay.io/csiaddons/k8s-sidecar:v0.13.0
-  ROOK_CSI_ATTACHER_IMAGE: registry.k8s.io/sig-storage/csi-attacher:v4.8.1
+  ROOK_CSIADDONS_IMAGE: quay.io/csiaddons/k8s-sidecar:v0.14.0
+  ROOK_CSI_ATTACHER_IMAGE: registry.k8s.io/sig-storage/csi-attacher:v4.10.0
   ROOK_CSI_CEPH_IMAGE: quay.io/cephcsi/cephcsi:v3.15.1
   ROOK_CSI_DISABLE_DRIVER: 'false'
   ROOK_CSI_ENABLE_CEPHFS: 'false'
   ROOK_CSI_ENABLE_NFS: 'false'
   ROOK_CSI_ENABLE_RBD: 'true'
   ROOK_CSI_IMAGE_PULL_POLICY: IfNotPresent
-  ROOK_CSI_PROVISIONER_IMAGE: registry.k8s.io/sig-storage/csi-provisioner:v5.2.0
-  ROOK_CSI_REGISTRAR_IMAGE: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.13.0
-  ROOK_CSI_RESIZER_IMAGE: registry.k8s.io/sig-storage/csi-resizer:v1.13.2
-  ROOK_CSI_SNAPSHOTTER_IMAGE: registry.k8s.io/sig-storage/csi-snapshotter:v8.2.1
+  ROOK_CSI_PROVISIONER_IMAGE: registry.k8s.io/sig-storage/csi-provisioner:v6.0.0
+  ROOK_CSI_REGISTRAR_IMAGE: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.15.0
+  ROOK_CSI_RESIZER_IMAGE: registry.k8s.io/sig-storage/csi-resizer:v2.0.0
+  ROOK_CSI_SNAPSHOTTER_IMAGE: registry.k8s.io/sig-storage/csi-snapshotter:v8.4.0
   ROOK_ENABLE_DISCOVERY_DAEMON: 'false'
   ROOK_LOG_LEVEL: INFO
   ROOK_OBC_ALLOW_ADDITIONAL_CONFIG_FIELDS: maxObjects,maxSize
@@ -227,8 +227,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.18.9
-    helm.sh/chart: rook-ceph-v1.18.9
+    app.kubernetes.io/version: v1.19.2
+    helm.sh/chart: rook-ceph-v1.19.2
     operator: rook
     storage-backend: ceph
   name: rook-ceph-operator-config

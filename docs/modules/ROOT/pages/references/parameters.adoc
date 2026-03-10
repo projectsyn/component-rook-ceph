@@ -489,7 +489,7 @@ The component assumes that nodes on which the deployments should be scheduled ma
 type:: dict
 default:: See https://github.com/projectsyn/component-rook-ceph/blob/master/class/defaults.yml[`class/defaults.yml` on Github]
 
-This parameter allows selecting the Docker images to use for Rook.io, Ceph, and Ceph-CSI.
+This parameter allows selecting the Docker images to use for Rook.io, Ceph, the Ceph CSI operator, and Ceph-CSI.
 Each image is specified using keys `registry`, `image` and `tag`.
 This structure allows easily injecting a registry mirror, if required.
 
@@ -521,7 +521,7 @@ The Helm values to use when rendering the rook-ceph operator Helm chart.
 
 A few Helm values are configured based on other component parameters by default:
 
-* The data in parameter `images` is used to set the `image.repository`, `image.tag`, `csi.cephcsi.repository`, and `csi.cephcsi.tag` Helm values
+* The data in parameter `images` is used to set the `image.repository`, `image.tag`, `ceph-csi-operator.controllerManager.manager.image.repository`, `ceph-csi-operator.controllerManager.manager.image.tag`, `csi.cephcsi.repository`, and `csi.cephcsi.tag` Helm values
 * The value of `node_selector` is used to set Helm value `nodeSelector`
 * The value of `tolerations` is used to set Helm value `tolerations`
 * The component ensures that `hostpathRequiresPrivileged` is enabled on OpenShift 4 regardless of the contents of the Helm value.

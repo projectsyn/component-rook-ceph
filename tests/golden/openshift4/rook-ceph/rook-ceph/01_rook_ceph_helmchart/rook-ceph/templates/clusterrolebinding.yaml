@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.18.9
-    helm.sh/chart: rook-ceph-v1.18.9
+    app.kubernetes.io/version: v1.19.2
+    helm.sh/chart: rook-ceph-v1.19.2
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -30,8 +30,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.18.9
-    helm.sh/chart: rook-ceph-v1.18.9
+    app.kubernetes.io/version: v1.19.2
+    helm.sh/chart: rook-ceph-v1.19.2
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -53,8 +53,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.18.9
-    helm.sh/chart: rook-ceph-v1.18.9
+    app.kubernetes.io/version: v1.19.2
+    helm.sh/chart: rook-ceph-v1.19.2
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -76,8 +76,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.18.9
-    helm.sh/chart: rook-ceph-v1.18.9
+    app.kubernetes.io/version: v1.19.2
+    helm.sh/chart: rook-ceph-v1.19.2
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin
@@ -99,8 +99,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.18.9
-    helm.sh/chart: rook-ceph-v1.18.9
+    app.kubernetes.io/version: v1.19.2
+    helm.sh/chart: rook-ceph-v1.19.2
     operator: rook
     storage-backend: ceph
   name: cephfs-csi-provisioner-role
@@ -122,8 +122,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.18.9
-    helm.sh/chart: rook-ceph-v1.18.9
+    app.kubernetes.io/version: v1.19.2
+    helm.sh/chart: rook-ceph-v1.19.2
     operator: rook
     storage-backend: ceph
   name: cephfs-csi-nodeplugin-role
@@ -145,8 +145,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.18.9
-    helm.sh/chart: rook-ceph-v1.18.9
+    app.kubernetes.io/version: v1.19.2
+    helm.sh/chart: rook-ceph-v1.19.2
     operator: rook
     storage-backend: ceph
   name: rbd-csi-provisioner-role

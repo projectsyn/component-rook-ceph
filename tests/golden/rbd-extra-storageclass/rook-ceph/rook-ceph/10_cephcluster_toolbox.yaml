@@ -117,7 +117,7 @@ spec:
                 secretKeyRef:
                   key: ceph-username
                   name: rook-ceph-mon
-          image: docker.io/rook/ceph:v1.18.9
+          image: docker.io/rook/ceph:v1.19.2
           imagePullPolicy: IfNotPresent
           name: rook-ceph-tools
           securityContext: {}

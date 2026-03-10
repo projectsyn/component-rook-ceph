@@ -248,6 +248,10 @@ parameters:
         registry: quay.io
         image: cephcsi/cephcsi
         tag: v3.15.1
+      ceph-csi-operator:
+        registry: quay.io
+        image: cephcsi/ceph-csi-operator
+        tag: v0.4.1
       oc:
         registry: quay.io
         repository: appuio/oc
@@ -272,6 +276,12 @@ parameters:
           cpu: 750m
           memory: 512Mi
       tolerations: ${rook_ceph:tolerations}
+      ceph-csi-operator:
+        controllerManager:
+          manager:
+            image:
+              repository: ${rook_ceph:images:ceph-csi-operator:registry}/${rook_ceph:images:ceph-csi-operator:image}
+              tag: ${rook_ceph:images:ceph-csi-operator:tag}
       csi:
         provisionerTolerations: ${rook_ceph:tolerations}
         enableCSIHostNetwork: true

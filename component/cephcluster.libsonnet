@@ -41,6 +41,15 @@ local roles =
           resources: [ 'cephclusters', 'cephclusters/finalizers' ],
           verbs: [ 'get', 'list', 'create', 'update', 'delete' ],
         },
+        // Required for OSD prepare jobs with recent Rook versions.
+        // NOTE(sg): I've not fully determined when/how this changed, but we
+        // noticed on a test cluster where the storage cluster was provisioned
+        // with Rook 1.18.
+        {
+          apiGroups: [ '' ],
+          resources: [ 'secrets' ],
+          verbs: [ 'get' ],
+        },
       ],
     },
     mgr: kube.Role('rook-ceph-mgr') {

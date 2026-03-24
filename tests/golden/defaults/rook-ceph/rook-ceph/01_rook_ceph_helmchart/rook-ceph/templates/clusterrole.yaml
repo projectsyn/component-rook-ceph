@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
@@ -99,8 +99,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: rook-ceph-cluster-mgmt
@@ -135,8 +135,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
@@ -339,8 +339,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -391,8 +391,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-system
@@ -415,8 +415,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket
@@ -481,8 +481,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: rook-ceph-osd
@@ -504,8 +504,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: cephfs-csi-nodeplugin
@@ -550,8 +550,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: cephfs-external-provisioner-runner
@@ -740,8 +740,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: rbd-csi-nodeplugin
@@ -807,8 +807,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.2
-    helm.sh/chart: rook-ceph-v1.19.2
+    app.kubernetes.io/version: v1.19.3
+    helm.sh/chart: rook-ceph-v1.19.3
     operator: rook
     storage-backend: ceph
   name: rbd-external-provisioner-runner

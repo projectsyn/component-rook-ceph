@@ -243,7 +243,7 @@ parameters:
       ceph:
         registry: quay.io
         image: ceph/ceph
-        tag: v19.2.4
+        tag: v19.2.5
       cephcsi:
         registry: quay.io
         image: cephcsi/cephcsi

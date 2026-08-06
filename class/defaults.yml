@@ -255,7 +255,7 @@ parameters:
       oc:
         registry: quay.io
         repository: appuio/oc
-        tag: v4.20
+        tag: v4.21
 
     charts:
       # We do not support helm chart versions older than v1.7.0

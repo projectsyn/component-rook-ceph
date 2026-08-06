@@ -96,7 +96,7 @@ spec:
               value: /home
             - name: STORAGECLASSES
               value: '["rbd-storagepool-cluster","rbd-storagepool-cluster-small-files"]'
-          image: quay.io/appuio/oc:v4.20
+          image: quay.io/appuio/oc:v4.21
           imagePullPolicy: IfNotPresent
           name: migrate-rook-ceph-storageclasses
           ports: []

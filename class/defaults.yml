@@ -251,7 +251,7 @@ parameters:
       ceph-csi-operator:
         registry: quay.io
         image: cephcsi/ceph-csi-operator
-        tag: v0.5.0
+        tag: v1.0.4
       oc:
         registry: quay.io
         repository: appuio/oc

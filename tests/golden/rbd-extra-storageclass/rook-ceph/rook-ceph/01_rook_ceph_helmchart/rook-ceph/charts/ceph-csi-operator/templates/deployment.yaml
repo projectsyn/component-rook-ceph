@@ -5,9 +5,9 @@ metadata:
     app.kubernetes.io/instance: syn-rook-ceph
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ceph-csi
-    app.kubernetes.io/version: v0.6.0
+    app.kubernetes.io/version: v1.0.4
     control-plane: controller-manager
-    helm.sh/chart: ceph-csi-operator-0.6.0
+    helm.sh/chart: ceph-csi-operator-1.0.4
   name: ceph-csi-controller-manager
   namespace: syn-rook-ceph-operator
 spec:
@@ -37,7 +37,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: CSI_SERVICE_ACCOUNT_PREFIX
-              value: ceph-csi-
+              value: ''
             - name: WATCH_NAMESPACE
               value: ''
             - name: KUBERNETES_CLUSTER_DOMAIN
@@ -70,7 +70,11 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
       imagePullSecrets: []
+      nodeSelector: {}
+      priorityClassName: null
       securityContext:
         runAsNonRoot: true
-      serviceAccountName: ceph-csi-controller-manager
+      serviceAccountName: ceph-csi
       terminationGracePeriodSeconds: 10
+      tolerations: []
+      topologySpreadConstraints: []

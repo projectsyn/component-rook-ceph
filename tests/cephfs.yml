@@ -1,5 +1,5 @@
 applications:
-  - rancher-monitoring
+  - prometheus
 
 parameters:
   kapitan:
@@ -7,6 +7,9 @@ parameters:
       - type: https
         source: https://raw.githubusercontent.com/projectsyn/component-storageclass/v1.0.0/lib/storageclass.libsonnet
         output_path: vendor/lib/storageclass.libsonnet
+      - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-prometheus/master/lib/prometheus-alert-patching.libsonnet
+        output_path: vendor/lib/alert-patching.libsonnet
 
   storageclass:
     defaults: {}
@@ -17,7 +20,6 @@ parameters:
       rbd_enabled: false
       cephfs_enabled: true
 
-  rancher_monitoring:
+  prometheus:
     alerts:
       ignoreNames: []
-      customAnnotations: {}

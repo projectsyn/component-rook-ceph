@@ -90,6 +90,13 @@ local add_labels(manifests) = [
   for manifest in manifests
 ];
 
+local has_monitoring = std.member(inv.applications, 'prometheus') || std.member(inv.applications, 'openshift4-monitoring');
+// Only evaluated if `has_monitoring` is true, because rendering the rules
+// requires `lib/alert-patching.libsonnet`.
+local has_alerts = std.length(std.flattenArrays([
+  r.spec.groups
+  for r in alert_rules.rules
+])) > 0;
 
 std.mapWithKey(
   function(field, value)
@@ -123,7 +130,7 @@ std.mapWithKey(
     '40_csi_driver_metrics':
       csi_metrics.rbac +
       csi_metrics.servicemonitor,
-    [if params.ceph_cluster.monitoring_enabled then '40_alertrules']:
+    [if params.ceph_cluster.monitoring_enabled && has_monitoring && has_alerts then '40_alertrules']:
       alert_rules.rules,
     '99_migrate_storageclasses':
       (import 'migrate-storageclasses.libsonnet').manifests(

@@ -97,7 +97,7 @@ spec:
                           scheduling settings of a mirrored pool
                         properties:
                           interval:
-                            description: Interval represent the periodicity of the
+                            description: Interval represents the periodicity of the
                               snapshot.
                             type: string
                           path:
@@ -144,7 +144,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -202,12 +202,10 @@ spec:
                       description: Details contains potential status errors
                       type: string
                     lastChanged:
-                      description: LastChanged is the last time time the status last
-                        changed
+                      description: LastChanged is the last time the status last changed
                       type: string
                     lastChecked:
-                      description: LastChecked is the last time time the status was
-                        checked
+                      description: LastChecked is the last time the status was checked
                       type: string
                     summary:
                       description: Summary is the mirroring status summary
@@ -326,7 +324,7 @@ spec:
                       type: object
                   type: object
                 phase:
-                  description: ConditionType represent a resource's status
+                  description: ConditionType represents a resource's status
                   type: string
                 snapshotScheduleStatus:
                   description: SnapshotScheduleStatusSpec is the status of the snapshot
@@ -336,12 +334,10 @@ spec:
                       description: Details contains potential status errors
                       type: string
                     lastChanged:
-                      description: LastChanged is the last time time the status last
-                        changed
+                      description: LastChanged is the last time the status last changed
                       type: string
                     lastChecked:
-                      description: LastChecked is the last time time the status was
-                        checked
+                      description: LastChecked is the last time the status was checked
                       type: string
                     snapshotSchedules:
                       description: SnapshotSchedules is the list of snapshots scheduled
@@ -513,6 +509,22 @@ spec:
                         This is the number of OSDs that can be lost simultaneously before data cannot be recovered.
                       minimum: 0
                       type: integer
+                    crushNumFailureDomains:
+                      description: |-
+                        Number of failure domains to use for erasure coded chunk placement.
+                        When specified along with crushOSDsPerFailureDomain, a CRUSH MSR rule will be created
+                        that distributes chunks across this many failure domains.
+                      format: int32
+                      minimum: 1
+                      type: integer
+                    crushOSDsPerFailureDomain:
+                      description: |-
+                        Number of OSDs allowed per failure domain for erasure coded chunk placement.
+                        When specified along with crushNumFailureDomains, a CRUSH MSR rule will be created
+                        that allows up to this many chunks on OSDs within each failure domain.
+                      format: int32
+                      minimum: 1
+                      type: integer
                     dataChunks:
                       description: |-
                         Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).
@@ -520,10 +532,29 @@ spec:
                         as dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.
                       minimum: 0
                       type: integer
+                    stripeUnit:
+                      anyOf:
+                        - type: integer
+                        - type: string
+                      description: |-
+                        Erasure code stripe size in bytes. Ceph default is 4096 bytes (4 KiB).
+                        Value must be a multiple of 4096 (4Ki).
+                      enum:
+                        - 4Ki
+                        - 16Ki
+                        - 64Ki
+                        - 256Ki
+                        - 1Mi
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
                   required:
                     - codingChunks
                     - dataChunks
                   type: object
+                  x-kubernetes-validations:
+                    - message: crushNumFailureDomains and crushOSDsPerFailureDomain
+                        must be specified together
+                      rule: has(self.crushNumFailureDomains) == has(self.crushOSDsPerFailureDomain)
                 failureDomain:
                   description: 'The failure domain: osd/host/(region or zone if available)
                     - technically also any type in the crush map'
@@ -560,7 +591,7 @@ spec:
                           scheduling settings of a mirrored pool
                         properties:
                           interval:
-                            description: Interval represent the periodicity of the
+                            description: Interval represents the periodicity of the
                               snapshot.
                             type: string
                           path:
@@ -580,6 +611,7 @@ spec:
                     - .rgw.root
                     - .nfs
                     - .mgr
+                    - .nvmeof
                   type: string
                 parameters:
                   additionalProperties:
@@ -733,7 +765,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -791,12 +823,10 @@ spec:
                       description: Details contains potential status errors
                       type: string
                     lastChanged:
-                      description: LastChanged is the last time time the status last
-                        changed
+                      description: LastChanged is the last time the status last changed
                       type: string
                     lastChecked:
-                      description: LastChecked is the last time time the status was
-                        checked
+                      description: LastChecked is the last time the status was checked
                       type: string
                     summary:
                       description: Summary is the mirroring status summary
@@ -920,7 +950,7 @@ spec:
                   format: int64
                   type: integer
                 phase:
-                  description: ConditionType represent a resource's status
+                  description: ConditionType represents a resource's status
                   type: string
                 poolID:
                   description: optional
@@ -933,12 +963,10 @@ spec:
                       description: Details contains potential status errors
                       type: string
                     lastChanged:
-                      description: LastChanged is the last time time the status last
-                        changed
+                      description: LastChanged is the last time the status last changed
                       type: string
                     lastChecked:
-                      description: LastChecked is the last time time the status was
-                        checked
+                      description: LastChecked is the last time the status was checked
                       type: string
                     snapshotSchedules:
                       description: SnapshotSchedules is the list of snapshots scheduled
@@ -1035,45 +1063,15 @@ spec:
             metadata:
               type: object
             spec:
-              description: BucketNotificationSpec represent the spec of a Bucket Notification
+              description: BucketNotificationSpec represents the spec of a Bucket
+                Notification
               properties:
                 events:
                   description: List of events that should trigger the notification
                   items:
                     description: |-
-                      BucketNotificationSpec represent the event type of the bucket notification
+                      BucketNotificationEvent represents the event type of the bucket notification
                       See: https://docs.ceph.com/en/latest/radosgw/s3-notification-compatibility/#event-types
-                    enum:
-                      - s3:ObjectCreated:*
-                      - s3:ObjectCreated:Put
-                      - s3:ObjectCreated:Post
-                      - s3:ObjectCreated:Copy
-                      - s3:ObjectCreated:CompleteMultipartUpload
-                      - s3:ObjectRemoved:*
-                      - s3:ObjectRemoved:Delete
-                      - s3:ObjectRemoved:DeleteMarkerCreated
-                      - s3:ObjectLifecycle:Expiration:Current
-                      - s3:ObjectLifecycle:Expiration:NonCurrent
-                      - s3:ObjectLifecycle:Expiration:DeleteMarker
-                      - s3:ObjectLifecycle:Expiration:AbortMultipartUpload
-                      - s3:ObjectLifecycle:Transition:Current
-                      - s3:ObjectLifecycle:Transition:NonCurrent
-                      - s3:LifecycleExpiration:*
-                      - s3:LifecycleExpiration:Delete
-                      - s3:LifecycleExpiration:DeleteMarkerCreated
-                      - s3:LifecycleTransition
-                      - s3:ObjectSynced:*
-                      - s3:ObjectSynced:Create
-                      - s3:ObjectSynced:Delete
-                      - s3:ObjectSynced:DeletionMarkerCreated
-                      - s3:Replication:*
-                      - s3:Replication:Create
-                      - s3:Replication:Delete
-                      - s3:Replication:DeletionMarkerCreated
-                      - s3:ObjectRestore:*
-                      - s3:ObjectRestore:Post
-                      - s3:ObjectRestore:Completed
-                      - s3:ObjectRestore:Delete
                     type: string
                   type: array
                 filter:
@@ -1082,7 +1080,7 @@ spec:
                     keyFilters:
                       description: Filters based on the object's key
                       items:
-                        description: NotificationKeyFilterRule represent a single
+                        description: NotificationKeyFilterRule represents a single
                           key rule in the Notification Filter spec
                         properties:
                           name:
@@ -1103,7 +1101,7 @@ spec:
                     metadataFilters:
                       description: Filters based on the object's metadata
                       items:
-                        description: NotificationFilterRule represent a single rule
+                        description: NotificationFilterRule represents a single rule
                           in the Notification Filter spec
                         properties:
                           name:
@@ -1121,7 +1119,7 @@ spec:
                     tagFilters:
                       description: Filters based on the object's tags
                       items:
-                        description: NotificationFilterRule represent a single rule
+                        description: NotificationFilterRule represents a single rule
                           in the Notification Filter spec
                         properties:
                           name:
@@ -1166,7 +1164,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -1236,7 +1234,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: BucketTopicSpec represent the spec of a Bucket Topic
+              description: BucketTopicSpec represents the spec of a Bucket Topic
               properties:
                 endpoint:
                   description: Contains the endpoint spec of the topic
@@ -1246,10 +1244,14 @@ spec:
                       properties:
                         ackLevel:
                           default: broker
-                          description: The ack level required for this topic (none/broker/routeable)
+                          description: |-
+                            The ack level required for this topic (none/broker/routable). The misspelled value
+                            "routeable" is deprecated, is sent to the RGW as "routable", and will be removed in a
+                            future release.
                           enum:
                             - none
                             - broker
+                            - routable
                             - routeable
                           type: string
                         disableVerifySSL:
@@ -1608,7 +1610,7 @@ spec:
                   format: int64
                   type: integer
                 phase:
-                  description: ConditionType represent a resource's status
+                  description: ConditionType represents a resource's status
                   type: string
               type: object
               x-kubernetes-preserve-unknown-fields: true
@@ -1889,6 +1891,15 @@ spec:
                     ssl:
                       description: SSL determines whether SSL should be used
                       type: boolean
+                    sslCertificateRef:
+                      description: SSLCertificateRef references a Kubernetes secret
+                        of type kubernetes.io/tls in the CephCluster namespace. If
+                        set, Rook will configure the dashboard with this certificate
+                        instead of creating a self-signed certificate.
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                     urlPrefix:
                       description: URLPrefix is a prefix for all URLs to use the dashboard
                         with a reverse proxy
@@ -2034,6 +2045,13 @@ spec:
                               grpc:
                                 description: GRPC specifies a GRPC HealthCheckRequest.
                                 properties:
+                                  mode:
+                                    description: |-
+                                      mode specifies the connection mode for the gRPC health probe.
+                                      Set to "TLS" to use TLS without certificate verification.
+                                      Set to "Plaintext" to use a plaintext (insecure) connection explicitly.
+                                      If not specified, the probe uses a plaintext (insecure) connection.
+                                    type: string
                                   port:
                                     description: Port number of the gRPC service.
                                       Number must be in the range 1 to 65535.
@@ -2092,6 +2110,11 @@ spec:
                                       Number must be in the range 1 to 65535.
                                       Name must be an IANA_SVC_NAME.
                                     x-kubernetes-int-or-string: true
+                                  protocol:
+                                    description: |-
+                                      Protocol selects the wire protocol for the probe connection.
+                                      Nil defaults to HTTP/1.1.
+                                    type: string
                                   scheme:
                                     description: |-
                                       Scheme to use for connecting to the host.
@@ -2215,6 +2238,13 @@ spec:
                               grpc:
                                 description: GRPC specifies a GRPC HealthCheckRequest.
                                 properties:
+                                  mode:
+                                    description: |-
+                                      mode specifies the connection mode for the gRPC health probe.
+                                      Set to "TLS" to use TLS without certificate verification.
+                                      Set to "Plaintext" to use a plaintext (insecure) connection explicitly.
+                                      If not specified, the probe uses a plaintext (insecure) connection.
+                                    type: string
                                   port:
                                     description: Port number of the gRPC service.
                                       Number must be in the range 1 to 65535.
@@ -2273,6 +2303,11 @@ spec:
                                       Number must be in the range 1 to 65535.
                                       Name must be an IANA_SVC_NAME.
                                     x-kubernetes-int-or-string: true
+                                  protocol:
+                                    description: |-
+                                      Protocol selects the wire protocol for the probe connection.
+                                      Nil defaults to HTTP/1.1.
+                                    type: string
                                   scheme:
                                     description: |-
                                       Scheme to use for connecting to the host.
@@ -2339,7 +2374,7 @@ spec:
                   additionalProperties:
                     additionalProperties:
                       type: string
-                    description: Labels are label for a given daemons
+                    description: Labels are the labels for a given daemon
                     type: object
                   description: The labels-related configuration to add/set on each
                     Pod related object.
@@ -2347,7 +2382,7 @@ spec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
                 logCollector:
-                  description: Logging represents loggings settings
+                  description: LogCollector represents logging settings
                   nullable: true
                   properties:
                     enabled:
@@ -2443,6 +2478,31 @@ spec:
                       type: array
                     failureDomainLabel:
                       type: string
+                    floatingMon:
+                      description: |-
+                        FloatingMon is the specification of the floating monitor for two-node clusters.
+                        The floating mon is backed by a synchronously replicated store (e.g. DRBD)
+                        and can be scheduled on either node. Template variables are supplied via a ConfigMap.
+                      minProperties: 2
+                      properties:
+                        configmapName:
+                          description: |-
+                            ConfigMapName is the name of the ConfigMap containing key-value pairs
+                            of template variables for the floating mon deployment.
+                          maxLength: 253
+                          minLength: 1
+                          type: string
+                        name:
+                          description: Name is the identifier for the floating monitor
+                            (recommended "c")
+                          maxLength: 1
+                          minLength: 1
+                          pattern: ^[a-z]$
+                          type: string
+                      required:
+                        - configmapName
+                        - name
+                      type: object
                     stretchCluster:
                       description: StretchCluster is the stretch cluster specification
                       properties:
@@ -2512,8 +2572,8 @@ spec:
                                           * An existing PVC (PersistentVolumeClaim)
                                           If the provisioner or an external controller can support the specified data source,
                                           it will create a new volume based on the contents of the specified data source.
-                                          When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
-                                          and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+                                          dataSource contents will be copied to dataSourceRef, and dataSourceRef contents will be
+                                          copied to dataSource when dataSourceRef.namespace is not specified.
                                           If the namespace is specified, then dataSourceRef will not be copied to dataSource.
                                         properties:
                                           apiGroup:
@@ -2558,7 +2618,6 @@ spec:
                                             specified.
                                           * While dataSource only allows local objects, dataSourceRef allows objects
                                             in any namespaces.
-                                          (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
                                           (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
                                         properties:
                                           apiGroup:
@@ -2745,8 +2804,8 @@ spec:
                                 * An existing PVC (PersistentVolumeClaim)
                                 If the provisioner or an external controller can support the specified data source,
                                 it will create a new volume based on the contents of the specified data source.
-                                When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
-                                and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+                                dataSource contents will be copied to dataSourceRef, and dataSourceRef contents will be
+                                copied to dataSource when dataSourceRef.namespace is not specified.
                                 If the namespace is specified, then dataSourceRef will not be copied to dataSource.
                               properties:
                                 apiGroup:
@@ -2791,7 +2850,6 @@ spec:
                                   specified.
                                 * While dataSource only allows local objects, dataSourceRef allows objects
                                   in any namespaces.
-                                (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
                                 (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
                               properties:
                                 apiGroup:
@@ -2987,8 +3045,8 @@ spec:
                                       * An existing PVC (PersistentVolumeClaim)
                                       If the provisioner or an external controller can support the specified data source,
                                       it will create a new volume based on the contents of the specified data source.
-                                      When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
-                                      and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+                                      dataSource contents will be copied to dataSourceRef, and dataSourceRef contents will be
+                                      copied to dataSource when dataSourceRef.namespace is not specified.
                                       If the namespace is specified, then dataSourceRef will not be copied to dataSource.
                                     properties:
                                       apiGroup:
@@ -3033,7 +3091,6 @@ spec:
                                         specified.
                                       * While dataSource only allows local objects, dataSourceRef allows objects
                                         in any namespaces.
-                                      (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
                                       (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
                                     properties:
                                       apiGroup:
@@ -3303,6 +3360,79 @@ spec:
                         Whether to disable the metrics reported by Ceph. If false, the prometheus mgr module and Ceph exporter are enabled.
                         If true, the prometheus mgr module and Ceph exporter are both disabled. Default is false.
                       type: boolean
+                    metricsTLS:
+                      description: |-
+                        MetricsTLS configures native HTTPS for the MGR Prometheus metrics endpoint.
+                        Requires Ceph with prometheus module TLS support: https://github.com/ceph/ceph/pull/70989
+                        Rook mounts a Kubernetes TLS Secret into the mgr pod and configures the module.
+                      properties:
+                        ca:
+                          description: |-
+                            CA is an optional trust anchor for the ServiceMonitor tlsConfig.ca.
+                            Omit when the server cert contains a public CA.
+                          maxProperties: 1
+                          minProperties: 1
+                          properties:
+                            configMap:
+                              description: Selects a key from a ConfigMap.
+                              properties:
+                                key:
+                                  description: |-
+                                    The key to select from the ConfigMap's Data field.
+                                    Keys in the BinaryData field are not currently propagated to container env vars.
+                                  type: string
+                                name:
+                                  default: ''
+                                  description: |-
+                                    Name of the referent.
+                                    This field is effectively required, but due to backwards compatibility is
+                                    allowed to be empty. Instances of this type with an empty value here are
+                                    almost certainly wrong.
+                                    More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                  type: string
+                                optional:
+                                  description: Specify whether the ConfigMap or its
+                                    key must be defined
+                                  type: boolean
+                              required:
+                                - key
+                              type: object
+                              x-kubernetes-map-type: atomic
+                            secret:
+                              description: SecretKeySelector selects a key of a Secret.
+                              properties:
+                                key:
+                                  description: The key of the secret to select from.  Must
+                                    be a valid secret key.
+                                  type: string
+                                name:
+                                  default: ''
+                                  description: |-
+                                    Name of the referent.
+                                    This field is effectively required, but due to backwards compatibility is
+                                    allowed to be empty. Instances of this type with an empty value here are
+                                    almost certainly wrong.
+                                    More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                  type: string
+                                optional:
+                                  description: Specify whether the Secret or its key
+                                    must be defined
+                                  type: boolean
+                              required:
+                                - key
+                              type: object
+                              x-kubernetes-map-type: atomic
+                          type: object
+                        secretName:
+                          description: |-
+                            SecretName is the Kubernetes Secret containing tls.crt and tls.key for the
+                            mgr HTTPS listener.
+                          maxLength: 253
+                          minLength: 1
+                          type: string
+                      required:
+                        - secretName
+                      type: object
                     port:
                       description: Port is the prometheus server port
                       maximum: 65535
@@ -4525,8 +4655,8 @@ spec:
                                         * An existing PVC (PersistentVolumeClaim)
                                         If the provisioner or an external controller can support the specified data source,
                                         it will create a new volume based on the contents of the specified data source.
-                                        When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
-                                        and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+                                        dataSource contents will be copied to dataSourceRef, and dataSourceRef contents will be
+                                        copied to dataSource when dataSourceRef.namespace is not specified.
                                         If the namespace is specified, then dataSourceRef will not be copied to dataSource.
                                       properties:
                                         apiGroup:
@@ -4571,7 +4701,6 @@ spec:
                                           specified.
                                         * While dataSource only allows local objects, dataSourceRef allows objects
                                           in any namespaces.
-                                        (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
                                         (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
                                       properties:
                                         apiGroup:
@@ -4721,7 +4850,7 @@ spec:
                       type: integer
                     scheduleAlways:
                       description: Whether to always schedule OSDs on a node even
-                        if the node is not currently scheduleable or ready
+                        if the node is not currently schedulable or ready
                       type: boolean
                     storageClassDeviceSets:
                       items:
@@ -5895,8 +6024,8 @@ spec:
                                         * An existing PVC (PersistentVolumeClaim)
                                         If the provisioner or an external controller can support the specified data source,
                                         it will create a new volume based on the contents of the specified data source.
-                                        When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
-                                        and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+                                        dataSource contents will be copied to dataSourceRef, and dataSourceRef contents will be
+                                        copied to dataSource when dataSourceRef.namespace is not specified.
                                         If the namespace is specified, then dataSourceRef will not be copied to dataSource.
                                       properties:
                                         apiGroup:
@@ -5941,7 +6070,6 @@ spec:
                                           specified.
                                         * While dataSource only allows local objects, dataSourceRef allows objects
                                           in any namespaces.
-                                        (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
                                         (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
                                       properties:
                                         apiGroup:
@@ -6158,8 +6286,8 @@ spec:
                                   * An existing PVC (PersistentVolumeClaim)
                                   If the provisioner or an external controller can support the specified data source,
                                   it will create a new volume based on the contents of the specified data source.
-                                  When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
-                                  and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+                                  dataSource contents will be copied to dataSourceRef, and dataSourceRef contents will be
+                                  copied to dataSource when dataSourceRef.namespace is not specified.
                                   If the namespace is specified, then dataSourceRef will not be copied to dataSource.
                                 properties:
                                   apiGroup:
@@ -6204,7 +6332,6 @@ spec:
                                     specified.
                                   * While dataSource only allows local objects, dataSourceRef allows objects
                                     in any namespaces.
-                                  (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
                                   (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
                                 properties:
                                   apiGroup:
@@ -6354,7 +6481,7 @@ spec:
                     WaitTimeoutForHealthyOSDInMinutes defines the time the operator would wait before an OSD can be stopped for upgrade or restart.
                     If the timeout exceeds and OSD is not ok to stop, then the operator would skip upgrade for the current OSD and proceed with the next one
                     if `continueUpgradeAfterChecksEvenIfNotHealthy` is `false`. If `continueUpgradeAfterChecksEvenIfNotHealthy` is `true`, then operator would
-                    continue with the upgrade of an OSD even if its not ok to stop after the timeout. This timeout won't be applied if `skipUpgradeChecks` is `true`.
+                    continue with the upgrade of an OSD even if it's not ok to stop after the timeout. This timeout won't be applied if `skipUpgradeChecks` is `true`.
                     The default wait timeout is 10 minutes.
                   format: int64
                   type: integer
@@ -6407,7 +6534,7 @@ spec:
                     previousHealth:
                       type: string
                     versions:
-                      description: CephDaemonsVersions show the current ceph version
+                      description: CephDaemonsVersions shows the current ceph version
                         for different ceph daemons
                       properties:
                         cephfs-mirror:
@@ -6640,7 +6767,7 @@ spec:
                           type: string
                       type: object
                     osd:
-                      description: OSD shows the CephX key status of of OSDs
+                      description: OSD shows the CephX key status of OSDs
                       properties:
                         keyCephVersion:
                           description: |-
@@ -6718,7 +6845,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -6730,7 +6857,7 @@ spec:
                   format: int64
                   type: integer
                 phase:
-                  description: ConditionType represent a resource's status
+                  description: ConditionType represents a resource's status
                   type: string
                 state:
                   description: ClusterState represents the state of a Ceph Cluster
@@ -8121,7 +8248,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -8255,6 +8382,22 @@ spec:
                               This is the number of OSDs that can be lost simultaneously before data cannot be recovered.
                             minimum: 0
                             type: integer
+                          crushNumFailureDomains:
+                            description: |-
+                              Number of failure domains to use for erasure coded chunk placement.
+                              When specified along with crushOSDsPerFailureDomain, a CRUSH MSR rule will be created
+                              that distributes chunks across this many failure domains.
+                            format: int32
+                            minimum: 1
+                            type: integer
+                          crushOSDsPerFailureDomain:
+                            description: |-
+                              Number of OSDs allowed per failure domain for erasure coded chunk placement.
+                              When specified along with crushNumFailureDomains, a CRUSH MSR rule will be created
+                              that allows up to this many chunks on OSDs within each failure domain.
+                            format: int32
+                            minimum: 1
+                            type: integer
                           dataChunks:
                             description: |-
                               Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).
@@ -8262,10 +8405,29 @@ spec:
                               as dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.
                             minimum: 0
                             type: integer
+                          stripeUnit:
+                            anyOf:
+                              - type: integer
+                              - type: string
+                            description: |-
+                              Erasure code stripe size in bytes. Ceph default is 4096 bytes (4 KiB).
+                              Value must be a multiple of 4096 (4Ki).
+                            enum:
+                              - 4Ki
+                              - 16Ki
+                              - 64Ki
+                              - 256Ki
+                              - 1Mi
+                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                            x-kubernetes-int-or-string: true
                         required:
                           - codingChunks
                           - dataChunks
                         type: object
+                        x-kubernetes-validations:
+                          - message: crushNumFailureDomains and crushOSDsPerFailureDomain
+                              must be specified together
+                            rule: has(self.crushNumFailureDomains) == has(self.crushOSDsPerFailureDomain)
                       failureDomain:
                         description: 'The failure domain: osd/host/(region or zone
                           if available) - technically also any type in the crush map'
@@ -8305,7 +8467,7 @@ spec:
                                 scheduling settings of a mirrored pool
                               properties:
                                 interval:
-                                  description: Interval represent the periodicity
+                                  description: Interval represents the periodicity
                                     of the snapshot.
                                   type: string
                                 path:
@@ -8480,6 +8642,22 @@ spec:
                             This is the number of OSDs that can be lost simultaneously before data cannot be recovered.
                           minimum: 0
                           type: integer
+                        crushNumFailureDomains:
+                          description: |-
+                            Number of failure domains to use for erasure coded chunk placement.
+                            When specified along with crushOSDsPerFailureDomain, a CRUSH MSR rule will be created
+                            that distributes chunks across this many failure domains.
+                          format: int32
+                          minimum: 1
+                          type: integer
+                        crushOSDsPerFailureDomain:
+                          description: |-
+                            Number of OSDs allowed per failure domain for erasure coded chunk placement.
+                            When specified along with crushNumFailureDomains, a CRUSH MSR rule will be created
+                            that allows up to this many chunks on OSDs within each failure domain.
+                          format: int32
+                          minimum: 1
+                          type: integer
                         dataChunks:
                           description: |-
                             Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).
@@ -8487,10 +8665,29 @@ spec:
                             as dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.
                           minimum: 0
                           type: integer
+                        stripeUnit:
+                          anyOf:
+                            - type: integer
+                            - type: string
+                          description: |-
+                            Erasure code stripe size in bytes. Ceph default is 4096 bytes (4 KiB).
+                            Value must be a multiple of 4096 (4Ki).
+                          enum:
+                            - 4Ki
+                            - 16Ki
+                            - 64Ki
+                            - 256Ki
+                            - 1Mi
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
                       required:
                         - codingChunks
                         - dataChunks
                       type: object
+                      x-kubernetes-validations:
+                        - message: crushNumFailureDomains and crushOSDsPerFailureDomain
+                            must be specified together
+                          rule: has(self.crushNumFailureDomains) == has(self.crushOSDsPerFailureDomain)
                     failureDomain:
                       description: 'The failure domain: osd/host/(region or zone if
                         available) - technically also any type in the crush map'
@@ -8528,7 +8725,7 @@ spec:
                               scheduling settings of a mirrored pool
                             properties:
                               interval:
-                                description: Interval represent the periodicity of
+                                description: Interval represents the periodicity of
                                   the snapshot.
                                 type: string
                               path:
@@ -8727,6 +8924,13 @@ spec:
                             grpc:
                               description: GRPC specifies a GRPC HealthCheckRequest.
                               properties:
+                                mode:
+                                  description: |-
+                                    mode specifies the connection mode for the gRPC health probe.
+                                    Set to "TLS" to use TLS without certificate verification.
+                                    Set to "Plaintext" to use a plaintext (insecure) connection explicitly.
+                                    If not specified, the probe uses a plaintext (insecure) connection.
+                                  type: string
                                 port:
                                   description: Port number of the gRPC service. Number
                                     must be in the range 1 to 65535.
@@ -8785,6 +8989,11 @@ spec:
                                     Number must be in the range 1 to 65535.
                                     Name must be an IANA_SVC_NAME.
                                   x-kubernetes-int-or-string: true
+                                protocol:
+                                  description: |-
+                                    Protocol selects the wire protocol for the probe connection.
+                                    Nil defaults to HTTP/1.1.
+                                  type: string
                                 scheme:
                                   description: |-
                                     Scheme to use for connecting to the host.
@@ -9456,6 +9665,13 @@ spec:
                             grpc:
                               description: GRPC specifies a GRPC HealthCheckRequest.
                               properties:
+                                mode:
+                                  description: |-
+                                    mode specifies the connection mode for the gRPC health probe.
+                                    Set to "TLS" to use TLS without certificate verification.
+                                    Set to "Plaintext" to use a plaintext (insecure) connection explicitly.
+                                    If not specified, the probe uses a plaintext (insecure) connection.
+                                  type: string
                                 port:
                                   description: Port number of the gRPC service. Number
                                     must be in the range 1 to 65535.
@@ -9514,6 +9730,11 @@ spec:
                                     Number must be in the range 1 to 65535.
                                     Name must be an IANA_SVC_NAME.
                                   x-kubernetes-int-or-string: true
+                                protocol:
+                                  description: |-
+                                    Protocol selects the wire protocol for the probe connection.
+                                    Nil defaults to HTTP/1.1.
+                                  type: string
                                 scheme:
                                   description: |-
                                     Scheme to use for connecting to the host.
@@ -9620,7 +9841,7 @@ spec:
                           scheduling settings of a mirrored pool
                         properties:
                           interval:
-                            description: Interval represent the periodicity of the
+                            description: Interval represents the periodicity of the
                               snapshot.
                             type: string
                           path:
@@ -9723,7 +9944,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -9740,7 +9961,7 @@ spec:
                       description: PoolMirroringStatus is the mirroring status of
                         a filesystem
                       items:
-                        description: FilesystemMirrorInfoSpec is the filesystem mirror
+                        description: FilesystemMirroringInfo is the filesystem mirror
                           status of a given filesystem
                         properties:
                           daemon_id:
@@ -9770,7 +9991,7 @@ spec:
                                       specification of a filesystem peer mirror
                                     properties:
                                       remote:
-                                        description: Remote are the remote cluster
+                                        description: Remote is the remote cluster
                                           information
                                         properties:
                                           client_name:
@@ -9786,7 +10007,8 @@ spec:
                                             type: string
                                         type: object
                                       stats:
-                                        description: Stats are the stat a peer mirror
+                                        description: Stats is the mirror stat for
+                                          a given peer
                                         properties:
                                           failure_count:
                                             description: FailureCount is the number
@@ -9811,12 +10033,10 @@ spec:
                       description: Details contains potential status errors
                       type: string
                     lastChanged:
-                      description: LastChanged is the last time time the status last
-                        changed
+                      description: LastChanged is the last time the status last changed
                       type: string
                     lastChecked:
-                      description: LastChecked is the last time time the status was
-                        checked
+                      description: LastChecked is the last time the status was checked
                       type: string
                   type: object
                 observedGeneration:
@@ -9825,7 +10045,7 @@ spec:
                   format: int64
                   type: integer
                 phase:
-                  description: ConditionType represent a resource's status
+                  description: ConditionType represents a resource's status
                   type: string
                 snapshotScheduleStatus:
                   description: FilesystemSnapshotScheduleStatusSpec is the status
@@ -9835,12 +10055,10 @@ spec:
                       description: Details contains potential status errors
                       type: string
                     lastChanged:
-                      description: LastChanged is the last time time the status last
-                        changed
+                      description: LastChanged is the last time the status last changed
                       type: string
                     lastChecked:
-                      description: LastChecked is the last time time the status was
-                        checked
+                      description: LastChecked is the last time the status was checked
                       type: string
                     snapshotSchedules:
                       description: SnapshotSchedules is the list of snapshots scheduled
@@ -10070,7 +10288,7 @@ spec:
                   format: int64
                   type: integer
                 phase:
-                  description: ConditionType represent a resource's status
+                  description: ConditionType represents a resource's status
                   type: string
               type: object
               x-kubernetes-preserve-unknown-fields: true
@@ -10178,6 +10396,9 @@ spec:
                                     defaultMode:
                                       format: int32
                                       type: integer
+                                    defaultUser:
+                                      format: int64
+                                      type: integer
                                     items:
                                       items:
                                         properties:
@@ -10188,6 +10409,9 @@ spec:
                                             type: integer
                                           path:
                                             type: string
+                                          user:
+                                            format: int64
+                                            type: integer
                                         required:
                                           - key
                                           - path
@@ -10205,6 +10429,9 @@ spec:
                                   properties:
                                     medium:
                                       type: string
+                                    mode:
+                                      format: int32
+                                      type: integer
                                     sizeLimit:
                                       anyOf:
                                         - type: integer
@@ -10234,6 +10461,9 @@ spec:
                                   properties:
                                     defaultMode:
                                       format: int32
+                                      type: integer
+                                    defaultUser:
+                                      format: int64
                                       type: integer
                                     sources:
                                       items:
@@ -10274,6 +10504,9 @@ spec:
                                                 type: string
                                               signerName:
                                                 type: string
+                                              user:
+                                                format: int64
+                                                type: integer
                                             required:
                                               - path
                                             type: object
@@ -10289,6 +10522,9 @@ spec:
                                                       type: integer
                                                     path:
                                                       type: string
+                                                    user:
+                                                      format: int64
+                                                      type: integer
                                                   required:
                                                     - key
                                                     - path
@@ -10338,6 +10574,9 @@ spec:
                                                         - resource
                                                       type: object
                                                       x-kubernetes-map-type: atomic
+                                                    user:
+                                                      format: int64
+                                                      type: integer
                                                   required:
                                                     - path
                                                   type: object
@@ -10359,6 +10598,9 @@ spec:
                                                 type: integer
                                               signerName:
                                                 type: string
+                                              user:
+                                                format: int64
+                                                type: integer
                                               userAnnotations:
                                                 additionalProperties:
                                                   type: string
@@ -10379,6 +10621,9 @@ spec:
                                                       type: integer
                                                     path:
                                                       type: string
+                                                    user:
+                                                      format: int64
+                                                      type: integer
                                                   required:
                                                     - key
                                                     - path
@@ -10401,6 +10646,9 @@ spec:
                                                 type: integer
                                               path:
                                                 type: string
+                                              user:
+                                                format: int64
+                                                type: integer
                                             required:
                                               - path
                                             type: object
@@ -10413,6 +10661,9 @@ spec:
                                     defaultMode:
                                       format: int32
                                       type: integer
+                                    defaultUser:
+                                      format: int64
+                                      type: integer
                                     items:
                                       items:
                                         properties:
@@ -10423,6 +10674,9 @@ spec:
                                             type: integer
                                           path:
                                             type: string
+                                          user:
+                                            format: int64
+                                            type: integer
                                         required:
                                           - key
                                           - path
@@ -10454,6 +10708,9 @@ spec:
                                     defaultMode:
                                       format: int32
                                       type: integer
+                                    defaultUser:
+                                      format: int64
+                                      type: integer
                                     items:
                                       items:
                                         properties:
@@ -10464,6 +10721,9 @@ spec:
                                             type: integer
                                           path:
                                             type: string
+                                          user:
+                                            format: int64
+                                            type: integer
                                         required:
                                           - key
                                           - path
@@ -10481,6 +10741,9 @@ spec:
                                   properties:
                                     medium:
                                       type: string
+                                    mode:
+                                      format: int32
+                                      type: integer
                                     sizeLimit:
                                       anyOf:
                                         - type: integer
@@ -10510,6 +10773,9 @@ spec:
                                   properties:
                                     defaultMode:
                                       format: int32
+                                      type: integer
+                                    defaultUser:
+                                      format: int64
                                       type: integer
                                     sources:
                                       items:
@@ -10550,6 +10816,9 @@ spec:
                                                 type: string
                                               signerName:
                                                 type: string
+                                              user:
+                                                format: int64
+                                                type: integer
                                             required:
                                               - path
                                             type: object
@@ -10565,6 +10834,9 @@ spec:
                                                       type: integer
                                                     path:
                                                       type: string
+                                                    user:
+                                                      format: int64
+                                                      type: integer
                                                   required:
                                                     - key
                                                     - path
@@ -10614,6 +10886,9 @@ spec:
                                                         - resource
                                                       type: object
                                                       x-kubernetes-map-type: atomic
+                                                    user:
+                                                      format: int64
+                                                      type: integer
                                                   required:
                                                     - path
                                                   type: object
@@ -10635,6 +10910,9 @@ spec:
                                                 type: integer
                                               signerName:
                                                 type: string
+                                              user:
+                                                format: int64
+                                                type: integer
                                               userAnnotations:
                                                 additionalProperties:
                                                   type: string
@@ -10655,6 +10933,9 @@ spec:
                                                       type: integer
                                                     path:
                                                       type: string
+                                                    user:
+                                                      format: int64
+                                                      type: integer
                                                   required:
                                                     - key
                                                     - path
@@ -10677,6 +10958,9 @@ spec:
                                                 type: integer
                                               path:
                                                 type: string
+                                              user:
+                                                format: int64
+                                                type: integer
                                             required:
                                               - path
                                             type: object
@@ -10689,6 +10973,9 @@ spec:
                                     defaultMode:
                                       format: int32
                                       type: integer
+                                    defaultUser:
+                                      format: int64
+                                      type: integer
                                     items:
                                       items:
                                         properties:
@@ -10699,6 +10986,9 @@ spec:
                                             type: integer
                                           path:
                                             type: string
+                                          user:
+                                            format: int64
+                                            type: integer
                                         required:
                                           - key
                                           - path
@@ -10760,6 +11050,9 @@ spec:
                                           defaultMode:
                                             format: int32
                                             type: integer
+                                          defaultUser:
+                                            format: int64
+                                            type: integer
                                           items:
                                             items:
                                               properties:
@@ -10770,6 +11063,9 @@ spec:
                                                   type: integer
                                                 path:
                                                   type: string
+                                                user:
+                                                  format: int64
+                                                  type: integer
                                               required:
                                                 - key
                                                 - path
@@ -10787,6 +11083,9 @@ spec:
                                         properties:
                                           medium:
                                             type: string
+                                          mode:
+                                            format: int32
+                                            type: integer
                                           sizeLimit:
                                             anyOf:
                                               - type: integer
@@ -10816,6 +11115,9 @@ spec:
                                         properties:
                                           defaultMode:
                                             format: int32
+                                            type: integer
+                                          defaultUser:
+                                            format: int64
                                             type: integer
                                           sources:
                                             items:
@@ -10856,6 +11158,9 @@ spec:
                                                       type: string
                                                     signerName:
                                                       type: string
+                                                    user:
+                                                      format: int64
+                                                      type: integer
                                                   required:
                                                     - path
                                                   type: object
@@ -10871,6 +11176,9 @@ spec:
                                                             type: integer
                                                           path:
                                                             type: string
+                                                          user:
+                                                            format: int64
+                                                            type: integer
                                                         required:
                                                           - key
                                                           - path
@@ -10920,6 +11228,9 @@ spec:
                                                               - resource
                                                             type: object
                                                             x-kubernetes-map-type: atomic
+                                                          user:
+                                                            format: int64
+                                                            type: integer
                                                         required:
                                                           - path
                                                         type: object
@@ -10941,6 +11252,9 @@ spec:
                                                       type: integer
                                                     signerName:
                                                       type: string
+                                                    user:
+                                                      format: int64
+                                                      type: integer
                                                     userAnnotations:
                                                       additionalProperties:
                                                         type: string
@@ -10961,6 +11275,9 @@ spec:
                                                             type: integer
                                                           path:
                                                             type: string
+                                                          user:
+                                                            format: int64
+                                                            type: integer
                                                         required:
                                                           - key
                                                           - path
@@ -10983,6 +11300,9 @@ spec:
                                                       type: integer
                                                     path:
                                                       type: string
+                                                    user:
+                                                      format: int64
+                                                      type: integer
                                                   required:
                                                     - path
                                                   type: object
@@ -10995,6 +11315,9 @@ spec:
                                           defaultMode:
                                             format: int32
                                             type: integer
+                                          defaultUser:
+                                            format: int64
+                                            type: integer
                                           items:
                                             items:
                                               properties:
@@ -11005,6 +11328,9 @@ spec:
                                                   type: integer
                                                 path:
                                                   type: string
+                                                user:
+                                                  format: int64
+                                                  type: integer
                                               required:
                                                 - key
                                                 - path
@@ -11111,6 +11437,9 @@ spec:
                                         defaultMode:
                                           format: int32
                                           type: integer
+                                        defaultUser:
+                                          format: int64
+                                          type: integer
                                         items:
                                           items:
                                             properties:
@@ -11121,6 +11450,9 @@ spec:
                                                 type: integer
                                               path:
                                                 type: string
+                                              user:
+                                                format: int64
+                                                type: integer
                                             required:
                                               - key
                                               - path
@@ -11138,6 +11470,9 @@ spec:
                                       properties:
                                         medium:
                                           type: string
+                                        mode:
+                                          format: int32
+                                          type: integer
                                         sizeLimit:
                                           anyOf:
                                             - type: integer
@@ -11167,6 +11502,9 @@ spec:
                                       properties:
                                         defaultMode:
                                           format: int32
+                                          type: integer
+                                        defaultUser:
+                                          format: int64
                                           type: integer
                                         sources:
                                           items:
@@ -11207,6 +11545,9 @@ spec:
                                                     type: string
                                                   signerName:
                                                     type: string
+                                                  user:
+                                                    format: int64
+                                                    type: integer
                                                 required:
                                                   - path
                                                 type: object
@@ -11222,6 +11563,9 @@ spec:
                                                           type: integer
                                                         path:
                                                           type: string
+                                                        user:
+                                                          format: int64
+                                                          type: integer
                                                       required:
                                                         - key
                                                         - path
@@ -11271,6 +11615,9 @@ spec:
                                                             - resource
                                                           type: object
                                                           x-kubernetes-map-type: atomic
+                                                        user:
+                                                          format: int64
+                                                          type: integer
                                                       required:
                                                         - path
                                                       type: object
@@ -11292,6 +11639,9 @@ spec:
                                                     type: integer
                                                   signerName:
                                                     type: string
+                                                  user:
+                                                    format: int64
+                                                    type: integer
                                                   userAnnotations:
                                                     additionalProperties:
                                                       type: string
@@ -11312,6 +11662,9 @@ spec:
                                                           type: integer
                                                         path:
                                                           type: string
+                                                        user:
+                                                          format: int64
+                                                          type: integer
                                                       required:
                                                         - key
                                                         - path
@@ -11334,6 +11687,9 @@ spec:
                                                     type: integer
                                                   path:
                                                     type: string
+                                                  user:
+                                                    format: int64
+                                                    type: integer
                                                 required:
                                                   - path
                                                 type: object
@@ -11346,6 +11702,9 @@ spec:
                                         defaultMode:
                                           format: int32
                                           type: integer
+                                        defaultUser:
+                                          format: int64
+                                          type: integer
                                         items:
                                           items:
                                             properties:
@@ -11356,6 +11715,9 @@ spec:
                                                 type: integer
                                               path:
                                                 type: string
+                                              user:
+                                                format: int64
+                                                type: integer
                                             required:
                                               - key
                                               - path
@@ -11463,6 +11825,13 @@ spec:
                             grpc:
                               description: GRPC specifies a GRPC HealthCheckRequest.
                               properties:
+                                mode:
+                                  description: |-
+                                    mode specifies the connection mode for the gRPC health probe.
+                                    Set to "TLS" to use TLS without certificate verification.
+                                    Set to "Plaintext" to use a plaintext (insecure) connection explicitly.
+                                    If not specified, the probe uses a plaintext (insecure) connection.
+                                  type: string
                                 port:
                                   description: Port number of the gRPC service. Number
                                     must be in the range 1 to 65535.
@@ -11521,6 +11890,11 @@ spec:
                                     Number must be in the range 1 to 65535.
                                     Name must be an IANA_SVC_NAME.
                                   x-kubernetes-int-or-string: true
+                                protocol:
+                                  description: |-
+                                    Protocol selects the wire protocol for the probe connection.
+                                    Nil defaults to HTTP/1.1.
+                                  type: string
                                 scheme:
                                   description: |-
                                     Scheme to use for connecting to the host.
@@ -11580,7 +11954,7 @@ spec:
                           type: object
                       type: object
                     logLevel:
-                      description: LogLevel set logging level
+                      description: LogLevel sets logging level
                       type: string
                     placement:
                       nullable: true
@@ -12093,6 +12467,14 @@ spec:
                           type: array
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    port:
+                      description: |-
+                        The port the NFS server (NFS-Ganesha) will listen on for NFS clients. Defaults to 2049.
+                        Useful when host networking is enabled and the default NFS port is already in use.
+                      format: int32
+                      maximum: 65535
+                      minimum: 1
+                      type: integer
                     priorityClassName:
                       description: PriorityClassName sets the priority class on the
                         pods
@@ -12219,7 +12601,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -12316,6 +12698,9 @@ spec:
                   description: |-
                     Image is the container image to use for the NVMe-oF gateway daemon.
                     For example, quay.io/ceph/nvmeof:1.5
+                    If not specified, the image is fetched from the Ceph mon config store
+                    (mgr/cephadm/container_image_nvmeof).
+                  maxLength: 1024
                   minLength: 1
                   type: string
                 instances:
@@ -12367,6 +12752,13 @@ spec:
                         grpc:
                           description: GRPC specifies a GRPC HealthCheckRequest.
                           properties:
+                            mode:
+                              description: |-
+                                mode specifies the connection mode for the gRPC health probe.
+                                Set to "TLS" to use TLS without certificate verification.
+                                Set to "Plaintext" to use a plaintext (insecure) connection explicitly.
+                                If not specified, the probe uses a plaintext (insecure) connection.
+                              type: string
                             port:
                               description: Port number of the gRPC service. Number
                                 must be in the range 1 to 65535.
@@ -12424,6 +12816,11 @@ spec:
                                 Number must be in the range 1 to 65535.
                                 Name must be an IANA_SVC_NAME.
                               x-kubernetes-int-or-string: true
+                            protocol:
+                              description: |-
+                                Protocol selects the wire protocol for the probe connection.
+                                Nil defaults to HTTP/1.1.
+                              type: string
                             scheme:
                               description: |-
                                 Scheme to use for connecting to the host.
@@ -12999,11 +13396,6 @@ spec:
                         type: object
                       type: array
                   type: object
-                pool:
-                  description: Pool is the RADOS pool where NVMe-oF configuration
-                    is stored
-                  minLength: 1
-                  type: string
                 ports:
                   description: Ports configuration for the NVMe-oF gateway
                   properties:
@@ -13100,9 +13492,7 @@ spec:
                   type: object
               required:
                 - group
-                - image
                 - instances
-                - pool
               type: object
             status:
               description: NVMeOFGatewayStatus represents the status of Ceph NVMe-oF
@@ -13160,7 +13550,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -13229,7 +13619,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: ObjectRealmSpec represent the spec of an ObjectRealm
+              description: ObjectRealmSpec represents the spec of a CephObjectRealm
               nullable: true
               properties:
                 defaultRealm:
@@ -13267,7 +13657,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -13282,6 +13672,133 @@ spec:
               x-kubernetes-preserve-unknown-fields: true
           required:
             - metadata
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+    helm.sh/resource-policy: keep
+  name: cephobjectstoreaccounts.ceph.rook.io
+spec:
+  group: ceph.rook.io
+  names:
+    kind: CephObjectStoreAccount
+    listKind: CephObjectStoreAccountList
+    plural: cephobjectstoreaccounts
+    singular: cephobjectstoreaccount
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1
+      schema:
+        openAPIV3Schema:
+          description: CephObjectStoreAccount represents the RGW user account
+          properties:
+            apiVersion:
+              description: |-
+                APIVersion defines the versioned schema of this representation of an object.
+                Servers should convert recognized schemas to the latest internal value, and
+                may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+              type: string
+            kind:
+              description: |-
+                Kind is a string value representing the REST resource this object represents.
+                Servers may infer this from the endpoint the client submits requests to.
+                Cannot be updated.
+                In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: ObjectStoreAccountSpec represents the spec of an RGW Account
+              properties:
+                accountID:
+                  description: |-
+                    AccountID uniquely identifies an account and resource ownership. Format should be RGW followed by 17 digits
+                    (e.g., RGW00889737169837717). If not specified, the ID will be automatically generated.
+                  maxLength: 20
+                  minLength: 20
+                  pattern: ^RGW\d{17}$
+                  type: string
+                  x-kubernetes-validations:
+                    - message: accountID is immutable
+                      rule: self == oldSelf
+                name:
+                  description: Name is the desired display name of the RGW account
+                    if different from the CephObjectStoreAccount CR name.
+                  maxLength: 2048
+                  minLength: 1
+                  pattern: ^[a-zA-Z0-9 ._-]+$
+                  type: string
+                rootUser:
+                  description: |-
+                    RootUser configures the root user for the account. The root user is created by default
+                    and has default permissions across all account resources.
+                  properties:
+                    displayName:
+                      description: DisplayName for the root user
+                      maxLength: 64
+                      minLength: 1
+                      pattern: ^[\w+=,.@-]+$
+                      type: string
+                    skipCreate:
+                      description: |-
+                        SkipCreate when set to true, the root user will not be created for this account.
+                        This can be useful if the user wants to manually manage the root user outside of Rook.
+                      type: boolean
+                  type: object
+                store:
+                  description: Store is the CephObjectStore the account will be associated
+                    with
+                  maxLength: 253
+                  minLength: 1
+                  type: string
+                  x-kubernetes-validations:
+                    - message: store is immutable
+                      rule: self == oldSelf
+              required:
+                - store
+              type: object
+            status:
+              description: ObjectStoreAccountStatus represents the status of a CephObjectStoreAccount
+                resource
+              properties:
+                accountID:
+                  description: AccountID associated with the RGW user account
+                  maxLength: 20
+                  minLength: 20
+                  type: string
+                observedGeneration:
+                  description: ObservedGeneration is the latest generation observed
+                    by the controller.
+                  format: int64
+                  type: integer
+                phase:
+                  type: string
+                rootAccountSecretName:
+                  description: RootAccountSecretName is the name of the Kubernetes
+                    secret containing the root user's access credentials
+                  maxLength: 253
+                  minLength: 1
+                  type: string
+              type: object
+          required:
+            - metadata
+            - spec
           type: object
       served: true
       storage: true
@@ -13342,7 +13859,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: ObjectStoreSpec represent the spec of a pool
+              description: ObjectStoreSpec represents the spec of a CephObjectStore
               properties:
                 allowUsersInNamespaces:
                   description: |-
@@ -13455,6 +13972,22 @@ spec:
                             This is the number of OSDs that can be lost simultaneously before data cannot be recovered.
                           minimum: 0
                           type: integer
+                        crushNumFailureDomains:
+                          description: |-
+                            Number of failure domains to use for erasure coded chunk placement.
+                            When specified along with crushOSDsPerFailureDomain, a CRUSH MSR rule will be created
+                            that distributes chunks across this many failure domains.
+                          format: int32
+                          minimum: 1
+                          type: integer
+                        crushOSDsPerFailureDomain:
+                          description: |-
+                            Number of OSDs allowed per failure domain for erasure coded chunk placement.
+                            When specified along with crushNumFailureDomains, a CRUSH MSR rule will be created
+                            that allows up to this many chunks on OSDs within each failure domain.
+                          format: int32
+                          minimum: 1
+                          type: integer
                         dataChunks:
                           description: |-
                             Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).
@@ -13462,10 +13995,29 @@ spec:
                             as dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.
                           minimum: 0
                           type: integer
+                        stripeUnit:
+                          anyOf:
+                            - type: integer
+                            - type: string
+                          description: |-
+                            Erasure code stripe size in bytes. Ceph default is 4096 bytes (4 KiB).
+                            Value must be a multiple of 4096 (4Ki).
+                          enum:
+                            - 4Ki
+                            - 16Ki
+                            - 64Ki
+                            - 256Ki
+                            - 1Mi
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
                       required:
                         - codingChunks
                         - dataChunks
                       type: object
+                      x-kubernetes-validations:
+                        - message: crushNumFailureDomains and crushOSDsPerFailureDomain
+                            must be specified together
+                          rule: has(self.crushNumFailureDomains) == has(self.crushOSDsPerFailureDomain)
                     failureDomain:
                       description: 'The failure domain: osd/host/(region or zone if
                         available) - technically also any type in the crush map'
@@ -13503,7 +14055,7 @@ spec:
                               scheduling settings of a mirrored pool
                             properties:
                               interval:
-                                description: Interval represent the periodicity of
+                                description: Interval represents the periodicity of
                                   the snapshot.
                                 type: string
                               path:
@@ -13652,6 +14204,9 @@ spec:
                                   defaultMode:
                                     format: int32
                                     type: integer
+                                  defaultUser:
+                                    format: int64
+                                    type: integer
                                   items:
                                     items:
                                       properties:
@@ -13662,6 +14217,9 @@ spec:
                                           type: integer
                                         path:
                                           type: string
+                                        user:
+                                          format: int64
+                                          type: integer
                                       required:
                                         - key
                                         - path
@@ -13679,6 +14237,9 @@ spec:
                                 properties:
                                   medium:
                                     type: string
+                                  mode:
+                                    format: int32
+                                    type: integer
                                   sizeLimit:
                                     anyOf:
                                       - type: integer
@@ -13708,6 +14269,9 @@ spec:
                                 properties:
                                   defaultMode:
                                     format: int32
+                                    type: integer
+                                  defaultUser:
+                                    format: int64
                                     type: integer
                                   sources:
                                     items:
@@ -13748,6 +14312,9 @@ spec:
                                               type: string
                                             signerName:
                                               type: string
+                                            user:
+                                              format: int64
+                                              type: integer
                                           required:
                                             - path
                                           type: object
@@ -13763,6 +14330,9 @@ spec:
                                                     type: integer
                                                   path:
                                                     type: string
+                                                  user:
+                                                    format: int64
+                                                    type: integer
                                                 required:
                                                   - key
                                                   - path
@@ -13812,6 +14382,9 @@ spec:
                                                       - resource
                                                     type: object
                                                     x-kubernetes-map-type: atomic
+                                                  user:
+                                                    format: int64
+                                                    type: integer
                                                 required:
                                                   - path
                                                 type: object
@@ -13833,6 +14406,9 @@ spec:
                                               type: integer
                                             signerName:
                                               type: string
+                                            user:
+                                              format: int64
+                                              type: integer
                                             userAnnotations:
                                               additionalProperties:
                                                 type: string
@@ -13853,6 +14429,9 @@ spec:
                                                     type: integer
                                                   path:
                                                     type: string
+                                                  user:
+                                                    format: int64
+                                                    type: integer
                                                 required:
                                                   - key
                                                   - path
@@ -13875,6 +14454,9 @@ spec:
                                               type: integer
                                             path:
                                               type: string
+                                            user:
+                                              format: int64
+                                              type: integer
                                           required:
                                             - path
                                           type: object
@@ -13887,6 +14469,9 @@ spec:
                                   defaultMode:
                                     format: int32
                                     type: integer
+                                  defaultUser:
+                                    format: int64
+                                    type: integer
                                   items:
                                     items:
                                       properties:
@@ -13897,6 +14482,9 @@ spec:
                                           type: integer
                                         path:
                                           type: string
+                                        user:
+                                          format: int64
+                                          type: integer
                                       required:
                                         - key
                                         - path
@@ -14777,6 +15365,13 @@ spec:
                             grpc:
                               description: GRPC specifies a GRPC HealthCheckRequest.
                               properties:
+                                mode:
+                                  description: |-
+                                    mode specifies the connection mode for the gRPC health probe.
+                                    Set to "TLS" to use TLS without certificate verification.
+                                    Set to "Plaintext" to use a plaintext (insecure) connection explicitly.
+                                    If not specified, the probe uses a plaintext (insecure) connection.
+                                  type: string
                                 port:
                                   description: Port number of the gRPC service. Number
                                     must be in the range 1 to 65535.
@@ -14835,6 +15430,11 @@ spec:
                                     Number must be in the range 1 to 65535.
                                     Name must be an IANA_SVC_NAME.
                                   x-kubernetes-int-or-string: true
+                                protocol:
+                                  description: |-
+                                    Protocol selects the wire protocol for the probe connection.
+                                    Nil defaults to HTTP/1.1.
+                                  type: string
                                 scheme:
                                   description: |-
                                     Scheme to use for connecting to the host.
@@ -14932,6 +15532,13 @@ spec:
                             grpc:
                               description: GRPC specifies a GRPC HealthCheckRequest.
                               properties:
+                                mode:
+                                  description: |-
+                                    mode specifies the connection mode for the gRPC health probe.
+                                    Set to "TLS" to use TLS without certificate verification.
+                                    Set to "Plaintext" to use a plaintext (insecure) connection explicitly.
+                                    If not specified, the probe uses a plaintext (insecure) connection.
+                                  type: string
                                 port:
                                   description: Port number of the gRPC service. Number
                                     must be in the range 1 to 65535.
@@ -14990,6 +15597,11 @@ spec:
                                     Number must be in the range 1 to 65535.
                                     Name must be an IANA_SVC_NAME.
                                   x-kubernetes-int-or-string: true
+                                protocol:
+                                  description: |-
+                                    Protocol selects the wire protocol for the probe connection.
+                                    Nil defaults to HTTP/1.1.
+                                  type: string
                                 scheme:
                                   description: |-
                                     Scheme to use for connecting to the host.
@@ -15161,6 +15773,22 @@ spec:
                             This is the number of OSDs that can be lost simultaneously before data cannot be recovered.
                           minimum: 0
                           type: integer
+                        crushNumFailureDomains:
+                          description: |-
+                            Number of failure domains to use for erasure coded chunk placement.
+                            When specified along with crushOSDsPerFailureDomain, a CRUSH MSR rule will be created
+                            that distributes chunks across this many failure domains.
+                          format: int32
+                          minimum: 1
+                          type: integer
+                        crushOSDsPerFailureDomain:
+                          description: |-
+                            Number of OSDs allowed per failure domain for erasure coded chunk placement.
+                            When specified along with crushNumFailureDomains, a CRUSH MSR rule will be created
+                            that allows up to this many chunks on OSDs within each failure domain.
+                          format: int32
+                          minimum: 1
+                          type: integer
                         dataChunks:
                           description: |-
                             Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).
@@ -15168,10 +15796,29 @@ spec:
                             as dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.
                           minimum: 0
                           type: integer
+                        stripeUnit:
+                          anyOf:
+                            - type: integer
+                            - type: string
+                          description: |-
+                            Erasure code stripe size in bytes. Ceph default is 4096 bytes (4 KiB).
+                            Value must be a multiple of 4096 (4Ki).
+                          enum:
+                            - 4Ki
+                            - 16Ki
+                            - 64Ki
+                            - 256Ki
+                            - 1Mi
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
                       required:
                         - codingChunks
                         - dataChunks
                       type: object
+                      x-kubernetes-validations:
+                        - message: crushNumFailureDomains and crushOSDsPerFailureDomain
+                            must be specified together
+                          rule: has(self.crushNumFailureDomains) == has(self.crushOSDsPerFailureDomain)
                     failureDomain:
                       description: 'The failure domain: osd/host/(region or zone if
                         available) - technically also any type in the crush map'
@@ -15209,7 +15856,7 @@ spec:
                               scheduling settings of a mirrored pool
                             properties:
                               interval:
-                                description: Interval represent the periodicity of
+                                description: Interval represents the periodicity of
                                   the snapshot.
                                 type: string
                               path:
@@ -15400,6 +16047,26 @@ spec:
                   description: Security represents security settings
                   nullable: true
                   properties:
+                    cipherSuites:
+                      description: |-
+                        CipherSuites specifies the cipher suites used during the TLS handshake for TLS v1.3.
+                        Each value must be a valid OpenSSL cipher suite name.
+                        See https://docs.openssl.org/master/man1/openssl-ciphers/
+                      items:
+                        type: string
+                      maxItems: 1000
+                      minItems: 0
+                      type: array
+                    ciphers:
+                      description: |-
+                        Ciphers specifies the cipher suites used during the TLS handshake for TLS v1.2 and below.
+                        Each value must be a valid OpenSSL cipher suite name.
+                        See https://docs.openssl.org/master/man1/openssl-ciphers/
+                      items:
+                        type: string
+                      maxItems: 1000
+                      minItems: 0
+                      type: array
                     keyRotation:
                       description: KeyRotation defines options for Key Rotation.
                       nullable: true
@@ -15449,6 +16116,55 @@ spec:
                             the KMS token
                           type: string
                       type: object
+                    sslOptions:
+                      description: |-
+                        SslOptions sets the SSL context options for the Ceph RGW beast frontend.
+                        See https://docs.ceph.com/en/latest/radosgw/frontends/#options
+                      properties:
+                        defaultWorkarounds:
+                          description: defaultWorkarounds implements various bug workaround
+                            when true, or disables it when false. Default disabled.
+                          type: boolean
+                        noCompression:
+                          description: noCompression disables compression when true,
+                            or disables it when false. Default disabled.
+                          type: boolean
+                        singleDiffieHellmanUse:
+                          description: SingleDiffieHellmanUse always creates a new
+                            key when using tmp_dh parameters when true, or disables
+                            it when false. Default disabled.
+                          type: boolean
+                        sslv2:
+                          description: sslv2 enables SSL v2 when true, or disables
+                            it when false. Default disabled.
+                          type: boolean
+                        sslv3:
+                          description: sslv3 enables SSL v3 when true, or disables
+                            it when false. Default disabled.
+                          type: boolean
+                        tlsv1_0:
+                          description: tlsv1_0 enables TLS v1.0 when true, or disables
+                            it when false. Default disabled.
+                          type: boolean
+                        tlsv1_1:
+                          description: tlsv1_1 enables TLS v1.1 when true, or disables
+                            it when false. Default disabled.
+                          type: boolean
+                        tlsv1_2:
+                          description: tlsv1_2 enables TLS v1.2 when true, or disables
+                            it when false. Default enabled.
+                          type: boolean
+                      type: object
+                    tlsGroups:
+                      description: |-
+                        TlsGroups specifies one or more TLS Group strings separated by colons.
+                        Multiple suites are supported with ':' colon-separated.
+                        The pseudo group name DEFAULT can be used to select the OpenSSL built-in default list of groups.
+                        Other valid group names will depend on OpenSSL version
+                        See https://docs.openssl.org/master/man3/SSL_CTX_set1_curves/#description
+                      items:
+                        type: string
+                      type: array
                   type: object
                 sharedPools:
                   description: The pool information when configuring RADOS namespaces
@@ -15624,7 +16340,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -15654,7 +16370,7 @@ spec:
                   format: int64
                   type: integer
                 phase:
-                  description: ConditionType represent a resource's status
+                  description: ConditionType represents a resource's status
                   type: string
                 replicas:
                   format: int32
@@ -15727,13 +16443,42 @@ spec:
             metadata:
               type: object
             spec:
-              description: ObjectStoreUserSpec represent the spec of an Objectstoreuser
+              description: ObjectStoreUserSpec represents the spec of a CephObjectStoreUser
               properties:
+                accountRef:
+                  description: |-
+                    AccountRef is a reference to a CephObjectStoreAccount to associate this user with.
+                    The referenced account must be in the same namespace as the user.
+                    When set, the user is created as an account user with no default permissions,
+                    and resources created by this user are owned by the account.
+                  properties:
+                    name:
+                      description: Name of the CephObjectStoreAccount CR
+                      maxLength: 2048
+                      minLength: 1
+                      pattern: ^[a-zA-Z0-9 ._-]+$
+                      type: string
+                  required:
+                    - name
+                  type: object
+                  x-kubernetes-validations:
+                    - message: accountRef is immutable
+                      rule: self == oldSelf
                 capabilities:
                   description: Additional admin-level capabilities for the Ceph object
                     store user
                   nullable: true
                   properties:
+                    accounts:
+                      description: |-
+                        Add capabilities for user to manage accounts. Documented in https://docs.ceph.com/en/latest/radosgw/admin/?#add-remove-admin-capabilities
+                        Note: Only supported from Ceph Squid (v19.2.3) onwards
+                      enum:
+                        - '*'
+                        - read
+                        - write
+                        - read, write
+                      type: string
                     amz-cache:
                       description: Add capabilities for user to send request to RGW
                         Cache API header. Documented in https://docs.ceph.com/en/latest/radosgw/rgw-cache/#cache-api
@@ -15860,6 +16605,16 @@ spec:
                         - write
                         - read, write
                       type: string
+                    userInfoWithoutKeys:
+                      description: |-
+                        Add capabilities for user to fetch user info without keys. Documented in https://docs.ceph.com/en/latest/radosgw/admin/?#add-remove-admin-capabilities
+                        Note: Only supported from Ceph Squid (v19.2.0) onwards
+                      enum:
+                        - '*'
+                        - read
+                        - write
+                        - read, write
+                      type: string
                     users:
                       description: Admin capabilities to read/write Ceph object store
                         users. Documented in https://docs.ceph.com/en/latest/radosgw/admin/?#add-remove-admin-capabilities
@@ -15882,6 +16637,31 @@ spec:
                 clusterNamespace:
                   description: The namespace where the parent CephCluster and CephObjectStore
                     are found
+                  type: string
+                defaultPlacement:
+                  description: |-
+                    DefaultPlacement sets the default pool placement target for buckets
+                    created by this user. It must name a placement target known to the
+                    zonegroup serving the referenced object store; RGW rejects unknown
+                    targets. If this field is absent the controller does not manage the
+                    user's placement: an existing value (set previously through this
+                    field, or outside of Rook) is left in place.
+                  maxLength: 2048
+                  minLength: 1
+                  pattern: ^[a-zA-Z0-9._-]+$
+                  type: string
+                defaultStorageClass:
+                  description: |-
+                    DefaultStorageClass sets the default storage class for objects created
+                    by this user, within the placement set by DefaultPlacement (which must
+                    also be set). The storage class must exist on that placement target;
+                    RGW rejects unknown storage classes. If this field is absent the
+                    controller does not manage the user's storage class: an existing value
+                    is preserved, except when DefaultPlacement changes, which resets the
+                    storage class to the new target's default (STANDARD).
+                  maxLength: 2048
+                  minLength: 1
+                  pattern: ^[a-zA-Z0-9._-]+$
                   type: string
                 displayName:
                   description: The display name for the ceph user.
@@ -15953,7 +16733,7 @@ spec:
                     description: 'Internally, RGW labels "operations" on persistent
                       state as `RGW_OP_TYPE_READ` (`read`), `RGW_OP_TYPE_WRITE` (`write`),
                       or `RGW_OP_TYPE_DELETE` (`delete`). All RGW users have an "operation
-                      mask", which does not function as mask or filter as is typically
+                      mask", which does not function as a mask or filter as is typically
                       implied by the word "mask", but as a set of allowed or permissible
                       "operation" types the user is able to perform. The "operation
                       mask" is applied regardless of the bucket or IAM policy. For
@@ -16005,6 +16785,9 @@ spec:
                   description: The store the user will be created in
                   type: string
               type: object
+              x-kubernetes-validations:
+                - message: defaultStorageClass requires defaultPlacement
+                  rule: '!has(self.defaultStorageClass) || has(self.defaultPlacement)'
             status:
               description: ObjectStoreUserStatus represents the status Ceph Object
                 Store Gateway User
@@ -16104,7 +16887,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: ObjectZoneGroupSpec represent the spec of an ObjectZoneGroup
+              description: ObjectZoneGroupSpec represents the spec of a CephObjectZoneGroup
               properties:
                 realm:
                   description: The name of the realm the zone group is a member of.
@@ -16134,7 +16917,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -16204,7 +16987,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: ObjectZoneSpec represent the spec of an ObjectZone
+              description: ObjectZoneSpec represents the spec of a CephObjectZone
               properties:
                 customEndpoints:
                   description: |-
@@ -16279,6 +17062,22 @@ spec:
                             This is the number of OSDs that can be lost simultaneously before data cannot be recovered.
                           minimum: 0
                           type: integer
+                        crushNumFailureDomains:
+                          description: |-
+                            Number of failure domains to use for erasure coded chunk placement.
+                            When specified along with crushOSDsPerFailureDomain, a CRUSH MSR rule will be created
+                            that distributes chunks across this many failure domains.
+                          format: int32
+                          minimum: 1
+                          type: integer
+                        crushOSDsPerFailureDomain:
+                          description: |-
+                            Number of OSDs allowed per failure domain for erasure coded chunk placement.
+                            When specified along with crushNumFailureDomains, a CRUSH MSR rule will be created
+                            that allows up to this many chunks on OSDs within each failure domain.
+                          format: int32
+                          minimum: 1
+                          type: integer
                         dataChunks:
                           description: |-
                             Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).
@@ -16286,10 +17085,29 @@ spec:
                             as dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.
                           minimum: 0
                           type: integer
+                        stripeUnit:
+                          anyOf:
+                            - type: integer
+                            - type: string
+                          description: |-
+                            Erasure code stripe size in bytes. Ceph default is 4096 bytes (4 KiB).
+                            Value must be a multiple of 4096 (4Ki).
+                          enum:
+                            - 4Ki
+                            - 16Ki
+                            - 64Ki
+                            - 256Ki
+                            - 1Mi
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
                       required:
                         - codingChunks
                         - dataChunks
                       type: object
+                      x-kubernetes-validations:
+                        - message: crushNumFailureDomains and crushOSDsPerFailureDomain
+                            must be specified together
+                          rule: has(self.crushNumFailureDomains) == has(self.crushOSDsPerFailureDomain)
                     failureDomain:
                       description: 'The failure domain: osd/host/(region or zone if
                         available) - technically also any type in the crush map'
@@ -16327,7 +17145,7 @@ spec:
                               scheduling settings of a mirrored pool
                             properties:
                               interval:
-                                description: Interval represent the periodicity of
+                                description: Interval represents the periodicity of
                                   the snapshot.
                                 type: string
                               path:
@@ -16495,6 +17313,22 @@ spec:
                             This is the number of OSDs that can be lost simultaneously before data cannot be recovered.
                           minimum: 0
                           type: integer
+                        crushNumFailureDomains:
+                          description: |-
+                            Number of failure domains to use for erasure coded chunk placement.
+                            When specified along with crushOSDsPerFailureDomain, a CRUSH MSR rule will be created
+                            that distributes chunks across this many failure domains.
+                          format: int32
+                          minimum: 1
+                          type: integer
+                        crushOSDsPerFailureDomain:
+                          description: |-
+                            Number of OSDs allowed per failure domain for erasure coded chunk placement.
+                            When specified along with crushNumFailureDomains, a CRUSH MSR rule will be created
+                            that allows up to this many chunks on OSDs within each failure domain.
+                          format: int32
+                          minimum: 1
+                          type: integer
                         dataChunks:
                           description: |-
                             Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).
@@ -16502,10 +17336,29 @@ spec:
                             as dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.
                           minimum: 0
                           type: integer
+                        stripeUnit:
+                          anyOf:
+                            - type: integer
+                            - type: string
+                          description: |-
+                            Erasure code stripe size in bytes. Ceph default is 4096 bytes (4 KiB).
+                            Value must be a multiple of 4096 (4Ki).
+                          enum:
+                            - 4Ki
+                            - 16Ki
+                            - 64Ki
+                            - 256Ki
+                            - 1Mi
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
                       required:
                         - codingChunks
                         - dataChunks
                       type: object
+                      x-kubernetes-validations:
+                        - message: crushNumFailureDomains and crushOSDsPerFailureDomain
+                            must be specified together
+                          rule: has(self.crushNumFailureDomains) == has(self.crushOSDsPerFailureDomain)
                     failureDomain:
                       description: 'The failure domain: osd/host/(region or zone if
                         available) - technically also any type in the crush map'
@@ -16543,7 +17396,7 @@ spec:
                               scheduling settings of a mirrored pool
                             properties:
                               interval:
-                                description: Interval represent the periodicity of
+                                description: Interval represents the periodicity of
                                   the snapshot.
                                 type: string
                               path:
@@ -16787,7 +17640,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -17527,7 +18380,7 @@ spec:
                       status:
                         type: string
                       type:
-                        description: ConditionType represent a resource's status
+                        description: ConditionType represents a resource's status
                         type: string
                     type: object
                   type: array
@@ -17553,6 +18406,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: objectbucketclaims.objectbucket.io
 spec:
@@ -17567,28 +18421,96 @@ spec:
     singular: objectbucketclaim
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - description: StorageClass
+          jsonPath: .spec.storageClassName
+          name: StorageClass
+          type: string
+        - description: Phase
+          jsonPath: .status.phase
+          name: Phase
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1alpha1
       schema:
         openAPIV3Schema:
+          description: ObjectBucketClaim is the Schema for the objectbucketclaims
+            API
           properties:
+            apiVersion:
+              description: |-
+                APIVersion defines the versioned schema of this representation of an object.
+                Servers should convert recognized schemas to the latest internal value, and
+                may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+              type: string
+            kind:
+              description: |-
+                Kind is a string value representing the REST resource this object represents.
+                Servers may infer this from the endpoint the client submits requests to.
+                Cannot be updated.
+                In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+              type: string
+            metadata:
+              type: object
             spec:
+              description: ObjectBucketClaimSpec defines the desired state of ObjectBucketClaim
               properties:
                 additionalConfig:
-                  nullable: true
+                  additionalProperties:
+                    type: string
+                  description: |-
+                    AdditionalConfig gives providers a location to set
+                    proprietary config values (tenant, namespace, etc)
                   type: object
-                  x-kubernetes-preserve-unknown-fields: true
                 bucketName:
+                  description: |-
+                    BucketName (not recommended) the name of the bucket.  Caution!
+                    In-store bucket names may collide across namespaces.  If you define
+                    the name yourself, try to make it as unique as possible.
                   type: string
                 generateBucketName:
+                  description: |-
+                    GenerateBucketName (recommended) a prefix for a bucket name to be
+                    followed by a hyphen and 5 random characters. Protects against
+                    in-store name collisions.
                   type: string
                 objectBucketName:
+                  description: |-
+                    ObjectBucketName is the name of the object bucket resource. This is the authoritative
+                    determination for binding.
                   type: string
                 storageClassName:
+                  description: StorageClass names the StorageClass object representing
+                    the desired provisioner and parameters
+                  minLength: 1
+                  type: string
+              required:
+                - storageClassName
+              type: object
+              x-kubernetes-validations:
+                - message: bucketName is immutable once set
+                  rule: '!has(oldSelf.bucketName) || oldSelf.bucketName == "" || self.bucketName
+                    == oldSelf.bucketName'
+                - message: generateBucketName is immutable once set
+                  rule: '!has(oldSelf.generateBucketName) || oldSelf.generateBucketName
+                    == "" || self.generateBucketName == oldSelf.generateBucketName'
+            status:
+              description: ObjectBucketClaimStatus defines the observed state of ObjectBucketClaim
+              properties:
+                phase:
+                  description: ObjectBucketClaimStatusPhase is set by the controller
+                    to save the state of the provisioning process.
+                  enum:
+                    - Pending
+                    - Bound
+                    - Released
+                    - Failed
                   type: string
               type: object
-            status:
-              type: object
-              x-kubernetes-preserve-unknown-fields: true
           type: object
       served: true
       storage: true
@@ -17599,6 +18521,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: objectbuckets.objectbucket.io
 spec:
@@ -17613,39 +18536,119 @@ spec:
     singular: objectbucket
   scope: Cluster
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - description: StorageClass
+          jsonPath: .spec.storageClassName
+          name: StorageClass
+          type: string
+        - description: ClaimNamespace
+          jsonPath: .spec.claimRef.namespace
+          name: ClaimNamespace
+          type: string
+        - description: ClaimName
+          jsonPath: .spec.claimRef.name
+          name: ClaimName
+          type: string
+        - description: ReclaimPolicy
+          jsonPath: .spec.reclaimPolicy
+          name: ReclaimPolicy
+          type: string
+        - description: Phase
+          jsonPath: .status.phase
+          name: Phase
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1alpha1
       schema:
         openAPIV3Schema:
+          description: ObjectBucket is the Schema for the objectbuckets API
           properties:
+            apiVersion:
+              description: |-
+                APIVersion defines the versioned schema of this representation of an object.
+                Servers should convert recognized schemas to the latest internal value, and
+                may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+              type: string
+            kind:
+              description: |-
+                Kind is a string value representing the REST resource this object represents.
+                Servers may infer this from the endpoint the client submits requests to.
+                Cannot be updated.
+                In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+              type: string
+            metadata:
+              type: object
             spec:
+              description: |-
+                ObjectBucketSpec defines the desired state of ObjectBucket. Fields defined here should be normal among all providers.
+                Authentication must be of a type defined in this package to pass type checks in reconciler
               properties:
                 additionalState:
-                  nullable: true
-                  type: object
-                  x-kubernetes-preserve-unknown-fields: true
-                authentication:
-                  items:
-                    type: object
-                    x-kubernetes-preserve-unknown-fields: true
-                  nullable: true
+                  additionalProperties:
+                    type: string
                   type: object
                 claimRef:
-                  nullable: true
+                  description: ObjectReference contains enough information to let
+                    you inspect or modify the referred object.
+                  properties:
+                    apiVersion:
+                      description: API version of the referent.
+                      type: string
+                    fieldPath:
+                      description: |-
+                        If referring to a piece of an object instead of an entire object, this string
+                        should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                        For example, if the object reference is to a container within a pod, this would take on a value like:
+                        "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                        the event) or if no container name is specified "spec.containers[2]" (container with
+                        index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                        referencing a part of an object.
+                      type: string
+                    kind:
+                      description: |-
+                        Kind of the referent.
+                        More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+                      type: string
+                    name:
+                      description: |-
+                        Name of the referent.
+                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      type: string
+                    namespace:
+                      description: |-
+                        Namespace of the referent.
+                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+                      type: string
+                    resourceVersion:
+                      description: |-
+                        Specific resourceVersion to which this reference is made, if any.
+                        More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+                      type: string
+                    uid:
+                      description: |-
+                        UID of the referent.
+                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
+                      type: string
                   type: object
-                  x-kubernetes-preserve-unknown-fields: true
+                  x-kubernetes-map-type: atomic
                 endpoint:
-                  nullable: true
+                  description: |-
+                    Endpoint contains all connection relevant data that an app may require for accessing
+                    the bucket
                   properties:
                     additionalConfig:
-                      nullable: true
+                      additionalProperties:
+                        type: string
                       type: object
-                      x-kubernetes-preserve-unknown-fields: true
                     bucketHost:
                       type: string
                     bucketName:
                       type: string
                     bucketPort:
-                      format: int32
                       type: integer
                     region:
                       type: string
@@ -17653,13 +18656,30 @@ spec:
                       type: string
                   type: object
                 reclaimPolicy:
+                  description: PersistentVolumeReclaimPolicy describes a policy for
+                    end-of-life maintenance of persistent volumes.
+                  enum:
+                    - Recycle
+                    - Retain
+                    - Delete
                   type: string
                 storageClassName:
                   type: string
+              required:
+                - storageClassName
               type: object
             status:
+              description: ObjectBucketStatus defines the observed state of ObjectBucket
+              properties:
+                phase:
+                  description: ObjectBucketStatusPhase is set by the controller to
+                    save the state of the provisioning process.
+                  enum:
+                    - Bound
+                    - Released
+                    - Failed
+                  type: string
               type: object
-              x-kubernetes-preserve-unknown-fields: true
           type: object
       served: true
       storage: true

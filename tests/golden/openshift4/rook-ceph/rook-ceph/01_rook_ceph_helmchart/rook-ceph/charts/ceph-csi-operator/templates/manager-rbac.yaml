@@ -5,8 +5,8 @@ metadata:
     app.kubernetes.io/instance: syn-rook-ceph
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ceph-csi
-    app.kubernetes.io/version: v0.6.0
-    helm.sh/chart: ceph-csi-operator-0.6.0
+    app.kubernetes.io/version: v1.1.0
+    helm.sh/chart: ceph-csi-operator-1.1.0
   name: ceph-csi-manager-role
 rules:
   - apiGroups:
@@ -23,6 +23,13 @@ rules:
       - update
       - watch
   - apiGroups:
+      - ''
+    resources:
+      - nodes
+    verbs:
+      - list
+      - watch
+  - apiGroups:
       - apps
     resources:
       - daemonsets
@@ -34,14 +41,6 @@ rules:
       - list
       - patch
       - update
-      - watch
-  - apiGroups:
-      - cbt.storage.k8s.io
-    resources:
-      - snapshotmetadataservices
-    verbs:
-      - get
-      - list
       - watch
   - apiGroups:
       - csi.ceph.io
@@ -57,6 +56,7 @@ rules:
       - csi.ceph.io
     resources:
       - clientprofilemappings
+      - clientprofilereplications
       - clientprofiles
       - drivers
     verbs:
@@ -71,6 +71,7 @@ rules:
       - csi.ceph.io
     resources:
       - clientprofilemappings/finalizers
+      - clientprofilereplications/finalizers
       - clientprofiles/finalizers
       - drivers/finalizers
     verbs:
@@ -79,6 +80,7 @@ rules:
       - csi.ceph.io
     resources:
       - clientprofilemappings/status
+      - clientprofilereplications/status
       - clientprofiles/status
       - drivers/status
     verbs:
@@ -92,6 +94,18 @@ rules:
     verbs:
       - get
       - list
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
       - watch
   - apiGroups:
       - storage.k8s.io
@@ -113,8 +127,8 @@ metadata:
     app.kubernetes.io/instance: syn-rook-ceph
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ceph-csi
-    app.kubernetes.io/version: v0.6.0
-    helm.sh/chart: ceph-csi-operator-0.6.0
+    app.kubernetes.io/version: v1.1.0
+    helm.sh/chart: ceph-csi-operator-1.1.0
   name: ceph-csi-manager-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -122,5 +136,5 @@ roleRef:
   name: ceph-csi-manager-role
 subjects:
   - kind: ServiceAccount
-    name: ceph-csi-controller-manager
+    name: ceph-csi
     namespace: syn-rook-ceph-operator

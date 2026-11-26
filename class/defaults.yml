@@ -343,6 +343,9 @@ parameters:
           requests:
             cpu: "2"
             memory: 5Gi
+      security:
+        cephx:
+          allowedCiphers: [aes256k]
       storage:
         useAllNodes: false
         useAllDevices: false

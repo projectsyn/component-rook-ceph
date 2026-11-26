@@ -62,6 +62,10 @@ spec:
       requests:
         cpu: '2'
         memory: 5Gi
+  security:
+    cephx:
+      allowedCiphers:
+        - aes256k
   storage:
     storageClassDeviceSets:
       - count: 3

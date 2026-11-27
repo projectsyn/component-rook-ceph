@@ -247,7 +247,7 @@ parameters:
       cephcsi:
         registry: quay.io
         image: cephcsi/cephcsi
-        tag: v3.17.2
+        tag: v3.18.2
       ceph-csi-operator:
         registry: quay.io
         image: cephcsi/ceph-csi-operator
